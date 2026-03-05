@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeaderScope — Evaluación de Liderazgo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0e17;
+    --paper: #fffcf5;
+    --cream: #f5f0e8;
+    --gold: #c9a84c;
+    --gold-light: #e8d5a3;
+    --rust: #c0392b;
+    --teal: #1a6b6b;
+    --teal-light: #e8f4f4;
+    --mid: #6b6560;
+    --border: #d8d0c4;
+    --shadow: rgba(15,14,23,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; }
+  .logo span { color: var(--gold); }
+  .nav-tabs { display: flex; gap: 0.25rem; }
+  .nav-tab {
+    padding: 0.5rem 1.25rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+    font-weight: 500; letter-spacing: 0.3px; transition: all 0.2s; color: rgba(255,255,255,0.6);
+    border: none; background: transparent;
+  }
+  .nav-tab.active, .nav-tab:hover { background: rgba(201,168,76,0.2); color: var(--gold); }
+
+  /* LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--ink) 0%, #1a1926 100%);
+    color: var(--paper); border-radius: 16px; padding: 3rem 2.5rem;
+    margin-bottom: 2rem; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '◈'; position: absolute; right: -30px; top: -40px;
+    font-size: 200px; color: rgba(201,168,76,0.06); font-family: serif;
+  }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 900; line-height: 1.1; }
+  .hero h1 em { color: var(--gold); font-style: normal; }
+  .hero p { margin-top: 1rem; color: rgba(255,255,255,0.65); font-size: 1.05rem; max-width: 500px; line-height: 1.6; }
+  .hero-stats { display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat .num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--gold); }
+  .hero-stat .lbl { font-size: 0.75rem; color: rgba(255,255,255,0.5); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+
+  /* CARD */
+  .card {
+    background: white; border: 1px solid var(--border); border-radius: 12px;
+    padding: 2rem; margin-bottom: 1.5rem;
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700;
+    color: var(--ink); margin-bottom: 1.5rem; padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--gold-light); display: flex; align-items: center; gap: 0.5rem;
+  }
+  .card-title .icon { font-size: 1.1rem; }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group.full { grid-column: 1/-1; }
+  label { font-size: 0.82rem; font-weight: 600; color: var(--mid); letter-spacing: 0.5px; text-transform: uppercase; }
+  input, select, textarea {
+    padding: 0.7rem 1rem; border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--ink);
+    background: var(--paper); transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--teal); }
+
+  /* CATEGORIES */
+  .categories { display: flex; flex-direction: column; gap: 2rem; }
+  .category {
+    border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    box-shadow: 0 1px 6px var(--shadow);
+  }
+  .category-header {
+    padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.75rem;
+    font-weight: 600; font-size: 0.95rem; letter-spacing: 0.3px;
+  }
+  .category-body { background: white; padding: 1rem 1.5rem; }
+  .cat-1 .category-header { background: #1a6b6b; color: white; }
+  .cat-2 .category-header { background: #7b3f00; color: white; }
+  .cat-3 .category-header { background: #2c4a7c; color: white; }
+  .cat-4 .category-header { background: #5a2d82; color: white; }
+  .cat-5 .category-header { background: #8b2635; color: white; }
+
+  /* LIKERT */
+  .question { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #f0ece4; }
+  .question:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .q-text { font-size: 0.95rem; color: var(--ink); margin-bottom: 0.85rem; line-height: 1.5; font-weight: 500; }
+  .likert-scale { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
+  .likert-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--mid); margin-top: 0.4rem; }
+  .likert-btn {
+    flex: 1; min-width: 40px; padding: 0.5rem 0.25rem; border: 1.5px solid var(--border);
+    border-radius: 8px; cursor: pointer; text-align: center; font-size: 0.85rem; font-weight: 600;
+    transition: all 0.18s; background: var(--paper); color: var(--mid);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .likert-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+  .likert-btn.selected { background: var(--teal); border-color: var(--teal); color: white; }
+  .likert-btn[data-val="1"].selected { background: #c0392b; border-color: #c0392b; }
+  .likert-btn[data-val="2"].selected { background: #e67e22; border-color: #e67e22; }
+  .likert-btn[data-val="3"].selected { background: #f1c40f; border-color: #f1c40f; color: #333; }
+  .likert-btn[data-val="4"].selected { background: #27ae60; border-color: #27ae60; }
+  .likert-btn[data-val="5"].selected { background: #1a6b6b; border-color: #1a6b6b; }
+  .likert-legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: var(--cream); border-radius: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--mid); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* BUTTONS */
+  .btn {
+    padding: 0.75rem 2rem; border: none; border-radius: 8px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600;
+    transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-primary { background: var(--teal); color: white; }
+  .btn-primary:hover { background: #14585a; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,107,107,0.3); }
+  .btn-gold { background: var(--gold); color: var(--ink); }
+  .btn-gold:hover { background: #b8953e; transform: translateY(-1px); }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--mid); }
+  .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+  .btn-danger { background: var(--rust); color: white; }
+  .btn-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+
+  /* PROGRESS */
+  .progress-bar { height: 6px; background: var(--border); border-radius: 3px; margin: 1rem 0; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--gold)); border-radius: 3px; transition: width 0.4s ease; }
+
+  /* REPORTS */
+  .report-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+  }
+  .leaders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+  .leader-card {
+    background: white; border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.5rem; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .leader-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--shadow); border-color: var(--gold); }
+  .leader-card.selected { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(26,107,107,0.15); }
+  .leader-name { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .leader-role { font-size: 0.82rem; color: var(--mid); margin-bottom: 1rem; }
+  .leader-score { display: flex; align-items: baseline; gap: 0.3rem; }
+  .score-num { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; color: var(--teal); }
+  .score-max { font-size: 0.85rem; color: var(--mid); }
+  .score-label { font-size: 0.78rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 20px; margin-left: auto; }
+  .eval-count { font-size: 0.78rem; color: var(--mid); margin-top: 0.5rem; }
+
+  /* GAUGE */
+  .gauge-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .gauge-item { padding: 1rem 1.25rem; background: var(--cream); border-radius: 10px; }
+  .gauge-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--mid); font-weight: 600; margin-bottom: 0.5rem; }
+  .gauge-val { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; }
+  .gauge-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 0.5rem; }
+  .gauge-fill { height: 100%; border-radius: 2px; background: var(--teal); }
+
+  /* CATEGORY SCORES */
+  .cat-score-list { display: flex; flex-direction: column; gap: 0.85rem; }
+  .cat-score-item { display: flex; align-items: center; gap: 1rem; }
+  .cat-score-name { font-size: 0.88rem; font-weight: 600; min-width: 160px; }
+  .cat-score-bar { flex: 1; height: 12px; background: var(--border); border-radius: 6px; overflow: hidden; }
+  .cat-score-fill { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
+  .cat-score-num { font-weight: 700; font-size: 0.9rem; min-width: 40px; text-align: right; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { background: var(--ink); color: var(--paper); padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; letter-spacing: 0.5px; text-transform: uppercase; }
+  td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); }
+  tr:hover td { background: var(--cream); }
+
+  /* BADGE */
+  .badge {
+    display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 600;
+  }
+  .badge-excellent { background: #d4f4e8; color: #1a7a4a; }
+  .badge-good { background: #d9f0e8; color: #27ae60; }
+  .badge-average { background: #fef9c3; color: #a16207; }
+  .badge-below { background: #fee2e2; color: #dc2626; }
+
+  /* EMPTY STATE */
+  .empty { text-align: center; padding: 3rem; color: var(--mid); }
+  .empty .big { font-size: 3rem; margin-bottom: 1rem; }
+  .empty p { font-size: 1rem; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 2rem; right: 2rem; background: var(--ink); color: white;
+    padding: 1rem 1.5rem; border-radius: 10px; font-size: 0.9rem; font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 999;
+    transform: translateY(100px); opacity: 0; transition: all 0.35s ease;
+    max-width: 320px; border-left: 4px solid var(--gold);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* RESPONDENT INFO */
+  .info-strip { background: var(--teal-light); border: 1px solid rgba(26,107,107,0.2); border-radius: 10px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--teal); font-weight: 500; }
+
+  /* MODAL */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; }
+  .overlay.open { display: flex; }
+  .modal { background: white; border-radius: 16px; padding: 2rem; max-width: 480px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 1rem; }
+
+  @media(max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .gauge-row { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Leader<span>Scope</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('home')">Inicio</button>
+    <button class="nav-tab" onclick="showSection('lideres')">Líderes</button>
+    <button class="nav-tab" onclick="showSection('evaluar')">Evaluar</button>
+    <button class="nav-tab" onclick="showSection('reportes')">Reportes</button>
+  </div>
+</nav>
+
+<!-- ===================== HOME ===================== -->
+<div id="home" class="section active">
+  <div class="container">
+    <div class="hero">
+      <h1>Evaluación de<br><em>Liderazgo 360°</em></h1>
+      <p>Plataforma para evaluar habilidades de gestión, liderazgo y competencias blandas de tus líderes, usando escala Likert validada.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="num" id="stat-lideres">0</div><div class="lbl">Líderes</div></div>
+        <div class="hero-stat"><div class="num" id="stat-evals">0</div><div class="lbl">Evaluaciones</div></div>
+        <div class="hero-stat"><div class="num" id="stat-promedio">—</div><div class="lbl">Prom. General</div></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;flex-wrap:wrap;">
+      <div class="card" style="cursor:pointer" onclick="showSection('lideres')">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">👤</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Gestionar Líderes</div>
+        <div style="font-size:0.85rem;color:var(--mid);line-height:1.5;">Registra y administra los líderes a evaluar.</div>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="showSection('evaluar')">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">📋</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Realizar Evaluación</div>
+        <div style="font-size:0.85rem;color:var(--mid);line-height:1.5;">Subalternos evalúan a sus líderes en 5 categorías clave.</div>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="showSection('reportes')">
+        <div style="font-size:2rem;margin-bottom:0.75rem;">📊</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Ver Reportes</div>
+        <div style="font-size:0.85rem;color:var(--mid);line-height:1.5;">Analiza resultados generales e individuales por categoría.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1.5rem;">
+      <div class="card-title"><span class="icon">🎯</span> Categorías de Evaluación</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;">
+        <div style="padding:1rem;border-radius:8px;background:#e8f4f4;border-left:4px solid #1a6b6b;">
+          <div style="font-weight:700;font-size:0.9rem;color:#1a6b6b;">🧭 Liderazgo</div>
+          <div style="font-size:0.78rem;color:var(--mid);margin-top:0.3rem;">Visión, motivación, inspiración</div>
+        </div>
+        <div style="padding:1rem;border-radius:8px;background:#fdf3e7;border-left:4px solid #e67e22;">
+          <div style="font-weight:700;font-size:0.9rem;color:#c06000;">⚙️ Gestión</div>
+          <div style="font-size:0.78rem;color:var(--mid);margin-top:0.3rem;">Planificación, organización, resultados</div>
+        </div>
+        <div style="padding:1rem;border-radius:8px;background:#eaf0fb;border-left:4px solid #2c4a7c;">
+          <div style="font-weight:700;font-size:0.9rem;color:#2c4a7c;">💬 Comunicación</div>
+          <div style="font-size:0.78rem;color:var(--mid);margin-top:0.3rem;">Claridad, escucha, feedback</div>
+        </div>
+        <div style="padding:1rem;border-radius:8px;background:#f5eefb;border-left:4px solid #5a2d82;">
+          <div style="font-weight:700;font-size:0.9rem;color:#5a2d82;">🤝 Inteligencia Emocional</div>
+          <div style="font-size:0.78rem;color:var(--mid);margin-top:0.3rem;">Empatía, manejo de conflictos</div>
+        </div>
+        <div style="padding:1rem;border-radius:8px;background:#fbeaec;border-left:4px solid #8b2635;">
+          <div style="font-weight:700;font-size:0.9rem;color:#8b2635;">🌱 Desarrollo de Equipo</div>
+          <div style="font-size:0.78rem;color:var(--mid);margin-top:0.3rem;">Coaching, delegación, reconocimiento</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== LÍDERES ===================== -->
+<div id="lideres" class="section">
+  <div class="container">
+    <div class="card">
+      <div class="card-title"><span class="icon">➕</span> Registrar Nuevo Líder</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre Completo</label>
+          <input type="text" id="l-nombre" placeholder="Ej: Carlos Mendoza">
+        </div>
+        <div class="form-group">
+          <label>Cargo / Rol</label>
+          <input type="text" id="l-cargo" placeholder="Ej: Gerente Comercial">
+        </div>
+        <div class="form-group">
+          <label>Área / Departamento</label>
+          <input type="text" id="l-area" placeholder="Ej: Ventas">
+        </div>
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input type="email" id="l-email" placeholder="correo@empresa.com">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="registrarLider()">✓ Registrar Líder</button>
+        <button class="btn btn-ghost" onclick="limpiarFormLider()">Limpiar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">👥</span> Líderes Registrados</div>
+      <div id="lideres-lista"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== EVALUAR ===================== -->
+<div id="evaluar" class="section">
+  <div class="container">
+    <div class="card" id="eval-step-1">
+      <div class="card-title"><span class="icon">📋</span> Información del Evaluador</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Tu Nombre</label>
+          <input type="text" id="ev-nombre" placeholder="Nombre del evaluador">
+        </div>
+        <div class="form-group">
+          <label>Tu Cargo</label>
+          <input type="text" id="ev-cargo" placeholder="Tu cargo en la empresa">
+        </div>
+        <div class="form-group full">
+          <label>Líder a Evaluar</label>
+          <select id="ev-lider">
+            <option value="">— Selecciona un líder —</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="iniciarEvaluacion()">Comenzar Evaluación →</button>
+      </div>
+    </div>
+
+    <div id="eval-formulario" style="display:none;">
+      <div class="info-strip" id="eval-info-strip"></div>
+
+      <div class="likert-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div> 1 - Nunca</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div> 2 - Rara vez</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f1c40f"></div> 3 - A veces</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#27ae60"></div> 4 - Frecuentemente</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1a6b6b"></div> 5 - Siempre</div>
+      </div>
+
+      <div class="progress-bar"><div class="progress-fill" id="eval-progress" style="width:0%"></div></div>
+      <div style="font-size:0.8rem;color:var(--mid);margin-bottom:1.5rem;" id="eval-progress-label"></div>
+
+      <div class="categories" id="eval-categories"></div>
+
+      <div class="btn-row" style="margin-top:2rem;">
+        <button class="btn btn-gold" onclick="enviarEvaluacion()">📤 Enviar Evaluación</button>
+        <button class="btn btn-ghost" onclick="cancelarEvaluacion()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== REPORTES ===================== -->
+<div id="reportes" class="section">
+  <div class="container">
+    <div class="report-header">
+      <div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;">Reportes de Desempeño</h2>
+        <p style="color:var(--mid);margin-top:0.25rem;font-size:0.9rem;">Resultados en escala Likert 1–5</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="toggleReporte('general')" id="btn-general">📊 Reporte General</button>
+        <button class="btn btn-ghost" onclick="toggleReporte('individual')" id="btn-individual">👤 Individual</button>
+        <button class="btn btn-danger" onclick="confirmarLimpiar()" style="font-size:0.82rem;padding:0.5rem 1rem;">🗑 Limpiar BD</button>
+      </div>
+    </div>
+
+    <!-- GENERAL -->
+    <div id="reporte-general" style="display:none;">
+      <div class="card">
+        <div class="card-title"><span class="icon">🌐</span> Resumen General de Todos los Líderes</div>
+        <div id="reporte-general-content"></div>
+      </div>
+    </div>
+
+    <!-- INDIVIDUAL -->
+    <div id="reporte-individual" style="display:none;">
+      <div class="leaders-grid" id="leaders-selector"></div>
+      <div id="reporte-individual-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR -->
+<div class="overlay" id="confirm-overlay">
+  <div class="modal">
+    <h3>⚠️ ¿Limpiar base de datos?</h3>
+    <p style="color:var(--mid);margin-bottom:1.5rem;line-height:1.6;">Esto eliminará todos los líderes y evaluaciones registradas. Esta acción no se puede deshacer.</p>
+    <div style="display:flex;gap:1rem;">
+      <button class="btn btn-danger" onclick="limpiarTodo()">Sí, eliminar todo</button>
+      <button class="btn btn-ghost" onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== DATA ==========
+const PREGUNTAS = {
+  liderazgo: {
+    nombre: "🧭 Liderazgo e Inspiración",
+    color: "#1a6b6b",
+    cls: "cat-1",
+    preguntas: [
+      "Comunica una visión clara y motivadora para el equipo",
+      "Inspira a los colaboradores a dar lo mejor de sí mismos",
+      "Da el ejemplo con su actitud y comportamiento",
+      "Toma decisiones con seguridad incluso en situaciones difíciles",
+      "Genera confianza y credibilidad en el equipo"
+    ]
+  },
+  gestion: {
+    nombre: "⚙️ Gestión y Resultados",
+    color: "#7b3f00",
+    cls: "cat-2",
+    preguntas: [
+      "Planifica y organiza el trabajo de manera efectiva",
+      "Establece metas claras y alcanzables para el equipo",
+      "Monitorea el avance de tareas y proyectos",
+      "Toma acciones correctivas cuando los resultados no son los esperados",
+      "Optimiza los recursos disponibles para lograr los objetivos"
+    ]
+  },
+  comunicacion: {
+    nombre: "💬 Comunicación",
+    color: "#2c4a7c",
+    cls: "cat-3",
+    preguntas: [
+      "Se expresa de forma clara y comprensible",
+      "Escucha activamente las ideas y preocupaciones del equipo",
+      "Brinda retroalimentación constructiva y oportuna",
+      "Mantiene informado al equipo sobre decisiones relevantes",
+      "Fomenta un diálogo abierto y sin miedo a represalias"
+    ]
+  },
+  emocional: {
+    nombre: "🤝 Inteligencia Emocional",
+    color: "#5a2d82",
+    cls: "cat-4",
+    preguntas: [
+      "Demuestra empatía ante las situaciones personales del equipo",
+      "Maneja sus emociones con madurez ante la presión",
+      "Resuelve conflictos de manera justa y efectiva",
+      "Respeta la diversidad de opiniones y estilos de trabajo",
+      "Mantiene una actitud positiva y resiliente frente a los cambios"
+    ]
+  },
+  desarrollo: {
+    nombre: "🌱 Desarrollo del Equipo",
+    color: "#8b2635",
+    cls: "cat-5",
+    preguntas: [
+      "Brinda oportunidades de aprendizaje y crecimiento profesional",
+      "Delega responsabilidades de forma apropiada",
+      "Reconoce y valora los logros individuales y del equipo",
+      "Apoya el desarrollo de habilidades de cada colaborador",
+      "Promueve el trabajo en equipo y la colaboración"
+    ]
+  }
+};
+
+let db = { lideres: [], evaluaciones: [] };
+let evalActual = null;
+let reporteActivo = null;
+let liderSeleccionado = null;
+
+function cargarDB() {
+  try {
+    const saved = localStorage.getItem('leaderscope_db');
+    if (saved) db = JSON.parse(saved);
+  } catch(e) {}
+}
+function guardarDB() {
+  try { localStorage.setItem('leaderscope_db', JSON.stringify(db)); } catch(e) {}
+}
+cargarDB();
+
+// ========== NAV ==========
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const tabs = ['home','lideres','evaluar','reportes'];
+  const idx = tabs.indexOf(id);
+  document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+
+  if (id === 'home') actualizarStats();
+  if (id === 'lideres') renderLideres();
+  if (id === 'evaluar') { document.getElementById('eval-step-1').style.display=''; document.getElementById('eval-formulario').style.display='none'; cargarSelectLideres(); }
+  if (id === 'reportes') { reporteActivo = null; document.getElementById('reporte-general').style.display='none'; document.getElementById('reporte-individual').style.display='none'; }
+}
+
+// ========== STATS ==========
+function actualizarStats() {
+  document.getElementById('stat-lideres').textContent = db.lideres.length;
+  document.getElementById('stat-evals').textContent = db.evaluaciones.length;
+  if (db.evaluaciones.length > 0) {
+    const total = db.evaluaciones.reduce((a,e) => a + e.puntajeGlobal, 0);
+    document.getElementById('stat-promedio').textContent = (total/db.evaluaciones.length).toFixed(2);
+  } else {
+    document.getElementById('stat-promedio').textContent = '—';
+  }
+}
+
+// ========== LÍDERES ==========
+function registrarLider() {
+  const nombre = document.getElementById('l-nombre').value.trim();
+  const cargo = document.getElementById('l-cargo').value.trim();
+  const area = document.getElementById('l-area').value.trim();
+  const email = document.getElementById('l-email').value.trim();
+  if (!nombre || !cargo) return toast('⚠️ Nombre y cargo son obligatorios');
+  db.lideres.push({ id: Date.now(), nombre, cargo, area, email, fechaRegistro: new Date().toLocaleDateString('es-PE') });
+  guardarDB();
+  limpiarFormLider();
+  renderLideres();
+  toast('✅ Líder registrado exitosamente');
+}
+function limpiarFormLider() {
+  ['l-nombre','l-cargo','l-area','l-email'].forEach(id => document.getElementById(id).value = '');
+}
+function eliminarLider(id) {
+  if (!confirm('¿Eliminar este líder y sus evaluaciones?')) return;
+  db.lideres = db.lideres.filter(l => l.id !== id);
+  db.evaluaciones = db.evaluaciones.filter(e => e.liderId !== id);
+  guardarDB(); renderLideres(); toast('Líder eliminado');
+}
+function renderLideres() {
+  const cont = document.getElementById('lideres-lista');
+  if (db.lideres.length === 0) { cont.innerHTML = '<div class="empty"><div class="big">👤</div><p>No hay líderes registrados aún.</p></div>'; return; }
+  const rows = db.lideres.map(l => {
+    const evals = db.evaluaciones.filter(e => e.liderId === l.id);
+    const prom = evals.length ? (evals.reduce((a,e) => a+e.puntajeGlobal,0)/evals.length).toFixed(2) : '—';
+    return `<tr>
+      <td><strong>${l.nombre}</strong></td>
+      <td>${l.cargo}</td>
+      <td>${l.area||'—'}</td>
+      <td>${l.email||'—'}</td>
+      <td>${evals.length}</td>
+      <td><strong>${prom}</strong></td>
+      <td>${l.fechaRegistro}</td>
+      <td><button class="btn btn-danger" style="padding:0.3rem 0.75rem;font-size:0.8rem;" onclick="eliminarLider(${l.id})">Eliminar</button></td>
+    </tr>`;
+  }).join('');
+  cont.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Nombre</th><th>Cargo</th><th>Área</th><th>Email</th><th>Evaluaciones</th><th>Promedio</th><th>Registrado</th><th></th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+// ========== EVALUAR ==========
+function cargarSelectLideres() {
+  const sel = document.getElementById('ev-lider');
+  sel.innerHTML = '<option value="">— Selecciona un líder —</option>';
+  db.lideres.forEach(l => sel.innerHTML += `<option value="${l.id}">${l.nombre} — ${l.cargo}</option>`);
+}
+function iniciarEvaluacion() {
+  const nombre = document.getElementById('ev-nombre').value.trim();
+  const cargo = document.getElementById('ev-cargo').value.trim();
+  const liderId = parseInt(document.getElementById('ev-lider').value);
+  if (!nombre || !cargo) return toast('⚠️ Completa tu información de evaluador');
+  if (!liderId) return toast('⚠️ Selecciona un líder a evaluar');
+  const lider = db.lideres.find(l => l.id === liderId);
+  evalActual = { nombre, cargo, liderId, lider, respuestas: {}, fecha: new Date().toLocaleDateString('es-PE') };
+  document.getElementById('eval-step-1').style.display = 'none';
+  document.getElementById('eval-formulario').style.display = '';
+  document.getElementById('eval-info-strip').textContent = `📋 Evaluando a: ${lider.nombre} (${lider.cargo}) · Evaluador: ${nombre}`;
+  renderEvalForm();
+}
+function renderEvalForm() {
+  const cont = document.getElementById('eval-categories');
+  cont.innerHTML = '';
+  Object.entries(PREGUNTAS).forEach(([key, cat]) => {
+    const pregs = cat.preguntas.map((p, i) => {
+      const qid = `${key}_${i}`;
+      const btns = [1,2,3,4,5].map(v =>
+        `<button class="likert-btn" data-val="${v}" data-qid="${qid}" onclick="selLikert('${qid}',${v},this)">${v}</button>`
+      ).join('');
+      return `<div class="question" id="q-${qid}">
+        <div class="q-text">${i+1}. ${p}</div>
+        <div class="likert-scale">${btns}</div>
+      </div>`;
+    }).join('');
+    cont.innerHTML += `<div class="category ${cat.cls}">
+      <div class="category-header"><span style="font-size:1.2rem">${cat.nombre.split(' ')[0]}</span><span>${cat.nombre.split(' ').slice(1).join(' ')}</span></div>
+      <div class="category-body">${pregs}</div>
+    </div>`;
+  });
+  actualizarProgreso();
+}
+function selLikert(qid, val, btn) {
+  evalActual.respuestas[qid] = val;
+  const btns = btn.parentElement.querySelectorAll('.likert-btn');
+  btns.forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  actualizarProgreso();
+}
+function actualizarProgreso() {
+  const total = Object.values(PREGUNTAS).reduce((a,c) => a + c.preguntas.length, 0);
+  const resp = Object.keys(evalActual.respuestas).length;
+  const pct = Math.round(resp/total*100);
+  document.getElementById('eval-progress').style.width = pct+'%';
+  document.getElementById('eval-progress-label').textContent = `${resp} de ${total} preguntas respondidas (${pct}%)`;
+}
+function cancelarEvaluacion() {
+  evalActual = null;
+  document.getElementById('eval-step-1').style.display = '';
+  document.getElementById('eval-formulario').style.display = 'none';
+}
+function enviarEvaluacion() {
+  const total = Object.values(PREGUNTAS).reduce((a,c) => a + c.preguntas.length, 0);
+  if (Object.keys(evalActual.respuestas).length < total) return toast('⚠️ Responde todas las preguntas antes de enviar');
+  // Calcular puntajes por categoría
+  const porCategoria = {};
+  let sumGlobal = 0, countGlobal = 0;
+  Object.entries(PREGUNTAS).forEach(([key, cat]) => {
+    let sum = 0;
+    cat.preguntas.forEach((_, i) => { sum += evalActual.respuestas[`${key}_${i}`]; });
+    porCategoria[key] = +(sum / cat.preguntas.length).toFixed(2);
+    sumGlobal += sum; countGlobal += cat.preguntas.length;
+  });
+  const eval_data = {
+    id: Date.now(),
+    liderId: evalActual.liderId,
+    evaluadorNombre: evalActual.nombre,
+    evaluadorCargo: evalActual.cargo,
+    fecha: evalActual.fecha,
+    respuestas: { ...evalActual.respuestas },
+    porCategoria,
+    puntajeGlobal: +(sumGlobal/countGlobal).toFixed(2)
+  };
+  db.evaluaciones.push(eval_data);
+  guardarDB();
+  cancelarEvaluacion();
+  toast('🎉 Evaluación registrada exitosamente');
+  showSection('reportes');
+  setTimeout(() => toggleReporte('individual'), 400);
+}
+
+// ========== REPORTES ==========
+function toggleReporte(tipo) {
+  document.getElementById('reporte-general').style.display = 'none';
+  document.getElementById('reporte-individual').style.display = 'none';
+  document.getElementById('btn-general').classList.remove('btn-primary');
+  document.getElementById('btn-individual').classList.remove('btn-primary');
+  document.getElementById('btn-general').classList.add('btn-ghost');
+  document.getElementById('btn-individual').classList.add('btn-ghost');
+
+  if (tipo === 'general') {
+    document.getElementById('reporte-general').style.display = '';
+    document.getElementById('btn-general').classList.add('btn-primary');
+    document.getElementById('btn-general').classList.remove('btn-ghost');
+    renderReporteGeneral();
+  } else {
+    document.getElementById('reporte-individual').style.display = '';
+    document.getElementById('btn-individual').classList.add('btn-primary');
+    document.getElementById('btn-individual').classList.remove('btn-ghost');
+    renderSelectorLideres();
+  }
+}
+
+function getLabel(score) {
+  if (score >= 4.5) return ['Excelente', 'badge-excellent'];
+  if (score >= 3.5) return ['Bueno', 'badge-good'];
+  if (score >= 2.5) return ['Regular', 'badge-average'];
+  return ['Por mejorar', 'badge-below'];
+}
+
+function renderReporteGeneral() {
+  const cont = document.getElementById('reporte-general-content');
+  if (db.evaluaciones.length === 0) { cont.innerHTML = '<div class="empty"><div class="big">📊</div><p>No hay evaluaciones registradas aún.</p></div>'; return; }
+
+  const catKeys = Object.keys(PREGUNTAS);
+  const catProms = {};
+  catKeys.forEach(k => {
+    const vals = db.evaluaciones.map(e => e.porCategoria[k]);
+    catProms[k] = +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2);
+  });
+  const globalProm = +(db.evaluaciones.reduce((a,e)=>a+e.puntajeGlobal,0)/db.evaluaciones.length).toFixed(2);
+  const [lbl, cls] = getLabel(globalProm);
+
+  const catColors = { liderazgo:'#1a6b6b', gestion:'#7b3f00', comunicacion:'#2c4a7c', emocional:'#5a2d82', desarrollo:'#8b2635' };
+
+  const catBars = catKeys.map(k => {
+    const pct = (catProms[k]/5*100).toFixed(1);
+    return `<div class="cat-score-item">
+      <div class="cat-score-name">${PREGUNTAS[k].nombre}</div>
+      <div class="cat-score-bar"><div class="cat-score-fill" style="width:${pct}%;background:${catColors[k]}"></div></div>
+      <div class="cat-score-num" style="color:${catColors[k]}">${catProms[k]}</div>
+    </div>`;
+  }).join('');
+
+  // Por líder
+  const liderRows = db.lideres.map(l => {
+    const evals = db.evaluaciones.filter(e => e.liderId === l.id);
+    if (evals.length === 0) return '';
+    const prom = (evals.reduce((a,e)=>a+e.puntajeGlobal,0)/evals.length).toFixed(2);
+    const [ll, lc] = getLabel(prom);
+    return `<tr><td><strong>${l.nombre}</strong></td><td>${l.cargo}</td><td>${evals.length}</td><td><strong>${prom}/5</strong></td><td><span class="badge ${lc}">${ll}</span></td></tr>`;
+  }).join('');
+
+  cont.innerHTML = `
+    <div class="gauge-row">
+      <div class="gauge-item">
+        <div class="gauge-label">Promedio Global</div>
+        <div class="gauge-val" style="color:var(--teal)">${globalProm} <span style="font-size:1rem;color:var(--mid)">/5</span></div>
+        <div class="gauge-bar"><div class="gauge-fill" style="width:${globalProm/5*100}%"></div></div>
+      </div>
+      <div class="gauge-item">
+        <div class="gauge-label">Clasificación</div>
+        <div class="gauge-val"><span class="badge ${cls}" style="font-size:1rem;padding:0.3rem 0.8rem;">${lbl}</span></div>
+      </div>
+      <div class="gauge-item">
+        <div class="gauge-label">Total Evaluaciones</div>
+        <div class="gauge-val">${db.evaluaciones.length}</div>
+      </div>
+      <div class="gauge-item">
+        <div class="gauge-label">Líderes Evaluados</div>
+        <div class="gauge-val">${db.lideres.filter(l=>db.evaluaciones.some(e=>e.liderId===l.id)).length}</div>
+      </div>
+    </div>
+    <div style="margin:1.5rem 0;">
+      <div style="font-weight:700;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--mid);margin-bottom:1rem;">Puntaje Promedio por Categoría</div>
+      <div class="cat-score-list">${catBars}</div>
+    </div>
+    <div class="table-wrap" style="margin-top:1.5rem;">
+      <table>
+        <thead><tr><th>Líder</th><th>Cargo</th><th>Evaluaciones</th><th>Promedio</th><th>Clasificación</th></tr></thead>
+        <tbody>${liderRows || '<tr><td colspan="5" style="text-align:center;color:var(--mid)">Sin datos</td></tr>'}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderSelectorLideres() {
+  const cont = document.getElementById('leaders-selector');
+  if (db.lideres.length === 0) { cont.innerHTML = '<div class="empty"><div class="big">👤</div><p>No hay líderes registrados.</p></div>'; return; }
+  cont.innerHTML = db.lideres.map(l => {
+    const evals = db.evaluaciones.filter(e => e.liderId === l.id);
+    const prom = evals.length ? (evals.reduce((a,e)=>a+e.puntajeGlobal,0)/evals.length).toFixed(2) : null;
+    const [lbl, cls] = prom ? getLabel(parseFloat(prom)) : ['Sin evaluar', 'badge-average'];
+    return `<div class="leader-card ${liderSeleccionado===l.id?'selected':''}" onclick="verLider(${l.id})">
+      <div class="leader-name">${l.nombre}</div>
+      <div class="leader-role">${l.cargo}${l.area?' · '+l.area:''}</div>
+      <div class="leader-score">
+        <span class="score-num">${prom||'—'}</span>
+        <span class="score-max">/5</span>
+        <span class="score-label badge ${cls}">${lbl}</span>
+      </div>
+      <div class="eval-count">${evals.length} evaluación${evals.length!==1?'es':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function verLider(id) {
+  liderSeleccionado = id;
+  renderSelectorLideres();
+  const lider = db.lideres.find(l => l.id === id);
+  const evals = db.evaluaciones.filter(e => e.liderId === id);
+  const cont = document.getElementById('reporte-individual-content');
+
+  if (evals.length === 0) {
+    cont.innerHTML = `<div class="card"><div class="empty"><div class="big">📋</div><p>No hay evaluaciones para ${lider.nombre} aún.</p></div></div>`;
+    return;
+  }
+
+  const catKeys = Object.keys(PREGUNTAS);
+  const catColors = { liderazgo:'#1a6b6b', gestion:'#7b3f00', comunicacion:'#2c4a7c', emocional:'#5a2d82', desarrollo:'#8b2635' };
+  const catProms = {};
+  catKeys.forEach(k => { catProms[k] = +(evals.reduce((a,e)=>a+e.porCategoria[k],0)/evals.length).toFixed(2); });
+  const globalProm = +(evals.reduce((a,e)=>a+e.puntajeGlobal,0)/evals.length).toFixed(2);
+  const [lbl, cls] = getLabel(globalProm);
+
+  // Preguntas individuales
+  const qProms = {};
+  catKeys.forEach(k => {
+    PREGUNTAS[k].preguntas.forEach((_, i) => {
+      const qid = `${k}_${i}`;
+      qProms[qid] = +(evals.reduce((a,e) => a+(e.respuestas[qid]||0), 0)/evals.length).toFixed(2);
+    });
+  });
+
+  const catDetail = catKeys.map(k => {
+    const cat = PREGUNTAS[k];
+    const pct = (catProms[k]/5*100).toFixed(1);
+    const pregs = cat.preguntas.map((p,i) => {
+      const qid = `${k}_${i}`;
+      const v = qProms[qid];
+      const barPct = (v/5*100).toFixed(1);
+      return `<div style="margin-bottom:0.85rem;">
+        <div style="font-size:0.82rem;color:var(--ink);margin-bottom:0.3rem;">${p}</div>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${barPct}%;background:${catColors[k]};border-radius:4px;"></div>
+          </div>
+          <span style="font-weight:700;font-size:0.85rem;color:${catColors[k]};min-width:30px;">${v}</span>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="card">
+      <div class="card-title" style="color:${catColors[k]}">${cat.nombre}</div>
+      <div style="margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+          <div style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;color:${catColors[k]}">${catProms[k]}</div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--mid);">Promedio categoría</div>
+            <div style="height:6px;width:120px;background:var(--border);border-radius:3px;margin-top:4px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:${catColors[k]};border-radius:3px;"></div>
+            </div>
+          </div>
+        </div>
+        ${pregs}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Tabla de evaluaciones individuales
+  const evRows = evals.map(e => `<tr>
+    <td>${e.evaluadorNombre}</td><td>${e.evaluadorCargo}</td>
+    ${catKeys.map(k=>`<td style="text-align:center;font-weight:600;">${e.porCategoria[k]}</td>`).join('')}
+    <td style="text-align:center;"><strong>${e.puntajeGlobal}</strong></td>
+    <td>${e.fecha}</td>
+  </tr>`).join('');
+
+  cont.innerHTML = `
+    <div class="card">
+      <div class="card-title"><span class="icon">👤</span> ${lider.nombre} — ${lider.cargo}${lider.area?' · '+lider.area:''}</div>
+      <div class="gauge-row">
+        <div class="gauge-item">
+          <div class="gauge-label">Puntaje Global</div>
+          <div class="gauge-val" style="color:var(--teal)">${globalProm}<span style="font-size:1rem;color:var(--mid)">/5</span></div>
+          <div class="gauge-bar"><div class="gauge-fill" style="width:${globalProm/5*100}%"></div></div>
+        </div>
+        <div class="gauge-item"><div class="gauge-label">Clasificación</div><div class="gauge-val"><span class="badge ${cls}" style="font-size:1rem;">${lbl}</span></div></div>
+        <div class="gauge-item"><div class="gauge-label">Total Evaluaciones</div><div class="gauge-val">${evals.length}</div></div>
+        <div class="gauge-item"><div class="gauge-label">Última Evaluación</div><div class="gauge-val" style="font-size:1.1rem;">${evals[evals.length-1].fecha}</div></div>
+      </div>
+      <div style="margin-top:1rem;">
+        <div style="font-weight:700;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--mid);margin-bottom:1rem;">Puntaje por Categoría</div>
+        <div class="cat-score-list">
+          ${catKeys.map(k=>`<div class="cat-score-item">
+            <div class="cat-score-name">${PREGUNTAS[k].nombre}</div>
+            <div class="cat-score-bar"><div class="cat-score-fill" style="width:${catProms[k]/5*100}%;background:${catColors[k]}"></div></div>
+            <div class="cat-score-num" style="color:${catColors[k]}">${catProms[k]}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    ${catDetail}
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span> Detalle de Evaluaciones Recibidas</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Evaluador</th><th>Cargo</th>${catKeys.map(k=>`<th>${PREGUNTAS[k].nombre.split(' ').slice(1,2).join('')}</th>`).join('')}<th>Global</th><th>Fecha</th></tr></thead>
+          <tbody>${evRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ========== UTILS ==========
+function confirmarLimpiar() { document.getElementById('confirm-overlay').classList.add('open'); }
+function cerrarModal() { document.getElementById('confirm-overlay').classList.remove('open'); }
+function limpiarTodo() {
+  db = { lideres: [], evaluaciones: [] }; guardarDB(); cerrarModal();
+  toast('🗑 Base de datos limpiada');
+  showSection('home');
+}
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+document.getElementById('confirm-overlay').addEventListener('click', function(e) { if(e.target===this) cerrarModal(); });
+actualizarStats();
+</script>
+</body>
+</html>
