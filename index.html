@@ -401,10 +401,13 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="card">
           <div class="card-title">✏️ Editar Mis Datos</div>
           <div class="grid-2">
-            <div class="form-group"><label>DNI</label><input type="text" id="p-dni" placeholder="DNI"></div>
+            <div class="form-group"><label>Nombre Completo</label><input type="text" id="p-nombre" placeholder="Tu nombre completo"></div>
+            <div class="form-group"><label>Puesto / Cargo</label><input type="text" id="p-puesto" placeholder="Tu cargo actual"></div>
+            <div class="form-group"><label>DNI</label><input type="text" id="p-dni" placeholder="DNI" maxlength="8"></div>
             <div class="form-group"><label>Correo</label><input type="email" id="p-email" disabled></div>
             <div class="form-group col-full"><label>Grupo de Evaluación</label><select id="p-grupo"><option value="">— Selecciona —</option></select></div>
           </div>
+          <div class="info-strip" style="font-size:.82rem">💡 Tu nombre y puesto se usarán automáticamente al evaluar para no tener que escribirlos cada vez.</div>
           <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem">
             <button class="btn btn-gold" onclick="guardarPerfil()">💾 Guardar Cambios</button>
             <button class="btn btn-ghost" onclick="cargarPerfil()">↺ Cancelar</button>
@@ -597,12 +600,20 @@ async function doLogout(){await sb.auth.signOut();currentUser=null;isAdmin=false
 // NAV
 // ============================================================
 function buildNav(){
-  document.getElementById('nav-user-info').textContent=currentUser?.email?.split('@')[0]||'';
+  const userLabel=currentUser?.email?.split('@')[0]||'';
+  document.getElementById('nav-user-info').textContent=userLabel;
   document.getElementById('nav-role-badge').textContent=isAdmin?'Admin':'Evaluador';
-  const tabs=isAdmin
-    ?[['dashboard','🏠 Inicio'],['grupos','🗂 Grupos'],['lideres','👤 Líderes'],['reportes-admin','📊 Reportes'],['usuarios','👥 Usuarios']]
-    :[['evaluar','📋 Evaluar'],['reporte-user','📊 Reporte General'],['perfil','👤 Mi Perfil']];
+  const adminTabs=[['dashboard','🏠 Inicio'],['grupos','🗂 Grupos'],['lideres','👤 Líderes'],['reportes-admin','📊 Reportes'],['usuarios','👥 Usuarios']];
+  const userTabs=[['evaluar','📋 Evaluar'],['reporte-user','📊 Reporte General'],['perfil','👤 Mi Perfil']];
+  const tabs=isAdmin?adminTabs:userTabs;
   document.getElementById('nav-tabs').innerHTML=tabs.map(([id,lbl])=>`<button class="nav-tab" onclick="navigateTo('${id}')" id="ntab-${id}">${lbl}</button>`).join('');
+  // Force render to DOM before navigating
+  requestAnimationFrame(()=>{
+    if(!isAdmin){
+      const perfilTab=document.getElementById('ntab-perfil');
+      if(perfilTab) perfilTab.style.display='inline-flex';
+    }
+  });
 }
 function navigateTo(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
@@ -778,6 +789,11 @@ async function cargarUsuarios(){
 // ============================================================
 async function loadEvalStep1(){
   document.getElementById('eval-step1').style.display='';document.getElementById('eval-form').style.display='none';
+  // Pre-fill from profile
+  if(userProfile){
+    if(userProfile.nombre_completo) document.getElementById('ev-nombre').value=userProfile.nombre_completo;
+    if(userProfile.puesto) document.getElementById('ev-puesto').value=userProfile.puesto;
+  }
   if(!userGrupoId)return;
   const{data}=await sb.from('lideres').select('id,nombre,cargo').eq('grupo_id',userGrupoId).order('nombre');
   const sel=document.getElementById('ev-lider');
@@ -827,17 +843,16 @@ function switchPTab(tab){
   if(tab==='historial')cargarHistorial();
 }
 async function cargarPerfil(){
-  // Cargar grupos en el select de perfil
   const{data:grupos}=await sb.from('grupos').select('id,nombre').order('nombre');
   const sel=document.getElementById('p-grupo');
   sel.innerHTML='<option value="">— Selecciona —</option>'+(grupos||[]).map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
-
   if(userProfile){
+    document.getElementById('p-nombre').value=userProfile.nombre_completo||'';
+    document.getElementById('p-puesto').value=userProfile.puesto||'';
     document.getElementById('p-dni').value=userProfile.dni||'';
     document.getElementById('p-email').value=currentUser.email||'';
     document.getElementById('p-grupo').value=userProfile.grupo_id||'';
   }
-  // Cargar puestos únicos de líderes para filtro historial
   if(userGrupoId){
     const{data:lideres}=await sb.from('lideres').select('cargo').eq('grupo_id',userGrupoId);
     const puestos=[...new Set((lideres||[]).map(l=>l.cargo))].sort();
@@ -846,13 +861,16 @@ async function cargarPerfil(){
   }
 }
 async function guardarPerfil(){
+  const nombre=document.getElementById('p-nombre').value.trim();
+  const puesto=document.getElementById('p-puesto').value.trim();
   const dni=document.getElementById('p-dni').value.trim();
   const grupo_id=document.getElementById('p-grupo').value;
   if(!dni)return toast('El DNI es obligatorio','err');
   if(!grupo_id)return toast('Selecciona un grupo','err');
-  const{error}=await sb.from('usuarios').update({dni,grupo_id}).eq('auth_id',currentUser.id);
+  const{error}=await sb.from('usuarios').update({nombre_completo:nombre,puesto,dni,grupo_id}).eq('auth_id',currentUser.id);
   if(error)return toast('Error: '+error.message,'err');
-  userProfile={...userProfile,dni,grupo_id};userGrupoId=parseInt(grupo_id);
+  userProfile={...userProfile,nombre_completo:nombre,puesto,dni,grupo_id};
+  userGrupoId=parseInt(grupo_id);
   toast('✅ Perfil actualizado','ok');
 }
 async function cambiarPass(){
