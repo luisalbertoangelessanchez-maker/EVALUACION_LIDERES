@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-:root {
+:root{
   --bg:#07090f;--surface:#0e1117;--surface2:#151922;--border:#1e2433;--border2:#2a3349;
   --gold:#d4a843;--gold2:#f0c96a;--teal:#2dd4bf;--red:#ef4444;--green:#22c55e;
   --yellow:#eab308;--orange:#fb923c;--purple:#c084fc;--blue:#60a5fa;
@@ -37,6 +37,7 @@ label{display:block;font-size:.78rem;font-weight:600;color:var(--text2);text-tra
 input,select,textarea{width:100%;padding:.75rem 1rem;background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:.95rem;transition:border-color .2s,box-shadow .2s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,67,.12)}
 input::placeholder{color:var(--text3)}
+input:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 select option{background:var(--surface2)}
 
 /* BUTTONS */
@@ -47,6 +48,8 @@ select option{background:var(--surface2)}
 .btn-teal:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(45,212,191,.3)}
 .btn-ghost{background:transparent;border:1.5px solid var(--border2);color:var(--text2)}
 .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-blue{background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.3);color:var(--blue)}
+.btn-blue:hover{background:rgba(96,165,250,.25)}
 .btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red)}
 .btn-danger:hover{background:rgba(239,68,68,.25)}
 .btn-active{background:rgba(212,168,67,.15);border:1.5px solid var(--gold);color:var(--gold)}
@@ -78,7 +81,7 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.
 
 /* CARDS */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem;margin-bottom:1.25rem}
-.card-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:1.5rem;padding-bottom:.85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem}
+.card-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:1.5rem;padding-bottom:.85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .card-title .sub{font-family:'Instrument Sans',sans-serif;font-size:.72rem;background:rgba(212,168,67,.15);color:var(--gold);padding:.2rem .6rem;border-radius:20px;font-weight:600}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
@@ -95,7 +98,7 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.
 table{width:100%;border-collapse:collapse;font-size:.875rem}
 thead tr{background:var(--surface2)}
 th{padding:.75rem 1rem;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);white-space:nowrap}
-td{padding:.7rem 1rem;border-top:1px solid var(--border);color:var(--text)}
+td{padding:.7rem 1rem;border-top:1px solid var(--border);color:var(--text);vertical-align:middle}
 tr:hover td{background:rgba(255,255,255,.02)}
 
 /* BADGE */
@@ -106,6 +109,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .badge-green{background:rgba(34,197,94,.12);color:var(--green)}
 .badge-yellow{background:rgba(234,179,8,.12);color:var(--yellow)}
 .badge-gray{background:var(--surface2);color:var(--text2)}
+.badge-blue{background:rgba(96,165,250,.12);color:var(--blue)}
 
 /* LIKERT EVAL */
 .categories-eval{display:flex;flex-direction:column;gap:1.25rem}
@@ -135,10 +139,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .prog-label{font-size:.75rem;color:var(--text2);margin-top:.4rem}
 
 /* FILTER BAR */
-.filter-bar{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;margin-bottom:1.5rem;padding:1.25rem;background:var(--surface2);border-radius:10px;border:1px solid var(--border)}
-.filter-bar label{margin-bottom:.25rem}
-.filter-group{display:flex;flex-direction:column;gap:.25rem;min-width:160px}
-.filter-group select{width:auto}
+.filter-bar{display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.5rem;padding:1.25rem;background:var(--surface2);border-radius:10px;border:1px solid var(--border)}
+.filter-group{display:flex;flex-direction:column;gap:.25rem;min-width:155px}
+.filter-group select,.filter-group input{width:auto}
 
 /* REPORT BARS */
 .report-bar-item{display:flex;align-items:center;gap:1rem;margin-bottom:.85rem}
@@ -148,21 +151,30 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .report-bar-val{font-weight:700;font-size:.85rem;min-width:36px;text-align:right}
 
 /* LEADER CARDS */
-.leader-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;margin-bottom:1.5rem}
+.leader-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-bottom:1.5rem}
 .leader-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;cursor:pointer;transition:all .2s}
 .leader-card:hover,.leader-card.sel{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,67,.1)}
 .lc-name{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.2rem}
 .lc-role{font-size:.78rem;color:var(--text2);margin-bottom:.85rem}
 .lc-score{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--teal)}
-.lc-evals{font-size:.75rem;color:var(--text3);margin-top:.25rem}
 
-/* CHART CONTAINERS */
+/* CHART */
 .chart-wrap{position:relative;background:var(--surface2);border-radius:10px;padding:1.25rem;margin-bottom:1.25rem}
 .chart-wrap canvas{max-height:320px}
-.chart-title{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:var(--text2);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.5px}
+
+/* INLINE EDIT ROW */
+.edit-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.edit-row input,.edit-row select{flex:1;min-width:100px;padding:.45rem .75rem;font-size:.85rem}
+.edit-row .btn{flex-shrink:0}
 
 /* INFO STRIP */
 .info-strip{background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.2);border-radius:8px;padding:.85rem 1.1rem;font-size:.87rem;color:var(--teal);margin-bottom:1.25rem}
+.warn-strip{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.2);border-radius:8px;padding:.85rem 1.1rem;font-size:.87rem;color:var(--yellow);margin-bottom:1.25rem}
+
+/* PROFILE TABS */
+.ptabs{display:flex;gap:.25rem;background:var(--bg);border-radius:8px;padding:3px;margin-bottom:1.5rem;width:fit-content}
+.ptab{padding:.45rem 1.1rem;border-radius:6px;cursor:pointer;font-size:.83rem;font-weight:600;color:var(--text2);border:none;background:transparent;transition:all .2s}
+.ptab.active{background:var(--surface2);color:var(--text)}
 
 /* CAT COLORS */
 .cc1{background:linear-gradient(135deg,#0f3d38,#0a2e2b)}.cc1 .cat-header{color:#2dd4bf}
@@ -171,31 +183,27 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .cc4{background:linear-gradient(135deg,#2a0f3d,#1e0a2e)}.cc4 .cat-header{color:#c084fc}
 .cc5{background:linear-gradient(135deg,#3d0f15,#2e0a10)}.cc5 .cat-header{color:#f87171}
 
-/* TOAST / MODAL / LOADER */
+/* MODAL / TOAST / LOADER */
 .toast{position:fixed;bottom:2rem;right:2rem;padding:.9rem 1.4rem;border-radius:10px;font-size:.88rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s ease;max-width:320px;border-left:3px solid var(--gold);background:var(--surface);box-shadow:0 8px 32px rgba(0,0,0,.5)}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.err{border-left-color:var(--red)}
 .toast.ok{border-left-color:var(--green)}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:2rem;max-width:480px;width:90%;box-shadow:0 32px 80px rgba(0,0,0,.6);animation:fadeUp .25s ease}
-.modal h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:1rem}
-.modal-btns{display:flex;gap:.75rem;margin-top:1.5rem}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:2rem;max-width:520px;width:90%;box-shadow:0 32px 80px rgba(0,0,0,.6);animation:fadeUp .25s ease;max-height:90vh;overflow-y:auto}
+.modal h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:1.25rem}
+.modal-btns{display:flex;gap:.75rem;margin-top:1.5rem;flex-wrap:wrap}
 .loader{display:inline-block;width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-screen{display:flex;align-items:center;justify-content:center;padding:3rem;gap:.75rem;color:var(--text2)}
 .empty-state{text-align:center;padding:3rem 1rem;color:var(--text2)}
 .empty-state .ico{font-size:2.5rem;margin-bottom:.75rem}
 .pw-strength{height:3px;border-radius:2px;margin-top:.4rem;transition:all .3s}
-.divider{height:1px;background:var(--border);margin:1.5rem 0}
 
 @media(max-width:700px){
-  .grid-2,.grid-3{grid-template-columns:1fr}
-  .col-full{grid-column:1}
-  nav{padding:0 1rem}
-  .container{padding:1.25rem 1rem}
-  .report-bar-label{min-width:120px}
-  .filter-bar{flex-direction:column;align-items:stretch}
+  .grid-2,.grid-3{grid-template-columns:1fr}.col-full{grid-column:1}
+  nav{padding:0 1rem}.container{padding:1.25rem 1rem}
+  .report-bar-label{min-width:120px}.filter-bar{flex-direction:column}
   .filter-group{min-width:unset;width:100%}
 }
 </style>
@@ -227,7 +235,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="form-group"><label>Confirmar Contraseña</label><input type="password" id="r-pass2" placeholder="Repite tu contraseña"></div>
       <div class="form-group"><label>Grupo de Evaluación</label><select id="r-grupo"><option value="">— Cargando... —</option></select></div>
       <button class="btn btn-gold btn-full" onclick="doRegister()" id="btn-register">Crear Cuenta</button>
-      <p style="font-size:.78rem;color:var(--text2);margin-top:.85rem;text-align:center">Recibirás un correo de confirmación para activar tu cuenta.</p>
+      <p style="font-size:.78rem;color:var(--text2);margin-top:.85rem;text-align:center">Recibirás un correo de confirmación.</p>
     </div>
   </div>
 </div>
@@ -247,21 +255,21 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
     <!-- DASHBOARD -->
     <div id="sec-dashboard" class="section">
-      <div class="page-header"><h1>Panel Principal</h1><p>Resumen del sistema de evaluación</p></div>
+      <div class="page-header"><h1>Panel Principal</h1><p>Resumen del sistema</p></div>
       <div class="stats-row" id="dash-stats"></div>
       <div class="grid-2">
         <div class="card"><div class="card-title">📊 Últimas Evaluaciones</div><div id="dash-recent"></div></div>
-        <div class="card"><div class="card-title">👥 Usuarios Registrados</div><div id="dash-users"></div></div>
+        <div class="card"><div class="card-title">👥 Últimos Usuarios</div><div id="dash-users"></div></div>
       </div>
     </div>
 
-    <!-- GRUPOS -->
+    <!-- GRUPOS (ADMIN) -->
     <div id="sec-grupos" class="section">
-      <div class="page-header"><h1>Grupos de Evaluación</h1><p>Crea y administra los grupos de evaluadores</p></div>
+      <div class="page-header"><h1>Grupos de Evaluación</h1><p>Crear, editar y eliminar grupos</p></div>
       <div class="grid-2">
         <div class="card">
           <div class="card-title">➕ Nuevo Grupo</div>
-          <div class="form-group"><label>Nombre del Grupo</label><input type="text" id="g-nombre" placeholder="Ej: Gerencia Comercial 2025"></div>
+          <div class="form-group"><label>Nombre</label><input type="text" id="g-nombre" placeholder="Ej: Gerencia Comercial 2025"></div>
           <div class="form-group"><label>Descripción (opcional)</label><textarea id="g-desc" rows="2" style="resize:vertical" placeholder="Breve descripción..."></textarea></div>
           <button class="btn btn-gold" onclick="crearGrupo()">Crear Grupo</button>
         </div>
@@ -269,9 +277,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
     </div>
 
-    <!-- LÍDERES -->
+    <!-- LÍDERES (ADMIN) -->
     <div id="sec-lideres" class="section">
-      <div class="page-header"><h1>Gestión de Líderes</h1><p>Registra los líderes a evaluar por grupo</p></div>
+      <div class="page-header"><h1>Gestión de Líderes</h1><p>Registrar, editar y eliminar líderes por grupo</p></div>
       <div class="card">
         <div class="card-title">➕ Registrar Líder</div>
         <div class="grid-2">
@@ -284,9 +292,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
       <div class="card">
         <div class="card-title">👤 Líderes Registrados</div>
-        <div style="display:flex;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap">
-          <select id="ldfilter-grupo" onchange="cargarLideresAdmin()" style="width:auto;min-width:180px"><option value="">Todos los grupos</option></select>
-        </div>
+        <div style="margin-bottom:1rem"><select id="ldfilter-grupo" onchange="cargarLideresAdmin()" style="width:auto;min-width:200px"><option value="">Todos los grupos</option></select></div>
         <div id="lideres-admin-lista"></div>
       </div>
     </div>
@@ -294,66 +300,51 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <!-- REPORTES ADMIN -->
     <div id="sec-reportes-admin" class="section">
       <div class="page-header"><h1>Reportes de Desempeño</h1><p>Análisis completo con filtros y gráficas — Escala Likert 1–5</p></div>
-
-      <!-- FILTROS -->
       <div class="filter-bar">
-        <div class="filter-group">
-          <label>Grupo de Evaluación</label>
-          <select id="rpt-grupo" onchange="onFiltroChange()"><option value="">— Todos los grupos —</option></select>
-        </div>
-        <div class="filter-group">
-          <label>Mes de Evaluación</label>
+        <div class="filter-group"><label>Grupo</label><select id="rpt-grupo" onchange="onFiltroChange()"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label>Mes</label>
           <select id="rpt-mes" onchange="onFiltroChange()">
-            <option value="">Todos los meses</option>
-            <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option>
-            <option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option>
-            <option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option>
-            <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+            <option value="">Todos</option><option value="01">Enero</option><option value="02">Febrero</option>
+            <option value="03">Marzo</option><option value="04">Abril</option><option value="05">Mayo</option>
+            <option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option>
+            <option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
           </select>
         </div>
-        <div class="filter-group">
-          <label>Antigüedad del Evaluador</label>
+        <div class="filter-group"><label>Antigüedad Evaluador</label>
           <select id="rpt-tiempo" onchange="onFiltroChange()">
-            <option value="">Todos</option>
-            <option value="menos_6m">Menos de 6 meses</option>
-            <option value="6m_1a">6 meses a 1 año</option>
-            <option value="1a_2a">1 año a 2 años</option>
+            <option value="">Todos</option><option value="menos_6m">Menos de 6 meses</option>
+            <option value="6m_1a">6 meses a 1 año</option><option value="1a_2a">1 año a 2 años</option>
             <option value="mas_2a">Mayor de 2 años</option>
           </select>
         </div>
-        <div class="filter-group">
-          <label>Categoría</label>
+        <div class="filter-group"><label>Categoría</label>
           <select id="rpt-categoria" onchange="onFiltroChange()">
-            <option value="">Todas las categorías</option>
-            <option value="liderazgo">🧭 Liderazgo e Inspiración</option>
-            <option value="gestion">⚙️ Gestión y Resultados</option>
-            <option value="comunicacion">💬 Comunicación</option>
-            <option value="emocional">🤝 Inteligencia Emocional</option>
-            <option value="desarrollo">🌱 Desarrollo del Equipo</option>
+            <option value="">Todas</option><option value="liderazgo">🧭 Liderazgo</option>
+            <option value="gestion">⚙️ Gestión</option><option value="comunicacion">💬 Comunicación</option>
+            <option value="emocional">🤝 Int. Emocional</option><option value="desarrollo">🌱 Desarrollo</option>
           </select>
         </div>
-        <div class="filter-group">
-          <label>Tipo de Reporte</label>
+        <div class="filter-group"><label>Tipo</label>
           <div style="display:flex;gap:.5rem">
             <button class="btn btn-active btn-sm" id="rbtn-general" onclick="setRptTipo('general')">📊 General</button>
             <button class="btn btn-ghost btn-sm" id="rbtn-individual" onclick="setRptTipo('individual')">👤 Individual</button>
           </div>
         </div>
       </div>
-
       <div id="rpt-content"></div>
     </div>
 
-    <!-- USUARIOS -->
+    <!-- USUARIOS (ADMIN) -->
     <div id="sec-usuarios" class="section">
-      <div class="page-header"><h1>Usuarios del Sistema</h1><p>Usuarios evaluadores registrados</p></div>
+      <div class="page-header"><h1>Usuarios del Sistema</h1><p>Evaluadores registrados</p></div>
       <div class="card"><div id="usuarios-lista"></div></div>
     </div>
 
     <!-- EVALUAR (USER) -->
     <div id="sec-evaluar" class="section">
       <div id="eval-step1">
-        <div class="page-header"><h1>Nueva Evaluación</h1><p>Completa tu información y selecciona al líder a evaluar</p></div>
+        <div class="page-header"><h1>Nueva Evaluación</h1><p>Completa tu información y selecciona al líder</p></div>
         <div class="card">
           <div class="card-title">📋 Información del Evaluador</div>
           <div class="grid-2">
@@ -392,79 +383,172 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
     </div>
 
-    <!-- REPORTE USUARIO -->
+    <!-- REPORTE GENERAL (USER) -->
     <div id="sec-reporte-user" class="section">
-      <div class="page-header"><h1>Reporte General</h1><p>Resultados generales de tu grupo de evaluación</p></div>
+      <div class="page-header"><h1>Reporte General</h1><p>Resultados generales de tu grupo</p></div>
       <div id="rpt-user-content"></div>
     </div>
 
+    <!-- MI PERFIL (USER) -->
+    <div id="sec-perfil" class="section">
+      <div class="page-header"><h1>Mi Perfil</h1><p>Datos personales e historial de evaluaciones</p></div>
+      <div class="ptabs">
+        <button class="ptab active" onclick="switchPTab('datos')" id="ptab-datos">👤 Mis Datos</button>
+        <button class="ptab" onclick="switchPTab('historial')" id="ptab-historial">📋 Mis Evaluaciones</button>
+      </div>
+      <!-- DATOS -->
+      <div id="ppane-datos">
+        <div class="card">
+          <div class="card-title">✏️ Editar Mis Datos</div>
+          <div class="grid-2">
+            <div class="form-group"><label>DNI</label><input type="text" id="p-dni" placeholder="DNI"></div>
+            <div class="form-group"><label>Correo</label><input type="email" id="p-email" disabled></div>
+            <div class="form-group col-full"><label>Grupo de Evaluación</label><select id="p-grupo"><option value="">— Selecciona —</option></select></div>
+          </div>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem">
+            <button class="btn btn-gold" onclick="guardarPerfil()">💾 Guardar Cambios</button>
+            <button class="btn btn-ghost" onclick="cargarPerfil()">↺ Cancelar</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🔑 Cambiar Contraseña</div>
+          <div class="grid-2">
+            <div class="form-group"><label>Nueva Contraseña</label><input type="password" id="p-pass" placeholder="Mínimo 8 caracteres"></div>
+            <div class="form-group"><label>Confirmar Contraseña</label><input type="password" id="p-pass2" placeholder="Repite la contraseña"></div>
+          </div>
+          <button class="btn btn-ghost" onclick="cambiarPass()">Actualizar Contraseña</button>
+        </div>
+      </div>
+      <!-- HISTORIAL -->
+      <div id="ppane-historial" style="display:none">
+        <div class="filter-bar">
+          <div class="filter-group"><label>Filtrar por Mes</label>
+            <select id="hist-mes" onchange="cargarHistorial()">
+              <option value="">Todos los meses</option><option value="01">Enero</option><option value="02">Febrero</option>
+              <option value="03">Marzo</option><option value="04">Abril</option><option value="05">Mayo</option>
+              <option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option>
+              <option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option>
+              <option value="12">Diciembre</option>
+            </select>
+          </div>
+          <div class="filter-group"><label>Filtrar por Puesto del Líder</label>
+            <select id="hist-puesto" onchange="cargarHistorial()"><option value="">Todos los puestos</option></select>
+          </div>
+        </div>
+        <div id="historial-content"></div>
+        <div class="card" style="margin-top:1.25rem">
+          <div class="card-title">📈 Mi Actividad Mensual</div>
+          <div class="chart-wrap"><canvas id="chart-hist-actividad"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+</div><!-- /app-screen -->
+
+<!-- MODAL EDITAR GRUPO -->
+<div class="overlay" id="modal-grupo">
+  <div class="modal">
+    <h3>✏️ Editar Grupo</h3>
+    <div class="form-group"><label>Nombre</label><input type="text" id="eg-nombre" placeholder="Nombre del grupo"></div>
+    <div class="form-group"><label>Descripción</label><textarea id="eg-desc" rows="2" style="resize:vertical"></textarea></div>
+    <input type="hidden" id="eg-id">
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="guardarGrupo()">💾 Guardar</button>
+      <button class="btn btn-ghost" onclick="closeOverlay('modal-grupo')">Cancelar</button>
+    </div>
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL EDITAR LÍDER -->
+<div class="overlay" id="modal-lider">
+  <div class="modal">
+    <h3>✏️ Editar Líder</h3>
+    <div class="form-group"><label>Nombre Completo</label><input type="text" id="el-nombre" placeholder="Nombre"></div>
+    <div class="form-group"><label>Cargo / Rol</label><input type="text" id="el-cargo" placeholder="Cargo"></div>
+    <div class="form-group"><label>Área / Departamento</label><input type="text" id="el-area" placeholder="Área"></div>
+    <div class="form-group"><label>Grupo de Evaluación</label><select id="el-grupo"><option value="">— Selecciona —</option></select></div>
+    <input type="hidden" id="el-id">
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="guardarLider()">💾 Guardar</button>
+      <button class="btn btn-ghost" onclick="closeOverlay('modal-lider')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR -->
 <div class="overlay" id="confirm-modal">
   <div class="modal">
     <h3 id="confirm-title">¿Confirmar?</h3>
     <p id="confirm-body" style="color:var(--text2);line-height:1.6;font-size:.9rem"></p>
     <div class="modal-btns">
       <button class="btn btn-danger" id="confirm-ok">Confirmar</button>
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-ghost" onclick="closeOverlay('confirm-modal')">Cancelar</button>
     </div>
   </div>
 </div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ===================== CONFIG =====================
-const { createClient } = supabase;
-const sb = createClient('https://pywuptvirqzatahmnugo.supabase.co','sb_publishable_caNjEQxg4C4ppwWh83YncA_skxyjC44');
-const ADMIN_EMAIL = 'luisalberto.angelessanchez@gmail.com';
+// ============================================================
+// CONFIG
+// ============================================================
+const{createClient}=supabase;
+const sb=createClient('https://pywuptvirqzatahmnugo.supabase.co','sb_publishable_caNjEQxg4C4ppwWh83YncA_skxyjC44');
+const ADMIN_EMAIL='luisalberto.angelessanchez@gmail.com';
+Chart.defaults.color='#8892a4';Chart.defaults.borderColor='#1e2433';
+Chart.defaults.font.family="'Instrument Sans',sans-serif";
 
-Chart.defaults.color = '#8892a4';
-Chart.defaults.borderColor = '#1e2433';
-Chart.defaults.font.family = "'Instrument Sans', sans-serif";
+const CAT_COLORS={liderazgo:'#2dd4bf',gestion:'#fb923c',comunicacion:'#60a5fa',emocional:'#c084fc',desarrollo:'#f87171'};
+const CAT_CC={liderazgo:'cc1',gestion:'cc2',comunicacion:'cc3',emocional:'cc4',desarrollo:'cc5'};
+const TIEMPO_LBL={menos_6m:'< 6 meses','6m_1a':'6m – 1 año','1a_2a':'1 – 2 años',mas_2a:'> 2 años'};
+const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const MES_NAMES={  '01':'Enero','02':'Febrero','03':'Marzo','04':'Abril','05':'Mayo','06':'Junio',
+  '07':'Julio','08':'Agosto','09':'Septiembre','10':'Octubre','11':'Noviembre','12':'Diciembre'};
 
-const CAT_COLORS = { liderazgo:'#2dd4bf', gestion:'#fb923c', comunicacion:'#60a5fa', emocional:'#c084fc', desarrollo:'#f87171' };
-const CAT_CC = { liderazgo:'cc1', gestion:'cc2', comunicacion:'cc3', emocional:'cc4', desarrollo:'cc5' };
-const TIEMPO_LABELS = { menos_6m:'< 6 meses', '6m_1a':'6m – 1 año', '1a_2a':'1 – 2 años', mas_2a:'> 2 años' };
-const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-
-const PREGUNTAS = {
-  liderazgo:{ nombre:'🧭 Liderazgo e Inspiración', preguntas:['Comunica una visión clara y motivadora para el equipo','Inspira a los colaboradores a dar lo mejor de sí mismos','Da el ejemplo con su actitud y comportamiento','Toma decisiones con seguridad incluso en situaciones difíciles','Genera confianza y credibilidad en el equipo'] },
-  gestion:  { nombre:'⚙️ Gestión y Resultados',    preguntas:['Planifica y organiza el trabajo de manera efectiva','Establece metas claras y alcanzables para el equipo','Monitorea el avance de tareas y proyectos','Toma acciones correctivas cuando los resultados no son los esperados','Optimiza los recursos disponibles para lograr los objetivos'] },
-  comunicacion:{ nombre:'💬 Comunicación',          preguntas:['Se expresa de forma clara y comprensible','Escucha activamente las ideas y preocupaciones del equipo','Brinda retroalimentación constructiva y oportuna','Mantiene informado al equipo sobre decisiones relevantes','Fomenta un diálogo abierto y sin miedo a represalias'] },
-  emocional:{ nombre:'🤝 Inteligencia Emocional',   preguntas:['Demuestra empatía ante las situaciones personales del equipo','Maneja sus emociones con madurez ante la presión','Resuelve conflictos de manera justa y efectiva','Respeta la diversidad de opiniones y estilos de trabajo','Mantiene una actitud positiva y resiliente frente a los cambios'] },
-  desarrollo:{ nombre:'🌱 Desarrollo del Equipo',   preguntas:['Brinda oportunidades de aprendizaje y crecimiento profesional','Delega responsabilidades de forma apropiada','Reconoce y valora los logros individuales y del equipo','Apoya el desarrollo de habilidades de cada colaborador','Promueve el trabajo en equipo y la colaboración'] }
+const PREGUNTAS={
+  liderazgo:{nombre:'🧭 Liderazgo e Inspiración',preguntas:['Comunica una visión clara y motivadora para el equipo','Inspira a los colaboradores a dar lo mejor de sí mismos','Da el ejemplo con su actitud y comportamiento','Toma decisiones con seguridad incluso en situaciones difíciles','Genera confianza y credibilidad en el equipo']},
+  gestion:{nombre:'⚙️ Gestión y Resultados',preguntas:['Planifica y organiza el trabajo de manera efectiva','Establece metas claras y alcanzables para el equipo','Monitorea el avance de tareas y proyectos','Toma acciones correctivas cuando los resultados no son los esperados','Optimiza los recursos disponibles para lograr los objetivos']},
+  comunicacion:{nombre:'💬 Comunicación',preguntas:['Se expresa de forma clara y comprensible','Escucha activamente las ideas y preocupaciones del equipo','Brinda retroalimentación constructiva y oportuna','Mantiene informado al equipo sobre decisiones relevantes','Fomenta un diálogo abierto y sin miedo a represalias']},
+  emocional:{nombre:'🤝 Inteligencia Emocional',preguntas:['Demuestra empatía ante las situaciones personales del equipo','Maneja sus emociones con madurez ante la presión','Resuelve conflictos de manera justa y efectiva','Respeta la diversidad de opiniones y estilos de trabajo','Mantiene una actitud positiva y resiliente frente a los cambios']},
+  desarrollo:{nombre:'🌱 Desarrollo del Equipo',preguntas:['Brinda oportunidades de aprendizaje y crecimiento profesional','Delega responsabilidades de forma apropiada','Reconoce y valora los logros individuales y del equipo','Apoya el desarrollo de habilidades de cada colaborador','Promueve el trabajo en equipo y la colaboración']}
 };
 
-// ===================== STATE =====================
-let currentUser=null, isAdmin=false, userGrupoId=null, evalData=null;
-let rptTipo='general', rptLiderId=null;
+// ============================================================
+// STATE
+// ============================================================
+let currentUser=null,isAdmin=false,userProfile=null,userGrupoId=null,evalData=null;
+let rptTipo='general',rptLiderId=null;
 const charts={};
 
-// ===================== INIT =====================
+// ============================================================
+// INIT
+// ============================================================
 async function init(){
-  const {data:{session}}=await sb.auth.getSession();
+  const{data:{session}}=await sb.auth.getSession();
   if(session) await loadUser(session.user); else showAuth();
-  sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session) await loadUser(session.user);
-    if(event==='SIGNED_OUT') showAuth();
+  sb.auth.onAuthStateChange(async(ev,ses)=>{
+    if(ev==='SIGNED_IN'&&ses) await loadUser(ses.user);
+    if(ev==='SIGNED_OUT') showAuth();
   });
   loadGruposPublic();
 }
-
 async function loadUser(user){
   currentUser=user; isAdmin=user.email===ADMIN_EMAIL;
   if(!isAdmin){
-    const{data:p}=await sb.from('usuarios').select('*').eq('auth_id',user.id).single();
-    if(p) userGrupoId=p.grupo_id;
+    const{data:p}=await sb.from('usuarios').select('*,grupos(nombre)').eq('auth_id',user.id).single();
+    if(p){userProfile=p;userGrupoId=p.grupo_id;}
   }
   showApp();
 }
-
-function showAuth(){ document.getElementById('auth-screen').style.display='flex'; document.getElementById('app-screen').style.display='none'; }
-function showApp(){ document.getElementById('auth-screen').style.display='none'; document.getElementById('app-screen').style.display='block'; buildNav(); if(isAdmin){navigateTo('dashboard');loadDashboard();}else{navigateTo('evaluar');loadEvalStep1();} }
-
+function showAuth(){document.getElementById('auth-screen').style.display='flex';document.getElementById('app-screen').style.display='none';}
+function showApp(){
+  document.getElementById('auth-screen').style.display='none';document.getElementById('app-screen').style.display='block';
+  buildNav();
+  if(isAdmin){navigateTo('dashboard');loadDashboard();}
+  else{navigateTo('evaluar');loadEvalStep1();}
+}
 function switchAuth(tab){
   document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
   document.getElementById('pane-login').style.display=tab==='login'?'':'none';
@@ -473,48 +557,51 @@ function switchAuth(tab){
 async function loadGruposPublic(){
   const{data}=await sb.from('grupos').select('id,nombre').order('nombre');
   const sel=document.getElementById('r-grupo');
-  if(!data||!data.length){sel.innerHTML='<option value="">— No hay grupos —</option>';return;}
-  sel.innerHTML='<option value="">— Selecciona tu grupo —</option>'+data.map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
+  sel.innerHTML='<option value="">— Selecciona tu grupo —</option>'+(data||[]).map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
 }
 function checkPwStrength(v){
-  const bar=document.getElementById('pw-bar'); let s=0;
+  const bar=document.getElementById('pw-bar');let s=0;
   if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;
   bar.style.background=['var(--border)','var(--red)','var(--yellow)','var(--gold)','var(--green)'][s];
 }
 
-// ===================== AUTH =====================
+// ============================================================
+// AUTH
+// ============================================================
 async function doLogin(){
-  const email=document.getElementById('l-email').value.trim(), pass=document.getElementById('l-pass').value;
-  if(!email||!pass) return toast('Completa todos los campos','err');
-  const btn=document.getElementById('btn-login'); btn.disabled=true; btn.innerHTML='<span class="loader"></span>';
+  const email=document.getElementById('l-email').value.trim(),pass=document.getElementById('l-pass').value;
+  if(!email||!pass)return toast('Completa todos los campos','err');
+  const btn=document.getElementById('btn-login');btn.disabled=true;btn.innerHTML='<span class="loader"></span>';
   const{error}=await sb.auth.signInWithPassword({email,password:pass});
-  btn.disabled=false; btn.textContent='Ingresar';
-  if(error) return toast('Credenciales incorrectas o cuenta no confirmada','err');
+  btn.disabled=false;btn.textContent='Ingresar';
+  if(error)return toast('Credenciales incorrectas o cuenta no confirmada','err');
 }
 async function doRegister(){
-  const dni=document.getElementById('r-dni').value.trim(), email=document.getElementById('r-email').value.trim();
-  const pass=document.getElementById('r-pass').value, pass2=document.getElementById('r-pass2').value;
+  const dni=document.getElementById('r-dni').value.trim(),email=document.getElementById('r-email').value.trim();
+  const pass=document.getElementById('r-pass').value,pass2=document.getElementById('r-pass2').value;
   const grupo=document.getElementById('r-grupo').value;
-  if(!dni||!email||!pass||!grupo) return toast('Completa todos los campos','err');
-  if(pass!==pass2) return toast('Las contraseñas no coinciden','err');
-  if(pass.length<8) return toast('Mínimo 8 caracteres','err');
-  if(email===ADMIN_EMAIL) return toast('Correo no permitido','err');
-  const btn=document.getElementById('btn-register'); btn.disabled=true; btn.innerHTML='<span class="loader"></span>';
+  if(!dni||!email||!pass||!grupo)return toast('Completa todos los campos','err');
+  if(pass!==pass2)return toast('Las contraseñas no coinciden','err');
+  if(pass.length<8)return toast('Mínimo 8 caracteres','err');
+  if(email===ADMIN_EMAIL)return toast('Correo no permitido','err');
+  const btn=document.getElementById('btn-register');btn.disabled=true;btn.innerHTML='<span class="loader"></span>';
   const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{dni,grupo_id:grupo}}});
-  btn.disabled=false; btn.textContent='Crear Cuenta';
-  if(error) return toast(error.message,'err');
-  if(data.user) await sb.from('usuarios').insert({auth_id:data.user.id,dni,email,grupo_id:grupo});
-  toast('✅ Revisa tu correo para confirmar tu cuenta','ok'); switchAuth('login');
+  btn.disabled=false;btn.textContent='Crear Cuenta';
+  if(error)return toast(error.message,'err');
+  if(data.user)await sb.from('usuarios').insert({auth_id:data.user.id,dni,email,grupo_id:grupo});
+  toast('✅ Revisa tu correo para confirmar','ok');switchAuth('login');
 }
-async function doLogout(){ await sb.auth.signOut(); currentUser=null; isAdmin=false; userGrupoId=null; }
+async function doLogout(){await sb.auth.signOut();currentUser=null;isAdmin=false;userProfile=null;userGrupoId=null;}
 
-// ===================== NAV =====================
+// ============================================================
+// NAV
+// ============================================================
 function buildNav(){
   document.getElementById('nav-user-info').textContent=currentUser?.email?.split('@')[0]||'';
   document.getElementById('nav-role-badge').textContent=isAdmin?'Admin':'Evaluador';
   const tabs=isAdmin
     ?[['dashboard','🏠 Inicio'],['grupos','🗂 Grupos'],['lideres','👤 Líderes'],['reportes-admin','📊 Reportes'],['usuarios','👥 Usuarios']]
-    :[['evaluar','📋 Evaluar'],['reporte-user','📊 Reporte General']];
+    :[['evaluar','📋 Evaluar'],['reporte-user','📊 Reporte General'],['perfil','👤 Mi Perfil']];
   document.getElementById('nav-tabs').innerHTML=tabs.map(([id,lbl])=>`<button class="nav-tab" onclick="navigateTo('${id}')" id="ntab-${id}">${lbl}</button>`).join('');
 }
 function navigateTo(id){
@@ -522,14 +609,17 @@ function navigateTo(id){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('sec-'+id)?.classList.add('active');
   document.getElementById('ntab-'+id)?.classList.add('active');
-  if(id==='grupos') cargarGrupos();
+  if(id==='grupos')cargarGrupos();
   if(id==='lideres'){cargarGruposSelect();cargarLideresAdmin();}
-  if(id==='reportes-admin') cargarGruposReporte();
-  if(id==='usuarios') cargarUsuarios();
-  if(id==='reporte-user') cargarReporteUser();
+  if(id==='reportes-admin')cargarGruposReporte();
+  if(id==='usuarios')cargarUsuarios();
+  if(id==='reporte-user')cargarReporteUser();
+  if(id==='perfil')cargarPerfil();
 }
 
-// ===================== DASHBOARD =====================
+// ============================================================
+// DASHBOARD
+// ============================================================
 async function loadDashboard(){
   const[{count:cg},{count:cl},{count:ce},{count:cu}]=await Promise.all([
     sb.from('grupos').select('*',{count:'exact',head:true}),
@@ -548,77 +638,158 @@ async function loadDashboard(){
   document.getElementById('dash-users').innerHTML=users?.length?`<div class="table-wrap"><table><thead><tr><th>DNI</th><th>Email</th><th>Grupo</th></tr></thead><tbody>${users.map(u=>`<tr><td>${u.dni}</td><td style="font-size:.8rem">${u.email}</td><td><span class="badge badge-teal">${u.grupos?.nombre||'—'}</span></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state"><div class="ico">👥</div><p>Sin usuarios aún</p></div>';
 }
 
-// ===================== GRUPOS =====================
+// ============================================================
+// GRUPOS — con edición
+// ============================================================
 async function crearGrupo(){
-  const nombre=document.getElementById('g-nombre').value.trim(), desc=document.getElementById('g-desc').value.trim();
-  if(!nombre) return toast('Ingresa un nombre','err');
+  const nombre=document.getElementById('g-nombre').value.trim(),desc=document.getElementById('g-desc').value.trim();
+  if(!nombre)return toast('Ingresa un nombre','err');
   const{error}=await sb.from('grupos').insert({nombre,descripcion:desc});
-  if(error) return toast('Error: '+error.message,'err');
-  document.getElementById('g-nombre').value=''; document.getElementById('g-desc').value='';
-  toast('✅ Grupo creado','ok'); cargarGrupos();
+  if(error)return toast('Error: '+error.message,'err');
+  document.getElementById('g-nombre').value='';document.getElementById('g-desc').value='';
+  toast('✅ Grupo creado','ok');cargarGrupos();
 }
 async function cargarGrupos(){
   const{data}=await sb.from('grupos').select('*,lideres(count),usuarios(count)').order('created_at');
   const cont=document.getElementById('grupos-lista');
   if(!data?.length){cont.innerHTML='<div class="empty-state"><div class="ico">🗂</div><p>No hay grupos aún</p></div>';return;}
-  cont.innerHTML=data.map(g=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid var(--border);gap:.5rem;flex-wrap:wrap">
-    <div><div style="font-weight:600;font-size:.92rem">${g.nombre}</div><div style="font-size:.75rem;color:var(--text2);margin-top:.15rem">${g.descripcion||''} · <span style="color:var(--gold)">${g.lideres?.[0]?.count||0} líderes</span> · ${g.usuarios?.[0]?.count||0} evaluadores</div></div>
-    <button class="btn btn-danger btn-sm" onclick="eliminarGrupo(${g.id},'${g.nombre.replace(/'/g,"\\'")}')">Eliminar</button>
-  </div>`).join('');
+  cont.innerHTML=data.map(g=>`
+    <div style="padding:.85rem 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:600;font-size:.92rem">${escH(g.nombre)}</div>
+          <div style="font-size:.75rem;color:var(--text2);margin-top:.1rem">${escH(g.descripcion||'')} · <span style="color:var(--gold)">${g.lideres?.[0]?.count||0} líderes</span> · ${g.usuarios?.[0]?.count||0} evaluadores</div>
+        </div>
+        <div style="display:flex;gap:.4rem">
+          <button class="btn btn-blue btn-sm" onclick="abrirEditGrupo(${g.id},'${escQ(g.nombre)}','${escQ(g.descripcion||'')}')">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="eliminarGrupo(${g.id},'${escQ(g.nombre)}')">Eliminar</button>
+        </div>
+      </div>
+    </div>`).join('');
 }
-function eliminarGrupo(id,nombre){ confirm2(`¿Eliminar "${nombre}"?`,'Se eliminarán líderes y evaluaciones asociados.',async()=>{await sb.from('grupos').delete().eq('id',id);toast('Eliminado');cargarGrupos();}); }
+function abrirEditGrupo(id,nombre,desc){
+  document.getElementById('eg-id').value=id;
+  document.getElementById('eg-nombre').value=nombre;
+  document.getElementById('eg-desc').value=desc;
+  openOverlay('modal-grupo');
+}
+async function guardarGrupo(){
+  const id=document.getElementById('eg-id').value;
+  const nombre=document.getElementById('eg-nombre').value.trim();
+  const desc=document.getElementById('eg-desc').value.trim();
+  if(!nombre)return toast('El nombre es obligatorio','err');
+  const{error}=await sb.from('grupos').update({nombre,descripcion:desc}).eq('id',id);
+  if(error)return toast('Error: '+error.message,'err');
+  toast('✅ Grupo actualizado','ok');closeOverlay('modal-grupo');cargarGrupos();
+}
+function eliminarGrupo(id,nombre){
+  confirm2(`¿Eliminar "${nombre}"?`,'Se eliminarán líderes, usuarios y evaluaciones asociados.',async()=>{
+    await sb.from('grupos').delete().eq('id',id);toast('Eliminado');cargarGrupos();
+  });
+}
 
-// ===================== LÍDERES =====================
+// ============================================================
+// LÍDERES — con edición
+// ============================================================
 async function cargarGruposSelect(){
   const{data}=await sb.from('grupos').select('id,nombre').order('nombre');
-  const opts=(all)=>(all?'<option value="">Todos los grupos</option>':'<option value="">— Selecciona grupo —</option>')+(data||[]).map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
-  ['ld-grupo'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts(false);});
-  ['ldfilter-grupo'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts(true);});
-  const rg=document.getElementById('r-grupo'); if(rg) rg.innerHTML=opts(false).replace('— Selecciona grupo —','— Selecciona tu grupo —');
+  const opts=(all)=>(all?'<option value="">Todos los grupos</option>':'<option value="">— Selecciona grupo —</option>')+(data||[]).map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
+  const el=id=>document.getElementById(id);
+  if(el('ld-grupo'))el('ld-grupo').innerHTML=opts(false);
+  if(el('ldfilter-grupo'))el('ldfilter-grupo').innerHTML=opts(true);
+  if(el('el-grupo'))el('el-grupo').innerHTML=opts(false);
+  if(el('r-grupo'))el('r-grupo').innerHTML=opts(false).replace('— Selecciona grupo —','— Selecciona tu grupo —');
 }
 async function crearLider(){
-  const nombre=document.getElementById('ld-nombre').value.trim(), cargo=document.getElementById('ld-cargo').value.trim();
-  const area=document.getElementById('ld-area').value.trim(), grupo_id=document.getElementById('ld-grupo').value;
-  if(!nombre||!cargo||!grupo_id) return toast('Nombre, cargo y grupo son obligatorios','err');
+  const nombre=document.getElementById('ld-nombre').value.trim(),cargo=document.getElementById('ld-cargo').value.trim();
+  const area=document.getElementById('ld-area').value.trim(),grupo_id=document.getElementById('ld-grupo').value;
+  if(!nombre||!cargo||!grupo_id)return toast('Nombre, cargo y grupo son obligatorios','err');
   const{error}=await sb.from('lideres').insert({nombre,cargo,area,grupo_id});
-  if(error) return toast('Error: '+error.message,'err');
+  if(error)return toast('Error: '+error.message,'err');
   ['ld-nombre','ld-cargo','ld-area'].forEach(id=>document.getElementById(id).value='');
-  toast('✅ Líder registrado','ok'); cargarLideresAdmin();
+  toast('✅ Líder registrado','ok');cargarLideresAdmin();
 }
 async function cargarLideresAdmin(){
   const gfilt=document.getElementById('ldfilter-grupo')?.value;
   let q=sb.from('lideres').select('*,grupos(nombre)').order('nombre');
-  if(gfilt) q=q.eq('grupo_id',gfilt);
+  if(gfilt)q=q.eq('grupo_id',gfilt);
   const{data}=await q;
   const cont=document.getElementById('lideres-admin-lista');
   if(!data?.length){cont.innerHTML='<div class="empty-state"><div class="ico">👤</div><p>No hay líderes registrados</p></div>';return;}
-  cont.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Cargo</th><th>Área</th><th>Grupo</th><th></th></tr></thead><tbody>${data.map(l=>`<tr><td><strong>${l.nombre}</strong></td><td>${l.cargo}</td><td>${l.area||'—'}</td><td><span class="badge badge-teal">${l.grupos?.nombre||'—'}</span></td><td><button class="btn btn-danger btn-sm" onclick="eliminarLider(${l.id},'${l.nombre.replace(/'/g,"\\'")}')">Eliminar</button></td></tr>`).join('')}</tbody></table></div>`;
+  cont.innerHTML=`<div class="table-wrap"><table>
+    <thead><tr><th>Nombre</th><th>Cargo</th><th>Área</th><th>Grupo</th><th style="text-align:right">Acciones</th></tr></thead>
+    <tbody>${data.map(l=>`<tr>
+      <td><strong>${escH(l.nombre)}</strong></td>
+      <td>${escH(l.cargo)}</td>
+      <td>${escH(l.area||'—')}</td>
+      <td><span class="badge badge-teal">${escH(l.grupos?.nombre||'—')}</span></td>
+      <td style="text-align:right">
+        <div style="display:flex;gap:.4rem;justify-content:flex-end">
+          <button class="btn btn-blue btn-sm" onclick="abrirEditLider(${l.id},'${escQ(l.nombre)}','${escQ(l.cargo)}','${escQ(l.area||'')}',${l.grupo_id})">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="eliminarLider(${l.id},'${escQ(l.nombre)}')">Eliminar</button>
+        </div>
+      </td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
 }
-function eliminarLider(id,nombre){ confirm2(`¿Eliminar a "${nombre}"?`,'Se eliminarán sus evaluaciones.',async()=>{await sb.from('lideres').delete().eq('id',id);toast('Eliminado');cargarLideresAdmin();}); }
+async function abrirEditLider(id,nombre,cargo,area,grupoId){
+  await cargarGruposSelect();
+  document.getElementById('el-id').value=id;
+  document.getElementById('el-nombre').value=nombre;
+  document.getElementById('el-cargo').value=cargo;
+  document.getElementById('el-area').value=area;
+  document.getElementById('el-grupo').value=grupoId;
+  openOverlay('modal-lider');
+}
+async function guardarLider(){
+  const id=document.getElementById('el-id').value;
+  const nombre=document.getElementById('el-nombre').value.trim();
+  const cargo=document.getElementById('el-cargo').value.trim();
+  const area=document.getElementById('el-area').value.trim();
+  const grupo_id=document.getElementById('el-grupo').value;
+  if(!nombre||!cargo||!grupo_id)return toast('Nombre, cargo y grupo son obligatorios','err');
+  const{error}=await sb.from('lideres').update({nombre,cargo,area,grupo_id}).eq('id',id);
+  if(error)return toast('Error: '+error.message,'err');
+  toast('✅ Líder actualizado','ok');closeOverlay('modal-lider');cargarLideresAdmin();
+}
+function eliminarLider(id,nombre){
+  confirm2(`¿Eliminar a "${nombre}"?`,'Se eliminarán sus evaluaciones.',async()=>{
+    await sb.from('lideres').delete().eq('id',id);toast('Eliminado');cargarLideresAdmin();
+  });
+}
 
-// ===================== USUARIOS =====================
+// ============================================================
+// USUARIOS (ADMIN)
+// ============================================================
 async function cargarUsuarios(){
   const{data}=await sb.from('usuarios').select('*,grupos(nombre)').order('created_at',{ascending:false});
   const cont=document.getElementById('usuarios-lista');
   if(!data?.length){cont.innerHTML='<div class="empty-state"><div class="ico">👥</div><p>No hay usuarios</p></div>';return;}
-  cont.innerHTML=`<div class="table-wrap"><table><thead><tr><th>DNI</th><th>Email</th><th>Grupo</th><th>Registrado</th></tr></thead><tbody>${data.map(u=>`<tr><td><strong>${u.dni}</strong></td><td>${u.email}</td><td><span class="badge badge-teal">${u.grupos?.nombre||'—'}</span></td><td style="font-size:.8rem;color:var(--text2)">${new Date(u.created_at).toLocaleDateString('es-PE')}</td></tr>`).join('')}</tbody></table></div>`;
+  cont.innerHTML=`<div class="table-wrap"><table><thead><tr><th>DNI</th><th>Email</th><th>Grupo</th><th>Registrado</th></tr></thead>
+    <tbody>${data.map(u=>`<tr>
+      <td><strong>${u.dni}</strong></td><td>${u.email}</td>
+      <td><span class="badge badge-teal">${u.grupos?.nombre||'—'}</span></td>
+      <td style="font-size:.8rem;color:var(--text2)">${new Date(u.created_at).toLocaleDateString('es-PE')}</td>
+    </tr>`).join('')}</tbody></table></div>`;
 }
 
-// ===================== EVALUAR =====================
+// ============================================================
+// EVALUAR (USER)
+// ============================================================
 async function loadEvalStep1(){
-  document.getElementById('eval-step1').style.display=''; document.getElementById('eval-form').style.display='none';
-  if(!userGrupoId) return;
+  document.getElementById('eval-step1').style.display='';document.getElementById('eval-form').style.display='none';
+  if(!userGrupoId)return;
   const{data}=await sb.from('lideres').select('id,nombre,cargo').eq('grupo_id',userGrupoId).order('nombre');
   const sel=document.getElementById('ev-lider');
-  sel.innerHTML='<option value="">— Selecciona líder —</option>'+(data||[]).map(l=>`<option value="${l.id}">${l.nombre} — ${l.cargo}</option>`).join('');
+  sel.innerHTML='<option value="">— Selecciona líder —</option>'+(data||[]).map(l=>`<option value="${l.id}">${escH(l.nombre)} — ${escH(l.cargo)}</option>`).join('');
 }
 function iniciarEval(){
-  const nombre=document.getElementById('ev-nombre').value.trim(), puesto=document.getElementById('ev-puesto').value.trim();
-  const tiempo=document.getElementById('ev-tiempo').value, liderId=document.getElementById('ev-lider').value;
-  if(!nombre||!puesto||!tiempo||!liderId) return toast('Completa todos los campos','err');
+  const nombre=document.getElementById('ev-nombre').value.trim(),puesto=document.getElementById('ev-puesto').value.trim();
+  const tiempo=document.getElementById('ev-tiempo').value,liderId=document.getElementById('ev-lider').value;
+  if(!nombre||!puesto||!tiempo||!liderId)return toast('Completa todos los campos','err');
   const liderText=document.getElementById('ev-lider').options[document.getElementById('ev-lider').selectedIndex].text;
   evalData={nombre,puesto,tiempo,liderId:parseInt(liderId),liderText,respuestas:{}};
-  document.getElementById('eval-step1').style.display='none'; document.getElementById('eval-form').style.display='';
+  document.getElementById('eval-step1').style.display='none';document.getElementById('eval-form').style.display='';
   document.getElementById('eval-info').textContent=`📋 Evaluando a: ${liderText} · Evaluador: ${nombre} (${puesto})`;
   renderEvalCats();
 }
@@ -626,248 +797,330 @@ function renderEvalCats(){
   document.getElementById('eval-cats').innerHTML=Object.entries(PREGUNTAS).map(([key,cat])=>`
     <div class="cat-block ${CAT_CC[key]}">
       <div class="cat-header">${cat.nombre}</div>
-      <div class="cat-body">${cat.preguntas.map((p,i)=>{const qid=`${key}_${i}`;return`<div class="question" id="qq-${qid}"><div class="q-text">${i+1}. ${p}</div><div class="likert-row">${[1,2,3,4,5].map(v=>`<button class="lbtn" data-qid="${qid}" data-val="${v}" onclick="selQ('${qid}',${v},this)">${v}</button>`).join('')}</div><div class="likert-labels"><span>Nunca</span><span>Siempre</span></div></div>`;}).join('')}</div>
+      <div class="cat-body">${cat.preguntas.map((p,i)=>{const qid=`${key}_${i}`;return`<div class="question"><div class="q-text">${i+1}. ${p}</div><div class="likert-row">${[1,2,3,4,5].map(v=>`<button class="lbtn" onclick="selQ('${qid}',${v},this)">${v}</button>`).join('')}</div><div class="likert-labels"><span>Nunca</span><span>Siempre</span></div></div>`;}).join('')}</div>
     </div>`).join('');
   updateProg();
 }
-function selQ(qid,val,btn){ evalData.respuestas[qid]=val; btn.closest('.likert-row').querySelectorAll('.lbtn').forEach(b=>{b.className='lbtn';}); btn.className=`lbtn sel-${val}`; updateProg(); }
-function updateProg(){ const total=25,done=Object.keys(evalData.respuestas).length,pct=Math.round(done/total*100); document.getElementById('eval-prog-fill').style.width=pct+'%'; document.getElementById('eval-prog-label').textContent=`${done} de ${total} preguntas (${pct}%)`; }
-function cancelarEval(){ evalData=null; loadEvalStep1(); }
+function selQ(qid,val,btn){evalData.respuestas[qid]=val;btn.closest('.likert-row').querySelectorAll('.lbtn').forEach(b=>{b.className='lbtn';});btn.className=`lbtn sel-${val}`;updateProg();}
+function updateProg(){const total=25,done=Object.keys(evalData.respuestas).length,pct=Math.round(done/total*100);document.getElementById('eval-prog-fill').style.width=pct+'%';document.getElementById('eval-prog-label').textContent=`${done} de ${total} preguntas (${pct}%)`;}
+function cancelarEval(){evalData=null;loadEvalStep1();}
 async function enviarEval(){
-  if(Object.keys(evalData.respuestas).length<25) return toast('Responde todas las preguntas','err');
-  const btn=document.getElementById('btn-enviar-eval'); btn.disabled=true; btn.innerHTML='<span class="loader"></span>';
+  if(Object.keys(evalData.respuestas).length<25)return toast('Responde todas las preguntas','err');
+  const btn=document.getElementById('btn-enviar-eval');btn.disabled=true;btn.innerHTML='<span class="loader"></span>';
   const porCategoria={};let sumG=0,cntG=0;
-  Object.entries(PREGUNTAS).forEach(([key,cat])=>{ const vals=cat.preguntas.map((_,i)=>evalData.respuestas[`${key}_${i}`]); porCategoria[key]=parseFloat((vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2)); sumG+=vals.reduce((a,b)=>a+b,0);cntG+=vals.length; });
+  Object.entries(PREGUNTAS).forEach(([key,cat])=>{const vals=cat.preguntas.map((_,i)=>evalData.respuestas[`${key}_${i}`]);porCategoria[key]=parseFloat((vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2));sumG+=vals.reduce((a,b)=>a+b,0);cntG+=vals.length;});
   const now=new Date();
-  const{error}=await sb.from('evaluaciones').insert({ lider_id:evalData.liderId, evaluador_auth_id:currentUser.id, evaluador_nombre:evalData.nombre, evaluador_puesto:evalData.puesto, evaluador_tiempo:evalData.tiempo, respuestas:evalData.respuestas, por_categoria:porCategoria, puntaje_global:parseFloat((sumG/cntG).toFixed(2)), grupo_id:userGrupoId, fecha:now.toLocaleDateString('es-PE'), mes:String(now.getMonth()+1).padStart(2,'0'), anio:now.getFullYear() });
-  btn.disabled=false; btn.textContent='📤 Enviar Evaluación';
-  if(error) return toast('Error: '+error.message,'err');
-  toast('🎉 Evaluación enviada','ok'); evalData=null; loadEvalStep1(); setTimeout(()=>navigateTo('reporte-user'),1000);
+  const{error}=await sb.from('evaluaciones').insert({lider_id:evalData.liderId,evaluador_auth_id:currentUser.id,evaluador_nombre:evalData.nombre,evaluador_puesto:evalData.puesto,evaluador_tiempo:evalData.tiempo,respuestas:evalData.respuestas,por_categoria:porCategoria,puntaje_global:parseFloat((sumG/cntG).toFixed(2)),grupo_id:userGrupoId,fecha:now.toLocaleDateString('es-PE'),mes:String(now.getMonth()+1).padStart(2,'0'),anio:now.getFullYear()});
+  btn.disabled=false;btn.textContent='📤 Enviar Evaluación';
+  if(error)return toast('Error: '+error.message,'err');
+  toast('🎉 Evaluación enviada','ok');evalData=null;loadEvalStep1();setTimeout(()=>navigateTo('reporte-user'),1000);
 }
 
-// ===================== FILTROS REPORTE ADMIN =====================
+// ============================================================
+// MI PERFIL (USER)
+// ============================================================
+function switchPTab(tab){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('ptab-'+tab).classList.add('active');
+  document.getElementById('ppane-datos').style.display=tab==='datos'?'':'none';
+  document.getElementById('ppane-historial').style.display=tab==='historial'?'':'none';
+  if(tab==='historial')cargarHistorial();
+}
+async function cargarPerfil(){
+  // Cargar grupos en el select de perfil
+  const{data:grupos}=await sb.from('grupos').select('id,nombre').order('nombre');
+  const sel=document.getElementById('p-grupo');
+  sel.innerHTML='<option value="">— Selecciona —</option>'+(grupos||[]).map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
+
+  if(userProfile){
+    document.getElementById('p-dni').value=userProfile.dni||'';
+    document.getElementById('p-email').value=currentUser.email||'';
+    document.getElementById('p-grupo').value=userProfile.grupo_id||'';
+  }
+  // Cargar puestos únicos de líderes para filtro historial
+  if(userGrupoId){
+    const{data:lideres}=await sb.from('lideres').select('cargo').eq('grupo_id',userGrupoId);
+    const puestos=[...new Set((lideres||[]).map(l=>l.cargo))].sort();
+    const sp=document.getElementById('hist-puesto');
+    sp.innerHTML='<option value="">Todos los puestos</option>'+puestos.map(p=>`<option value="${escH(p)}">${escH(p)}</option>`).join('');
+  }
+}
+async function guardarPerfil(){
+  const dni=document.getElementById('p-dni').value.trim();
+  const grupo_id=document.getElementById('p-grupo').value;
+  if(!dni)return toast('El DNI es obligatorio','err');
+  if(!grupo_id)return toast('Selecciona un grupo','err');
+  const{error}=await sb.from('usuarios').update({dni,grupo_id}).eq('auth_id',currentUser.id);
+  if(error)return toast('Error: '+error.message,'err');
+  userProfile={...userProfile,dni,grupo_id};userGrupoId=parseInt(grupo_id);
+  toast('✅ Perfil actualizado','ok');
+}
+async function cambiarPass(){
+  const pass=document.getElementById('p-pass').value,pass2=document.getElementById('p-pass2').value;
+  if(!pass||!pass2)return toast('Completa los campos de contraseña','err');
+  if(pass!==pass2)return toast('Las contraseñas no coinciden','err');
+  if(pass.length<8)return toast('Mínimo 8 caracteres','err');
+  const{error}=await sb.auth.updateUser({password:pass});
+  if(error)return toast('Error: '+error.message,'err');
+  document.getElementById('p-pass').value='';document.getElementById('p-pass2').value='';
+  toast('✅ Contraseña actualizada','ok');
+}
+
+// ============================================================
+// HISTORIAL DE EVALUACIONES (USER)
+// ============================================================
+async function cargarHistorial(){
+  const cont=document.getElementById('historial-content');
+  cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
+  destroyCharts('hist');
+
+  const mes=document.getElementById('hist-mes').value;
+  const puesto=document.getElementById('hist-puesto').value;
+
+  let q=sb.from('evaluaciones').select('*,lideres(nombre,cargo,area)').eq('evaluador_auth_id',currentUser.id).order('created_at',{ascending:false});
+  if(mes)q=q.eq('mes',mes);
+  const{data:evals}=await q;
+
+  let filtered=(evals||[]);
+  if(puesto)filtered=filtered.filter(e=>e.lideres?.cargo===puesto);
+
+  if(!filtered.length){cont.innerHTML='<div class="empty-state"><div class="ico">📋</div><p>No has realizado evaluaciones con estos filtros</p></div>';renderHistActividad([]);return;}
+
+  // Totales
+  const totalEvals=filtered.length;
+  const lideresUnicos=[...new Set(filtered.map(e=>e.lider_id))].length;
+  const promGlobal=(filtered.reduce((a,e)=>a+e.puntaje_global,0)/filtered.length).toFixed(2);
+
+  // Agrupar por mes para la tabla resumen
+  const byMes={};
+  filtered.forEach(e=>{
+    const k=`${e.anio||'—'}-${e.mes||'—'}`;
+    if(!byMes[k])byMes[k]={mes:e.mes,anio:e.anio,evals:[]};
+    byMes[k].evals.push(e);
+  });
+
+  const mesRows=Object.entries(byMes).sort().reverse().map(([k,m])=>{
+    const prom=(m.evals.reduce((a,e)=>a+e.puntaje_global,0)/m.evals.length).toFixed(2);
+    const[lbl,cls]=getLabel(prom);
+    return`<tr>
+      <td><strong>${MES_NAMES[m.mes]||m.mes} ${m.anio||''}</strong></td>
+      <td>${m.evals.length} evaluacion${m.evals.length!==1?'es':''}</td>
+      <td><strong>${prom}/5</strong></td>
+      <td><span class="badge ${cls}">${lbl}</span></td>
+    </tr>`;
+  }).join('');
+
+  // Tabla detalle
+  const detalleRows=filtered.map(e=>{
+    const[lbl,cls]=getLabel(e.puntaje_global);
+    return`<tr>
+      <td><strong>${escH(e.lideres?.nombre||'—')}</strong></td>
+      <td><span class="badge badge-gray">${escH(e.lideres?.cargo||'—')}</span></td>
+      <td><span class="badge badge-blue">${escH(e.lideres?.area||'—')}</span></td>
+      <td><strong>${e.puntaje_global}/5</strong></td>
+      <td><span class="badge ${cls}">${lbl}</span></td>
+      <td style="color:var(--text2);font-size:.8rem">${e.fecha||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  cont.innerHTML=`
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num">${totalEvals}</div><div class="stat-lbl">Evaluaciones realizadas</div></div>
+      <div class="stat-box"><div class="stat-num">${lideresUnicos}</div><div class="stat-lbl">Líderes evaluados</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--teal)">${promGlobal}</div><div class="stat-lbl">Puntaje promedio dado</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📅 Resumen por Mes</div>
+        <div class="table-wrap"><table><thead><tr><th>Mes</th><th>Evaluaciones</th><th>Prom. Dado</th><th>Nivel</th></tr></thead>
+        <tbody>${mesRows}</tbody></table></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 Detalle de Evaluaciones</div>
+        <div class="table-wrap"><table><thead><tr><th>Líder Evaluado</th><th>Puesto</th><th>Área</th><th>Puntaje</th><th>Nivel</th><th>Fecha</th></tr></thead>
+        <tbody>${detalleRows}</tbody></table></div>
+      </div>
+    </div>`;
+
+  renderHistActividad(filtered);
+}
+
+function renderHistActividad(evals){
+  setTimeout(()=>{
+    const el=document.getElementById('chart-hist-actividad');
+    if(!el)return;
+    destroyCharts('hist-act');
+    if(!evals.length){el.parentElement.innerHTML='<p style="color:var(--text2);text-align:center;padding:1rem">No hay datos suficientes</p>';return;}
+    const byMes={};
+    evals.forEach(e=>{const k=`${e.anio||'2025'}-${e.mes||'01'}`;if(!byMes[k])byMes[k]=[];byMes[k].push(e.puntaje_global);});
+    const sorted=Object.keys(byMes).sort();
+    const labels=sorted.map(k=>{const[y,m]=k.split('-');return`${MESES[parseInt(m)-1]} ${y}`;});
+    const counts=sorted.map(k=>byMes[k].length);
+    const proms=sorted.map(k=>parseFloat((byMes[k].reduce((a,b)=>a+b,0)/byMes[k].length).toFixed(2)));
+    if(charts['hist-act'])charts['hist-act'].destroy();
+    charts['hist-act']=new Chart(el,{type:'bar',data:{labels,datasets:[
+      {label:'Evaluaciones realizadas',data:counts,backgroundColor:'rgba(212,168,67,.3)',borderColor:'var(--gold)',borderWidth:2,borderRadius:5,yAxisID:'y1'},
+      {label:'Puntaje promedio dado',data:proms,type:'line',borderColor:'var(--teal)',backgroundColor:'rgba(45,212,191,.1)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'var(--teal)',tension:.35,fill:false,yAxisID:'y2'}
+    ]},options:{responsive:true,scales:{
+      y1:{type:'linear',position:'left',ticks:{stepSize:1},grid:{color:'#1e2433'},title:{display:true,text:'Cantidad'}},
+      y2:{type:'linear',position:'right',min:0,max:5,grid:{display:false},title:{display:true,text:'Puntaje'}}
+    },plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:11}}}}}});
+  },100);
+}
+
+// ============================================================
+// REPORTES ADMIN
+// ============================================================
 async function cargarGruposReporte(){
   const{data}=await sb.from('grupos').select('id,nombre').order('nombre');
   const sel=document.getElementById('rpt-grupo');
-  sel.innerHTML='<option value="">— Todos los grupos —</option>'+(data||[]).map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
-  document.getElementById('rpt-content').innerHTML='<div class="empty-state"><div class="ico">📊</div><p>Selecciona filtros y tipo de reporte</p></div>';
+  sel.innerHTML='<option value="">Todos</option>'+(data||[]).map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
+  document.getElementById('rpt-content').innerHTML='<div class="empty-state"><div class="ico">📊</div><p>Selecciona filtros para ver el reporte</p></div>';
 }
 function setRptTipo(tipo){
-  rptTipo=tipo; rptLiderId=null;
+  rptTipo=tipo;rptLiderId=null;
   document.getElementById('rbtn-general').className=tipo==='general'?'btn btn-active btn-sm':'btn btn-ghost btn-sm';
   document.getElementById('rbtn-individual').className=tipo==='individual'?'btn btn-active btn-sm':'btn btn-ghost btn-sm';
   onFiltroChange();
 }
-function onFiltroChange(){ if(rptTipo==='general') renderReporteGeneral(); else renderSelectorLideres(); }
-
-function getFiltros(){
-  return { grupoId:document.getElementById('rpt-grupo').value, mes:document.getElementById('rpt-mes').value, tiempo:document.getElementById('rpt-tiempo').value, categoria:document.getElementById('rpt-categoria').value };
-}
-
-async function fetchEvals(grupoId, mes, tiempo){
+function onFiltroChange(){if(rptTipo==='general')renderReporteGeneral();else renderSelectorLideres();}
+function getFiltros(){return{grupoId:document.getElementById('rpt-grupo').value,mes:document.getElementById('rpt-mes').value,tiempo:document.getElementById('rpt-tiempo').value,categoria:document.getElementById('rpt-categoria').value};}
+async function fetchEvals(grupoId,mes,tiempo){
   let q=sb.from('evaluaciones').select('*,lideres(nombre,cargo,area)');
-  if(grupoId) q=q.eq('grupo_id',grupoId);
-  if(mes) q=q.eq('mes',mes);
-  if(tiempo) q=q.eq('evaluador_tiempo',tiempo);
+  if(grupoId)q=q.eq('grupo_id',grupoId);
+  if(mes)q=q.eq('mes',mes);
+  if(tiempo)q=q.eq('evaluador_tiempo',tiempo);
   const{data}=await q.order('created_at');
   return data||[];
 }
 
-// ===================== REPORTE GENERAL ADMIN =====================
 async function renderReporteGeneral(){
   const cont=document.getElementById('rpt-content');
-  cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando datos...</div>';
-  destroyCharts();
+  cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
+  destroyCharts('g');
   const{grupoId,mes,tiempo,categoria}=getFiltros();
   const evals=await fetchEvals(grupoId,mes,tiempo);
-
-  if(!evals.length){ cont.innerHTML='<div class="empty-state"><div class="ico">📊</div><p>No hay evaluaciones con los filtros seleccionados</p></div>'; return; }
-
+  if(!evals.length){cont.innerHTML='<div class="empty-state"><div class="ico">📊</div><p>No hay evaluaciones con estos filtros</p></div>';return;}
   const catKeys=Object.keys(PREGUNTAS);
-  const catProms={};
-  catKeys.forEach(k=>{ catProms[k]=parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2)); });
+  const catProms={};catKeys.forEach(k=>{catProms[k]=parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2));});
   const globalProm=parseFloat((evals.reduce((a,e)=>a+e.puntaje_global,0)/evals.length).toFixed(2));
   const[lbl,cls]=getLabel(globalProm);
+  const liderMap={};evals.forEach(e=>{if(!liderMap[e.lider_id])liderMap[e.lider_id]={nombre:e.lideres?.nombre||'—',cargo:e.lideres?.cargo||'',evals:[]};liderMap[e.lider_id].evals.push(e);});
+  const histData=await buildHistData(grupoId,tiempo,null);
+  const likertDist=buildLikertDist(evals,categoria||null);
+  const tiempoCont={};evals.forEach(e=>{tiempoCont[e.evaluador_tiempo]=(tiempoCont[e.evaluador_tiempo]||0)+1;});
 
-  // lider ranking
-  const liderMap={};
-  evals.forEach(e=>{ if(!liderMap[e.lider_id]) liderMap[e.lider_id]={nombre:e.lideres?.nombre||'—',cargo:e.lideres?.cargo||'',evals:[]}; liderMap[e.lider_id].evals.push(e); });
+  const catBars=(categoria?[categoria]:catKeys).map(k=>`<div class="report-bar-item"><div class="report-bar-label">${PREGUNTAS[k].nombre}</div><div class="report-bar-track"><div class="report-bar-fill" style="width:${catProms[k]/5*100}%;background:${CAT_COLORS[k]}"></div></div><div class="report-bar-val" style="color:${CAT_COLORS[k]}">${catProms[k]}</div></div>`).join('');
 
-  // historia mensual (todos los meses disponibles, sin filtro de mes para historia)
-  const histData=await buildHistoricalData(grupoId,tiempo,null);
-
-  // distribucion likert global
-  const likertDist=buildLikertDist(evals, categoria||null);
-
-  // antigüedad
-  const tiempoCont={};
-  evals.forEach(e=>{ tiempoCont[e.evaluador_tiempo]=(tiempoCont[e.evaluador_tiempo]||0)+1; });
+  const liderRows=Object.entries(liderMap).sort((a,b)=>{const pa=a[1].evals.reduce((x,e)=>x+e.puntaje_global,0)/a[1].evals.length;const pb=b[1].evals.reduce((x,e)=>x+e.puntaje_global,0)/b[1].evals.length;return pb-pa;}).map(([,l])=>{const p=(l.evals.reduce((a,e)=>a+e.puntaje_global,0)/l.evals.length).toFixed(2);const[ll,lc]=getLabel(p);return`<tr><td><strong>${escH(l.nombre)}</strong></td><td>${escH(l.cargo)}</td><td>${l.evals.length}</td><td><strong>${p}/5</strong></td><td><span class="badge ${lc}">${ll}</span></td></tr>`;}).join('');
 
   cont.innerHTML=`
-    <!-- STATS -->
     <div class="stats-row">
       <div class="stat-box"><div class="stat-num" style="color:var(--teal)">${globalProm}</div><div class="stat-lbl">Promedio Global /5</div></div>
       <div class="stat-box"><div class="stat-num">${evals.length}</div><div class="stat-lbl">Evaluaciones</div></div>
       <div class="stat-box"><div class="stat-num">${Object.keys(liderMap).length}</div><div class="stat-lbl">Líderes Evaluados</div></div>
-      <div class="stat-box"><div class="stat-num"><span class="badge ${cls}" style="font-size:.9rem">${lbl}</span></div><div class="stat-lbl">Clasificación</div></div>
+      <div class="stat-box"><div class="stat-num"><span class="badge ${cls}">${lbl}</span></div><div class="stat-lbl">Clasificación</div></div>
     </div>
-
-    <!-- BARRAS CATEGORÍAS + RADAR -->
     <div class="grid-2">
-      <div class="card">
-        <div class="card-title">📊 Puntaje por Categoría <span class="sub">${categoria?PREGUNTAS[categoria]?.nombre:'Todas'}</span></div>
-        ${(categoria?[categoria]:catKeys).map(k=>`<div class="report-bar-item">
-          <div class="report-bar-label">${PREGUNTAS[k].nombre}</div>
-          <div class="report-bar-track"><div class="report-bar-fill" style="width:${catProms[k]/5*100}%;background:${CAT_COLORS[k]}"></div></div>
-          <div class="report-bar-val" style="color:${CAT_COLORS[k]}">${catProms[k]}</div>
-        </div>`).join('')}
-      </div>
-      <div class="card">
-        <div class="card-title">🕸 Radar por Categorías</div>
-        <div class="chart-wrap"><canvas id="chart-radar-g"></canvas></div>
-      </div>
+      <div class="card"><div class="card-title">📊 Puntaje por Categoría <span class="sub">${categoria?PREGUNTAS[categoria]?.nombre:'Todas'}</span></div>${catBars}</div>
+      <div class="card"><div class="card-title">🕸 Radar de Competencias</div><div class="chart-wrap"><canvas id="chart-radar-g"></canvas></div></div>
     </div>
-
-    <!-- LÍNEA HISTÓRICA -->
-    <div class="card">
-      <div class="card-title">📈 Evolución Histórica Mensual <span class="sub">Puntaje promedio por mes</span></div>
-      <div class="chart-wrap"><canvas id="chart-linea-g"></canvas></div>
-    </div>
-
-    <!-- COMPARATIVA LÍDERES + DISTRIBUCIÓN LIKERT -->
+    <div class="card"><div class="card-title">📈 Evolución Histórica Mensual</div><div class="chart-wrap"><canvas id="chart-linea-g"></canvas></div></div>
     <div class="grid-2">
-      <div class="card">
-        <div class="card-title">🏆 Comparativa entre Líderes</div>
-        <div class="chart-wrap"><canvas id="chart-barras-g"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📊 Distribución de Respuestas Likert <span class="sub">${categoria?PREGUNTAS[categoria]?.nombre:'Global'}</span></div>
-        <div class="chart-wrap"><canvas id="chart-likert-g"></canvas></div>
-      </div>
+      <div class="card"><div class="card-title">🏆 Comparativa entre Líderes</div><div class="chart-wrap"><canvas id="chart-barras-g"></canvas></div></div>
+      <div class="card"><div class="card-title">📊 Distribución Likert <span class="sub">${categoria?PREGUNTAS[categoria]?.nombre:'Global'}</span></div><div class="chart-wrap"><canvas id="chart-likert-g"></canvas></div></div>
     </div>
-
-    <!-- RANKING TABLA -->
     <div class="grid-2">
-      <div class="card">
-        <div class="card-title">📋 Ranking de Líderes</div>
-        <div class="table-wrap"><table><thead><tr><th>Líder</th><th>Cargo</th><th>Evals</th><th>Prom</th><th>Nivel</th></tr></thead>
-        <tbody>${Object.entries(liderMap).sort((a,b)=>{ const pa=a[1].evals.reduce((x,e)=>x+e.puntaje_global,0)/a[1].evals.length; const pb=b[1].evals.reduce((x,e)=>x+e.puntaje_global,0)/b[1].evals.length; return pb-pa;}).map(([id,l])=>{ const p=(l.evals.reduce((a,e)=>a+e.puntaje_global,0)/l.evals.length).toFixed(2);const[ll,lc]=getLabel(p);return`<tr><td><strong>${l.nombre}</strong></td><td>${l.cargo}</td><td>${l.evals.length}</td><td><strong>${p}/5</strong></td><td><span class="badge ${lc}">${ll}</span></td></tr>`;}).join('')}</tbody></table></div>
-      </div>
-      <div class="card">
-        <div class="card-title">⏱ Evaluadores por Antigüedad</div>
-        <div class="chart-wrap"><canvas id="chart-antiguedad-g"></canvas></div>
-      </div>
+      <div class="card"><div class="card-title">📋 Ranking de Líderes</div><div class="table-wrap"><table><thead><tr><th>Líder</th><th>Cargo</th><th>Evals</th><th>Prom</th><th>Nivel</th></tr></thead><tbody>${liderRows}</tbody></table></div></div>
+      <div class="card"><div class="card-title">⏱ Evaluadores por Antigüedad</div><div class="chart-wrap"><canvas id="chart-antiguedad-g"></canvas></div></div>
     </div>`;
 
-  // Render charts
-  await renderCharts_General(catProms, histData, liderMap, likertDist, tiempoCont, catKeys);
+  await sleep(80);
+  renderRadar('chart-radar-g',catProms,catKeys);
+  renderLinea('chart-linea-g',histData);
+  renderBarrasLideres('chart-barras-g',liderMap);
+  renderLikert('chart-likert-g',likertDist);
+  renderAntiguedad('chart-antiguedad-g',tiempoCont);
 }
 
-// ===================== SELECTOR LÍDERES INDIVIDUAL =====================
 async function renderSelectorLideres(){
   const cont=document.getElementById('rpt-content');
   cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
-  destroyCharts();
+  destroyCharts('ind');
   const{grupoId}=getFiltros();
-  let q=sb.from('lideres').select('*'); if(grupoId) q=q.eq('grupo_id',grupoId); q=q.order('nombre');
+  let q=sb.from('lideres').select('*');if(grupoId)q=q.eq('grupo_id',grupoId);q=q.order('nombre');
   const{data:lideres}=await q;
-  const{data:evals}=await sb.from('evaluaciones').select('lider_id,puntaje_global').eq('grupo_id',grupoId||undefined);
-  const evAll=evals||[];
-
-  const cards=(lideres||[]).map(l=>{ const le=evAll.filter(e=>e.lider_id===l.id); const prom=le.length?(le.reduce((a,e)=>a+e.puntaje_global,0)/le.length).toFixed(2):null; const[lbl,cls]=getLabel(prom); return`<div class="leader-card ${rptLiderId===l.id?'sel':''}" onclick="verLiderAdmin(${l.id})"><div class="lc-name">${l.nombre}</div><div class="lc-role">${l.cargo}${l.area?' · '+l.area:''}</div><div class="lc-score">${prom||'—'}<span style="font-size:1rem;color:var(--text2)">/5</span></div><div style="margin-top:.3rem"><span class="badge ${cls}">${lbl}</span></div><div class="lc-evals">${le.length} eval${le.length!==1?'s':''}</div></div>`; }).join('');
-
-  cont.innerHTML=`<div class="leader-cards">${cards||'<p style="color:var(--text2)">No hay líderes en este grupo</p>'}</div><div id="rpt-lider-detail"></div>`;
-  if(rptLiderId) await renderReporteIndividual(rptLiderId);
+  let q2=sb.from('evaluaciones').select('lider_id,puntaje_global');if(grupoId)q2=q2.eq('grupo_id',grupoId);
+  const{data:allEvals}=await q2;
+  const evAll=allEvals||[];
+  const cards=(lideres||[]).map(l=>{const le=evAll.filter(e=>e.lider_id===l.id);const prom=le.length?(le.reduce((a,e)=>a+e.puntaje_global,0)/le.length).toFixed(2):null;const[lbl2,cls2]=getLabel(prom);return`<div class="leader-card ${rptLiderId===l.id?'sel':''}" onclick="verLiderAdmin(${l.id})"><div class="lc-name">${escH(l.nombre)}</div><div class="lc-role">${escH(l.cargo)}${l.area?' · '+escH(l.area):''}</div><div class="lc-score">${prom||'—'}<span style="font-size:1rem;color:var(--text2)">/5</span></div><div style="margin-top:.3rem"><span class="badge ${cls2}">${lbl2}</span></div><div style="font-size:.75rem;color:var(--text3);margin-top:.25rem">${le.length} eval${le.length!==1?'s':''}</div></div>`;}).join('');
+  cont.innerHTML=`<div class="leader-cards">${cards||'<p style="color:var(--text2)">No hay líderes</p>'}</div><div id="rpt-lider-detail"></div>`;
+  if(rptLiderId)await renderReporteIndividual(rptLiderId);
 }
+async function verLiderAdmin(liderId){rptLiderId=liderId;await renderSelectorLideres();await renderReporteIndividual(liderId);}
 
-async function verLiderAdmin(liderId){ rptLiderId=liderId; await renderSelectorLideres(); await renderReporteIndividual(liderId); }
-
-// ===================== REPORTE INDIVIDUAL =====================
 async function renderReporteIndividual(liderId){
   const cont=document.getElementById('rpt-lider-detail');
   cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
-  destroyCharts('ind');
-
+  destroyCharts('ind-c');
   const{mes,tiempo,categoria}=getFiltros();
   const{data:lider}=await sb.from('lideres').select('*,grupos(nombre)').eq('id',liderId).single();
   let q=sb.from('evaluaciones').select('*').eq('lider_id',liderId);
-  if(mes) q=q.eq('mes',mes); if(tiempo) q=q.eq('evaluador_tiempo',tiempo);
+  if(mes)q=q.eq('mes',mes);if(tiempo)q=q.eq('evaluador_tiempo',tiempo);
   const{data:evals}=await q.order('created_at');
-
-  if(!evals?.length){ cont.innerHTML=`<div class="card"><div class="empty-state"><div class="ico">📋</div><p>No hay evaluaciones con los filtros seleccionados para ${lider?.nombre}</p></div></div>`; return; }
-
+  if(!evals?.length){cont.innerHTML=`<div class="card"><div class="empty-state"><div class="ico">📋</div><p>No hay evaluaciones con estos filtros para ${escH(lider?.nombre||'')}</p></div></div>`;return;}
   const catKeys=Object.keys(PREGUNTAS);
-  const catProms={};
-  catKeys.forEach(k=>{ catProms[k]=parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2)); });
+  const catProms={};catKeys.forEach(k=>{catProms[k]=parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2));});
   const globalProm=parseFloat((evals.reduce((a,e)=>a+e.puntaje_global,0)/evals.length).toFixed(2));
   const[lbl,cls]=getLabel(globalProm);
-
-  const qProms={};
-  catKeys.forEach(k=>{ PREGUNTAS[k].preguntas.forEach((_,i)=>{ const qid=`${k}_${i}`; qProms[qid]=parseFloat((evals.reduce((a,e)=>a+(e.respuestas?.[qid]||0),0)/evals.length).toFixed(2)); }); });
-
-  const histData=await buildHistoricalDataLider(liderId, tiempo);
-  const likertDist=buildLikertDist(evals, categoria||null);
-
-  const catDetail=catKeys.map(k=>{ const cat=PREGUNTAS[k]; const pregs=cat.preguntas.map((p,i)=>{ const qid=`${k}_${i}`; const v=qProms[qid]; return`<div style="margin-bottom:.75rem"><div style="font-size:.82rem;margin-bottom:.3rem;color:var(--text2)">${p}</div><div style="display:flex;align-items:center;gap:.75rem"><div style="flex:1;height:7px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:${v/5*100}%;background:${CAT_COLORS[k]};border-radius:3px"></div></div><span style="font-weight:700;font-size:.85rem;color:${CAT_COLORS[k]};min-width:30px">${v}</span></div></div>`; }).join(''); return`<div class="card"><div class="card-title" style="color:${CAT_COLORS[k]}">${cat.nombre} <span class="sub">${catProms[k]}/5</span></div>${pregs}</div>`; }).join('');
-
-  const evRows=evals.map(e=>`<tr><td>${e.evaluador_nombre}</td><td>${e.evaluador_puesto}</td><td><span class="badge badge-gray">${TIEMPO_LABELS[e.evaluador_tiempo]||'—'}</span></td>${catKeys.map(k=>`<td style="text-align:center;font-weight:600;color:${CAT_COLORS[k]}">${e.por_categoria?.[k]||'—'}</td>`).join('')}<td><strong>${e.puntaje_global}</strong></td><td style="color:var(--text2);font-size:.8rem">${e.fecha}</td></tr>`).join('');
+  const qProms={};catKeys.forEach(k=>{PREGUNTAS[k].preguntas.forEach((_,i)=>{const qid=`${k}_${i}`;qProms[qid]=parseFloat((evals.reduce((a,e)=>a+(e.respuestas?.[qid]||0),0)/evals.length).toFixed(2));});});
+  const histData=await buildHistDataLider(liderId,tiempo);
+  const likertDist=buildLikertDist(evals,categoria||null);
+  const catDetail=catKeys.map(k=>{const cat=PREGUNTAS[k];return`<div class="card"><div class="card-title" style="color:${CAT_COLORS[k]}">${cat.nombre} <span class="sub">${catProms[k]}/5</span></div>${cat.preguntas.map((p,i)=>{const qid=`${k}_${i}`;const v=qProms[qid];return`<div style="margin-bottom:.75rem"><div style="font-size:.82rem;margin-bottom:.3rem;color:var(--text2)">${escH(p)}</div><div style="display:flex;align-items:center;gap:.75rem"><div style="flex:1;height:7px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:${v/5*100}%;background:${CAT_COLORS[k]};border-radius:3px"></div></div><span style="font-weight:700;font-size:.85rem;color:${CAT_COLORS[k]};min-width:30px">${v}</span></div></div>`;}).join('')}</div>`;}).join('');
+  const evRows=evals.map(e=>`<tr><td>${escH(e.evaluador_nombre)}</td><td>${escH(e.evaluador_puesto||'—')}</td><td><span class="badge badge-gray">${TIEMPO_LBL[e.evaluador_tiempo]||'—'}</span></td>${catKeys.map(k=>`<td style="text-align:center;font-weight:600;color:${CAT_COLORS[k]}">${e.por_categoria?.[k]||'—'}</td>`).join('')}<td><strong>${e.puntaje_global}</strong></td><td style="color:var(--text2);font-size:.8rem">${e.fecha||'—'}</td></tr>`).join('');
 
   cont.innerHTML=`
     <div class="card">
-      <div class="card-title">👤 ${lider?.nombre} — ${lider?.cargo}${lider?.area?' · '+lider.area:''} <span class="sub">${lider?.grupos?.nombre||''}</span></div>
+      <div class="card-title">👤 ${escH(lider?.nombre)} — ${escH(lider?.cargo||'')}${lider?.area?' · '+escH(lider.area):''} <span class="sub">${escH(lider?.grupos?.nombre||'')}</span></div>
       <div class="stats-row">
         <div class="stat-box"><div class="stat-num" style="color:var(--teal)">${globalProm}</div><div class="stat-lbl">Global /5</div></div>
         <div class="stat-box"><div class="stat-num">${evals.length}</div><div class="stat-lbl">Evaluaciones</div></div>
         <div class="stat-box"><div class="stat-num"><span class="badge ${cls}">${lbl}</span></div><div class="stat-lbl">Nivel</div></div>
       </div>
     </div>
-
-    <!-- RADAR + LÍNEA -->
     <div class="grid-2">
-      <div class="card"><div class="card-title">🕸 Radar de Competencias</div><div class="chart-wrap"><canvas id="chart-radar-ind"></canvas></div></div>
-      <div class="card"><div class="card-title">📈 Evolución Histórica Mensual</div><div class="chart-wrap"><canvas id="chart-linea-ind"></canvas></div></div>
+      <div class="card"><div class="card-title">🕸 Radar de Competencias</div><div class="chart-wrap"><canvas id="chart-radar-ind-c"></canvas></div></div>
+      <div class="card"><div class="card-title">📈 Evolución Histórica</div><div class="chart-wrap"><canvas id="chart-linea-ind-c"></canvas></div></div>
     </div>
-
-    <!-- DISTRIBUCIÓN LIKERT -->
-    <div class="card">
-      <div class="card-title">📊 Distribución de Respuestas Likert <span class="sub">${categoria?PREGUNTAS[categoria]?.nombre:'Global'}</span></div>
-      <div class="chart-wrap" style="max-width:500px"><canvas id="chart-likert-ind"></canvas></div>
-    </div>
-
-    <!-- BARRAS CATEGORÍA -->
-    <div class="card">
-      <div class="card-title">📊 Puntaje por Categoría</div>
-      ${catKeys.map(k=>`<div class="report-bar-item"><div class="report-bar-label">${PREGUNTAS[k].nombre}</div><div class="report-bar-track"><div class="report-bar-fill" style="width:${catProms[k]/5*100}%;background:${CAT_COLORS[k]}"></div></div><div class="report-bar-val" style="color:${CAT_COLORS[k]}">${catProms[k]}</div></div>`).join('')}
-    </div>
-
+    <div class="card"><div class="card-title">📊 Distribución Likert <span class="sub">${categoria?PREGUNTAS[categoria]?.nombre:'Global'}</span></div><div class="chart-wrap" style="max-width:440px"><canvas id="chart-likert-ind-c"></canvas></div></div>
+    <div class="card"><div class="card-title">📊 Puntaje por Categoría</div>${catKeys.map(k=>`<div class="report-bar-item"><div class="report-bar-label">${PREGUNTAS[k].nombre}</div><div class="report-bar-track"><div class="report-bar-fill" style="width:${catProms[k]/5*100}%;background:${CAT_COLORS[k]}"></div></div><div class="report-bar-val" style="color:${CAT_COLORS[k]}">${catProms[k]}</div></div>`).join('')}</div>
     ${catDetail}
+    <div class="card"><div class="card-title">📋 Detalle de Evaluaciones</div><div class="table-wrap"><table><thead><tr><th>Evaluador</th><th>Puesto</th><th>Antigüedad</th>${catKeys.map(k=>`<th style="color:${CAT_COLORS[k]};font-size:.65rem">${PREGUNTAS[k].nombre.split(' ').slice(0,2).join(' ')}</th>`).join('')}<th>Global</th><th>Fecha</th></tr></thead><tbody>${evRows}</tbody></table></div></div>`;
 
-    <div class="card">
-      <div class="card-title">📋 Detalle de Evaluaciones</div>
-      <div class="table-wrap"><table><thead><tr><th>Evaluador</th><th>Puesto</th><th>Antigüedad</th>${catKeys.map(k=>`<th style="color:${CAT_COLORS[k]}">${PREGUNTAS[k].nombre.split(' ').slice(0,2).join(' ')}</th>`).join('')}<th>Global</th><th>Fecha</th></tr></thead><tbody>${evRows}</tbody></table></div>
-    </div>`;
-
-  renderCharts_Individual(catProms, histData, likertDist, catKeys);
+  setTimeout(()=>{
+    renderRadar('chart-radar-ind-c',catProms,catKeys);
+    renderLinea('chart-linea-ind-c',histData);
+    renderLikert('chart-likert-ind-c',likertDist);
+  },80);
 }
 
-// ===================== REPORTE USER =====================
+// ============================================================
+// REPORTE GENERAL USER
+// ============================================================
 async function cargarReporteUser(){
   const cont=document.getElementById('rpt-user-content');
-  if(!userGrupoId){ cont.innerHTML='<div class="empty-state"><div class="ico">🔒</div><p>No tienes grupo asignado</p></div>'; return; }
+  if(!userGrupoId){cont.innerHTML='<div class="empty-state"><div class="ico">🔒</div><p>No tienes grupo asignado. Edita tu perfil.</p></div>';return;}
   cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
   destroyCharts('user');
   const evals=await fetchEvals(userGrupoId,'','');
-  if(!evals.length){ cont.innerHTML='<div class="empty-state"><div class="ico">📊</div><p>No hay evaluaciones en tu grupo aún</p></div>'; return; }
-
+  if(!evals.length){cont.innerHTML='<div class="empty-state"><div class="ico">📊</div><p>No hay evaluaciones en tu grupo aún</p></div>';return;}
   const catKeys=Object.keys(PREGUNTAS);
-  const catProms={};
-  catKeys.forEach(k=>{ catProms[k]=parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2)); });
+  const catProms={};catKeys.forEach(k=>{catProms[k]=parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2));});
   const globalProm=parseFloat((evals.reduce((a,e)=>a+e.puntaje_global,0)/evals.length).toFixed(2));
   const[lbl,cls]=getLabel(globalProm);
-  const liderMap={};
-  evals.forEach(e=>{ if(!liderMap[e.lider_id]) liderMap[e.lider_id]={nombre:e.lideres?.nombre||'—',cargo:e.lideres?.cargo||'',evals:[]}; liderMap[e.lider_id].evals.push(e); });
-  const histData=await buildHistoricalData(userGrupoId,'','');
-
+  const liderMap={};evals.forEach(e=>{if(!liderMap[e.lider_id])liderMap[e.lider_id]={nombre:e.lideres?.nombre||'—',cargo:e.lideres?.cargo||'',evals:[]};liderMap[e.lider_id].evals.push(e);});
+  const histData=await buildHistData(userGrupoId,'','');
   cont.innerHTML=`
     <div class="stats-row">
       <div class="stat-box"><div class="stat-num" style="color:var(--teal)">${globalProm}</div><div class="stat-lbl">Promedio /5</div></div>
@@ -878,109 +1131,79 @@ async function cargarReporteUser(){
       <div class="card"><div class="card-title">📊 Por Categoría</div>${catKeys.map(k=>`<div class="report-bar-item"><div class="report-bar-label">${PREGUNTAS[k].nombre}</div><div class="report-bar-track"><div class="report-bar-fill" style="width:${catProms[k]/5*100}%;background:${CAT_COLORS[k]}"></div></div><div class="report-bar-val" style="color:${CAT_COLORS[k]}">${catProms[k]}</div></div>`).join('')}</div>
       <div class="card"><div class="card-title">🕸 Radar de Competencias</div><div class="chart-wrap"><canvas id="chart-radar-user"></canvas></div></div>
     </div>
-    <div class="card"><div class="card-title">📈 Evolución Histórica</div><div class="chart-wrap"><canvas id="chart-linea-user"></canvas></div></div>`;
-
-  setTimeout(()=>{ renderRadar('chart-radar-user', catProms, catKeys); renderLinea('chart-linea-user', histData); }, 100);
+    <div class="card"><div class="card-title">📈 Evolución Histórica del Grupo</div><div class="chart-wrap"><canvas id="chart-linea-user"></canvas></div></div>`;
+  setTimeout(()=>{renderRadar('chart-radar-user',catProms,catKeys);renderLinea('chart-linea-user',histData);},100);
 }
 
-// ===================== CHART DATA HELPERS =====================
-async function buildHistoricalData(grupoId, tiempo, mes){
+// ============================================================
+// CHART DATA HELPERS
+// ============================================================
+async function buildHistData(grupoId,tiempo,_mes){
   let q=sb.from('evaluaciones').select('mes,anio,puntaje_global');
-  if(grupoId) q=q.eq('grupo_id',grupoId);
-  if(tiempo) q=q.eq('evaluador_tiempo',tiempo);
+  if(grupoId)q=q.eq('grupo_id',grupoId);if(tiempo)q=q.eq('evaluador_tiempo',tiempo);
   const{data}=await q.order('anio').order('mes');
-  if(!data?.length) return {labels:[],values:[]};
-  const byMonth={};
-  data.forEach(e=>{ const key=`${e.anio||'2025'}-${e.mes||'01'}`; if(!byMonth[key]) byMonth[key]=[]; byMonth[key].push(e.puntaje_global); });
-  const sorted=Object.keys(byMonth).sort();
-  return{ labels:sorted.map(k=>{ const[y,m]=k.split('-'); return`${MESES[parseInt(m)-1]} ${y}`; }), values:sorted.map(k=>parseFloat((byMonth[k].reduce((a,b)=>a+b,0)/byMonth[k].length).toFixed(2))) };
+  return aggByMonth(data||[]);
 }
-async function buildHistoricalDataLider(liderId, tiempo){
+async function buildHistDataLider(liderId,tiempo){
   let q=sb.from('evaluaciones').select('mes,anio,puntaje_global').eq('lider_id',liderId);
-  if(tiempo) q=q.eq('evaluador_tiempo',tiempo);
+  if(tiempo)q=q.eq('evaluador_tiempo',tiempo);
   const{data}=await q.order('anio').order('mes');
-  if(!data?.length) return{labels:[],values:[]};
-  const byMonth={};
-  data.forEach(e=>{ const key=`${e.anio||'2025'}-${e.mes||'01'}`; if(!byMonth[key]) byMonth[key]=[]; byMonth[key].push(e.puntaje_global); });
-  const sorted=Object.keys(byMonth).sort();
-  return{ labels:sorted.map(k=>{ const[y,m]=k.split('-'); return`${MESES[parseInt(m)-1]} ${y}`; }), values:sorted.map(k=>parseFloat((byMonth[k].reduce((a,b)=>a+b,0)/byMonth[k].length).toFixed(2))) };
+  return aggByMonth(data||[]);
 }
-function buildLikertDist(evals, catFilter){
+function aggByMonth(data){
+  if(!data.length)return{labels:[],values:[]};
+  const byM={};data.forEach(e=>{const k=`${e.anio||'2025'}-${e.mes||'01'}`;if(!byM[k])byM[k]=[];byM[k].push(e.puntaje_global);});
+  const sorted=Object.keys(byM).sort();
+  return{labels:sorted.map(k=>{const[y,m]=k.split('-');return`${MESES[parseInt(m)-1]} ${y}`;}),values:sorted.map(k=>parseFloat((byM[k].reduce((a,b)=>a+b,0)/byM[k].length).toFixed(2)))};
+}
+function buildLikertDist(evals,catFilter){
   const dist={1:0,2:0,3:0,4:0,5:0};
-  evals.forEach(e=>{
-    const catKeys=catFilter?[catFilter]:Object.keys(PREGUNTAS);
-    catKeys.forEach(k=>{ PREGUNTAS[k].preguntas.forEach((_,i)=>{ const v=e.respuestas?.[`${k}_${i}`]; if(v) dist[v]=(dist[v]||0)+1; }); });
-  });
+  evals.forEach(e=>{const catKeys=catFilter?[catFilter]:Object.keys(PREGUNTAS);catKeys.forEach(k=>{PREGUNTAS[k].preguntas.forEach((_,i)=>{const v=e.respuestas?.[`${k}_${i}`];if(v)dist[v]=(dist[v]||0)+1;});});});
   return dist;
 }
 
-// ===================== CHART RENDERERS =====================
-function destroyCharts(prefix){
-  Object.keys(charts).forEach(k=>{ if(!prefix||k.includes(prefix)){ charts[k].destroy(); delete charts[k]; } });
+// ============================================================
+// CHART RENDERERS
+// ============================================================
+function destroyCharts(prefix){Object.keys(charts).forEach(k=>{if(!prefix||k.startsWith(prefix)){try{charts[k].destroy();}catch(e){}delete charts[k];}});}
+function renderRadar(id,catProms,catKeys){
+  const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
+  charts[id]=new Chart(el,{type:'radar',data:{labels:catKeys.map(k=>PREGUNTAS[k].nombre.replace(/^[^\s]+ /,'')),datasets:[{label:'Puntaje',data:catKeys.map(k=>catProms[k]),backgroundColor:'rgba(45,212,191,.15)',borderColor:'#2dd4bf',borderWidth:2,pointBackgroundColor:'#2dd4bf',pointRadius:4}]},options:{responsive:true,scales:{r:{min:0,max:5,ticks:{stepSize:1,backdropColor:'transparent'},grid:{color:'#1e2433'},angleLines:{color:'#1e2433'},pointLabels:{color:'#8892a4',font:{size:11}}}},plugins:{legend:{display:false}}}});
 }
-function renderRadar(id, catProms, catKeys){
-  const el=document.getElementById(id); if(!el) return;
-  if(charts[id]) charts[id].destroy();
-  charts[id]=new Chart(el,{ type:'radar', data:{ labels:catKeys.map(k=>PREGUNTAS[k].nombre.replace(/^[^\s]+ /,'')), datasets:[{label:'Puntaje',data:catKeys.map(k=>catProms[k]),backgroundColor:'rgba(45,212,191,.15)',borderColor:'#2dd4bf',borderWidth:2,pointBackgroundColor:'#2dd4bf',pointRadius:4}] }, options:{ responsive:true, scales:{ r:{ min:0,max:5, ticks:{stepSize:1,color:'#8892a4',backdropColor:'transparent'}, grid:{color:'#1e2433'}, angleLines:{color:'#1e2433'}, pointLabels:{color:'#8892a4',font:{size:11}} } }, plugins:{legend:{display:false}} } });
+function renderLinea(id,histData){
+  const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
+  if(!histData.labels.length){el.parentElement.innerHTML='<p style="color:var(--text2);text-align:center;padding:1rem">No hay datos históricos suficientes aún</p>';return;}
+  charts[id]=new Chart(el,{type:'line',data:{labels:histData.labels,datasets:[{label:'Puntaje Promedio',data:histData.values,borderColor:'#d4a843',backgroundColor:'rgba(212,168,67,.08)',borderWidth:2.5,pointBackgroundColor:'#d4a843',pointRadius:5,tension:.35,fill:true}]},options:{responsive:true,scales:{y:{min:0,max:5,ticks:{stepSize:1},grid:{color:'#1e2433'}},x:{grid:{color:'#1e2433'}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`Puntaje: ${ctx.parsed.y}/5`}}}}});
 }
-function renderLinea(id, histData){
-  const el=document.getElementById(id); if(!el) return;
-  if(charts[id]) charts[id].destroy();
-  if(!histData.labels.length){ el.parentElement.innerHTML='<p style="color:var(--text2);text-align:center;padding:1rem">No hay suficientes datos históricos aún</p>'; return; }
-  charts[id]=new Chart(el,{ type:'line', data:{ labels:histData.labels, datasets:[{label:'Puntaje Promedio',data:histData.values,borderColor:'#d4a843',backgroundColor:'rgba(212,168,67,.08)',borderWidth:2.5,pointBackgroundColor:'#d4a843',pointRadius:5,tension:.35,fill:true}] }, options:{ responsive:true, scales:{ y:{min:0,max:5,ticks:{stepSize:1},grid:{color:'#1e2433'}}, x:{grid:{color:'#1e2433'}} }, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>`Puntaje: ${ctx.parsed.y}/5`}} } } });
+function renderBarrasLideres(id,liderMap){
+  const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
+  const sorted=Object.values(liderMap).sort((a,b)=>{const pa=a.evals.reduce((x,e)=>x+e.puntaje_global,0)/a.evals.length;const pb=b.evals.reduce((x,e)=>x+e.puntaje_global,0)/b.evals.length;return pb-pa;});
+  charts[id]=new Chart(el,{type:'bar',data:{labels:sorted.map(l=>{const parts=l.nombre.split(' ');return parts[0]+(parts[1]?' '+parts[1][0]+'.':[]);}),datasets:[{label:'Puntaje',data:sorted.map(l=>parseFloat((l.evals.reduce((a,e)=>a+e.puntaje_global,0)/l.evals.length).toFixed(2))),backgroundColor:sorted.map((_,i)=>`hsl(${160+i*35},55%,50%)`),borderRadius:6}]},options:{responsive:true,indexAxis:'y',scales:{x:{min:0,max:5,ticks:{stepSize:1},grid:{color:'#1e2433'}},y:{grid:{color:'#1e2433'}}},plugins:{legend:{display:false}}}});
 }
-function renderBarrasLideres(id, liderMap){
-  const el=document.getElementById(id); if(!el) return;
-  if(charts[id]) charts[id].destroy();
-  const sorted=Object.values(liderMap).sort((a,b)=>{ const pa=a.evals.reduce((x,e)=>x+e.puntaje_global,0)/a.evals.length; const pb=b.evals.reduce((x,e)=>x+e.puntaje_global,0)/b.evals.length; return pb-pa; });
-  charts[id]=new Chart(el,{ type:'bar', data:{ labels:sorted.map(l=>l.nombre.split(' ')[0]+' '+( l.nombre.split(' ')[1]?l.nombre.split(' ')[1][0]+'.':'' )), datasets:[{label:'Puntaje',data:sorted.map(l=>parseFloat((l.evals.reduce((a,e)=>a+e.puntaje_global,0)/l.evals.length).toFixed(2))),backgroundColor:sorted.map((_,i)=>`hsl(${160+i*30},60%,50%)`),borderRadius:6}] }, options:{ responsive:true, indexAxis:'y', scales:{ x:{min:0,max:5,ticks:{stepSize:1},grid:{color:'#1e2433'}}, y:{grid:{color:'#1e2433'}} }, plugins:{legend:{display:false}} } });
-}
-function renderLikert(id, dist){
-  const el=document.getElementById(id); if(!el) return;
-  if(charts[id]) charts[id].destroy();
+function renderLikert(id,dist){
+  const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
   const total=Object.values(dist).reduce((a,b)=>a+b,0)||1;
-  charts[id]=new Chart(el,{ type:'doughnut', data:{ labels:['1 - Nunca','2 - Rara vez','3 - A veces','4 - Frecuentemente','5 - Siempre'], datasets:[{data:[1,2,3,4,5].map(v=>dist[v]||0),backgroundColor:['#ef4444','#eab308','#d4a843','#22c55e','#2dd4bf'],borderWidth:0,hoverOffset:8}] }, options:{ responsive:true, plugins:{ legend:{position:'bottom',labels:{padding:12,font:{size:11}}}, tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/total*100)}%)`}} } } });
+  charts[id]=new Chart(el,{type:'doughnut',data:{labels:['1 - Nunca','2 - Rara vez','3 - A veces','4 - Frecuentemente','5 - Siempre'],datasets:[{data:[1,2,3,4,5].map(v=>dist[v]||0),backgroundColor:['#ef4444','#eab308','#d4a843','#22c55e','#2dd4bf'],borderWidth:0,hoverOffset:8}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:12,font:{size:11}}},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/total*100)}%)`}}}}});
 }
-function renderAntiguedad(id, tiempoCont){
-  const el=document.getElementById(id); if(!el) return;
-  if(charts[id]) charts[id].destroy();
+function renderAntiguedad(id,tiempoCont){
+  const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
   const keys=['menos_6m','6m_1a','1a_2a','mas_2a'];
-  charts[id]=new Chart(el,{ type:'polarArea', data:{ labels:keys.map(k=>TIEMPO_LABELS[k]), datasets:[{data:keys.map(k=>tiempoCont[k]||0),backgroundColor:['rgba(96,165,250,.7)','rgba(45,212,191,.7)','rgba(212,168,67,.7)','rgba(192,132,252,.7)'],borderWidth:0}] }, options:{ responsive:true, plugins:{legend:{position:'bottom',labels:{padding:10,font:{size:11}}}} } });
+  charts[id]=new Chart(el,{type:'polarArea',data:{labels:keys.map(k=>TIEMPO_LBL[k]),datasets:[{data:keys.map(k=>tiempoCont[k]||0),backgroundColor:['rgba(96,165,250,.7)','rgba(45,212,191,.7)','rgba(212,168,67,.7)','rgba(192,132,252,.7)'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:10,font:{size:11}}}}}});
 }
-async function renderCharts_General(catProms, histData, liderMap, likertDist, tiempoCont, catKeys){
-  await sleep(80);
-  renderRadar('chart-radar-g', catProms, catKeys);
-  renderLinea('chart-linea-g', histData);
-  renderBarrasLideres('chart-barras-g', liderMap);
-  renderLikert('chart-likert-g', likertDist);
-  renderAntiguedad('chart-antiguedad-g', tiempoCont);
-}
-function renderCharts_Individual(catProms, histData, likertDist, catKeys){
-  setTimeout(()=>{
-    renderRadar('chart-radar-ind', catProms, catKeys);
-    renderLinea('chart-linea-ind', histData);
-    renderLikert('chart-likert-ind', likertDist);
-  },80);
-}
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
-// ===================== UTILS =====================
-function getLabel(score){
-  const s=parseFloat(score);
-  if(!score||isNaN(s)) return['Sin datos','badge-gray'];
-  if(s>=4.5) return['Excelente','badge-teal'];
-  if(s>=3.5) return['Bueno','badge-green'];
-  if(s>=2.5) return['Regular','badge-yellow'];
-  return['Por mejorar','badge-red'];
-}
-function toast(msg,type=''){
-  const el=document.getElementById('toast'); el.textContent=msg; el.className=`toast ${type} show`;
-  clearTimeout(window._tt); window._tt=setTimeout(()=>el.classList.remove('show'),3500);
-}
+// ============================================================
+// UTILS
+// ============================================================
+function getLabel(score){const s=parseFloat(score);if(!score||isNaN(s))return['Sin datos','badge-gray'];if(s>=4.5)return['Excelente','badge-teal'];if(s>=3.5)return['Bueno','badge-green'];if(s>=2.5)return['Regular','badge-yellow'];return['Por mejorar','badge-red'];}
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escQ(s){return String(s).replace(/'/g,"\\'").replace(/\n/g,' ');}
+function toast(msg,type=''){const el=document.getElementById('toast');el.textContent=msg;el.className=`toast ${type} show`;clearTimeout(window._tt);window._tt=setTimeout(()=>el.classList.remove('show'),3500);}
+function openOverlay(id){document.getElementById(id).classList.add('open');}
+function closeOverlay(id){document.getElementById(id).classList.remove('open');}
 let _cb=null;
-function confirm2(title,body,cb){ document.getElementById('confirm-title').textContent=title; document.getElementById('confirm-body').textContent=body; _cb=cb; document.getElementById('confirm-modal').classList.add('open'); document.getElementById('confirm-ok').onclick=()=>{closeModal();_cb&&_cb();}; }
-function closeModal(){ document.getElementById('confirm-modal').classList.remove('open'); }
-document.getElementById('confirm-modal').addEventListener('click',e=>{if(e.target.id==='confirm-modal')closeModal();});
+function confirm2(title,body,cb){document.getElementById('confirm-title').textContent=title;document.getElementById('confirm-body').textContent=body;_cb=cb;openOverlay('confirm-modal');document.getElementById('confirm-ok').onclick=()=>{closeOverlay('confirm-modal');_cb&&_cb();};}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeOverlay(o.id);}));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 init();
 </script>
