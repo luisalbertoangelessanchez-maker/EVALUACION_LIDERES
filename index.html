@@ -4,437 +4,500 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LeaderScope — Evaluación de Liderazgo</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root {
-    --ink: #0f0e17;
-    --paper: #fffcf5;
-    --cream: #f5f0e8;
-    --gold: #c9a84c;
-    --gold-light: #e8d5a3;
-    --rust: #c0392b;
-    --teal: #1a6b6b;
-    --teal-light: #e8f4f4;
-    --mid: #6b6560;
-    --border: #d8d0c4;
-    --shadow: rgba(15,14,23,0.12);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+:root {
+  --bg: #07090f;
+  --surface: #0e1117;
+  --surface2: #151922;
+  --border: #1e2433;
+  --border2: #2a3349;
+  --gold: #d4a843;
+  --gold2: #f0c96a;
+  --teal: #2dd4bf;
+  --teal-dim: #0f3d38;
+  --red: #ef4444;
+  --green: #22c55e;
+  --yellow: #eab308;
+  --text: #e8ecf4;
+  --text2: #8892a4;
+  --text3: #4a5568;
+  --radius: 12px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
 
-  /* NAV */
-  nav {
-    background: var(--ink);
-    color: var(--paper);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
-    position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
-  }
-  .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; }
-  .logo span { color: var(--gold); }
-  .nav-tabs { display: flex; gap: 0.25rem; }
-  .nav-tab {
-    padding: 0.5rem 1.25rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem;
-    font-weight: 500; letter-spacing: 0.3px; transition: all 0.2s; color: rgba(255,255,255,0.6);
-    border: none; background: transparent;
-  }
-  .nav-tab.active, .nav-tab:hover { background: rgba(201,168,76,0.2); color: var(--gold); }
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--surface); } ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
-  /* LAYOUT */
-  .container { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
+/* AUTH SCREEN */
+#auth-screen {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 20% 50%, rgba(212,168,67,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(45,212,191,0.06) 0%, transparent 50%), var(--bg);
+}
+.auth-box {
+  width: 100%; max-width: 420px; padding: 2.5rem;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 20px; box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+}
+.auth-logo { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.25rem; }
+.auth-logo span { color: var(--gold); }
+.auth-sub { color: var(--text2); font-size: 0.88rem; margin-bottom: 2rem; }
+.auth-tabs { display: flex; background: var(--bg); border-radius: 8px; padding: 3px; margin-bottom: 1.75rem; }
+.auth-tab { flex: 1; padding: 0.5rem; text-align: center; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--text2); transition: all 0.2s; border: none; background: transparent; }
+.auth-tab.active { background: var(--surface2); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
 
-  /* SECTION */
-  .section { display: none; }
-  .section.active { display: block; animation: fadeIn 0.4s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+/* FORMS */
+.form-group { margin-bottom: 1rem; }
+label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 0.4rem; }
+input, select, textarea {
+  width: 100%; padding: 0.75rem 1rem; background: var(--bg); border: 1.5px solid var(--border2);
+  border-radius: 8px; color: var(--text); font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,168,67,0.12); }
+input::placeholder { color: var(--text3); }
+select option { background: var(--surface2); }
 
-  /* HERO */
-  .hero {
-    background: linear-gradient(135deg, var(--ink) 0%, #1a1926 100%);
-    color: var(--paper); border-radius: 16px; padding: 3rem 2.5rem;
-    margin-bottom: 2rem; position: relative; overflow: hidden;
-  }
-  .hero::before {
-    content: '◈'; position: absolute; right: -30px; top: -40px;
-    font-size: 200px; color: rgba(201,168,76,0.06); font-family: serif;
-  }
-  .hero h1 { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 900; line-height: 1.1; }
-  .hero h1 em { color: var(--gold); font-style: normal; }
-  .hero p { margin-top: 1rem; color: rgba(255,255,255,0.65); font-size: 1.05rem; max-width: 500px; line-height: 1.6; }
-  .hero-stats { display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; }
-  .hero-stat { text-align: center; }
-  .hero-stat .num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--gold); }
-  .hero-stat .lbl { font-size: 0.75rem; color: rgba(255,255,255,0.5); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-family: 'Instrument Sans', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #0a0700; }
+.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,168,67,0.35); }
+.btn-teal { background: var(--teal); color: #031a18; }
+.btn-teal:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,212,191,0.3); }
+.btn-ghost { background: transparent; border: 1.5px solid var(--border2); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.btn-danger { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: var(--red); }
+.btn-danger:hover { background: rgba(239,68,68,0.25); }
+.btn-sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; }
+.btn-full { width: 100%; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
 
-  /* CARD */
-  .card {
-    background: white; border: 1px solid var(--border); border-radius: 12px;
-    padding: 2rem; margin-bottom: 1.5rem;
-    box-shadow: 0 2px 12px var(--shadow);
-  }
-  .card-title {
-    font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700;
-    color: var(--ink); margin-bottom: 1.5rem; padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--gold-light); display: flex; align-items: center; gap: 0.5rem;
-  }
-  .card-title .icon { font-size: 1.1rem; }
+/* NAV */
+#app-screen { display: none; }
+nav {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem; display: flex; align-items: center; gap: 1rem;
+  height: 60px; position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+.nav-logo { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; margin-right: 1rem; white-space: nowrap; }
+.nav-logo span { color: var(--gold); }
+.nav-tabs { display: flex; gap: 0.15rem; flex: 1; overflow-x: auto; }
+.nav-tab { padding: 0.45rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--text2); border: none; background: transparent; white-space: nowrap; transition: all 0.2s; }
+.nav-tab:hover { color: var(--text); background: var(--surface2); }
+.nav-tab.active { background: rgba(212,168,67,0.15); color: var(--gold); }
+.nav-right { display: flex; align-items: center; gap: 0.75rem; margin-left: auto; }
+.nav-user { font-size: 0.8rem; color: var(--text2); white-space: nowrap; }
+.nav-badge { background: linear-gradient(135deg,var(--gold),var(--gold2)); color: #0a0700; font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-  /* FORM */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
-  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
-  .form-group.full { grid-column: 1/-1; }
-  label { font-size: 0.82rem; font-weight: 600; color: var(--mid); letter-spacing: 0.5px; text-transform: uppercase; }
-  input, select, textarea {
-    padding: 0.7rem 1rem; border: 1.5px solid var(--border); border-radius: 8px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--ink);
-    background: var(--paper); transition: border-color 0.2s;
-  }
-  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--teal); }
+/* CONTAINER */
+.container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+.section { display: none; animation: fadeUp 0.35s ease; }
+.section.active { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* CATEGORIES */
-  .categories { display: flex; flex-direction: column; gap: 2rem; }
-  .category {
-    border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
-    box-shadow: 0 1px 6px var(--shadow);
-  }
-  .category-header {
-    padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.75rem;
-    font-weight: 600; font-size: 0.95rem; letter-spacing: 0.3px;
-  }
-  .category-body { background: white; padding: 1rem 1.5rem; }
-  .cat-1 .category-header { background: #1a6b6b; color: white; }
-  .cat-2 .category-header { background: #7b3f00; color: white; }
-  .cat-3 .category-header { background: #2c4a7c; color: white; }
-  .cat-4 .category-header { background: #5a2d82; color: white; }
-  .cat-5 .category-header { background: #8b2635; color: white; }
+/* PAGE HEADER */
+.page-header { margin-bottom: 2rem; }
+.page-header h1 { font-family: 'Syne', sans-serif; font-size: 1.9rem; font-weight: 800; }
+.page-header p { color: var(--text2); margin-top: 0.3rem; font-size: 0.9rem; }
 
-  /* LIKERT */
-  .question { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #f0ece4; }
-  .question:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-  .q-text { font-size: 0.95rem; color: var(--ink); margin-bottom: 0.85rem; line-height: 1.5; font-weight: 500; }
-  .likert-scale { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
-  .likert-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--mid); margin-top: 0.4rem; }
-  .likert-btn {
-    flex: 1; min-width: 40px; padding: 0.5rem 0.25rem; border: 1.5px solid var(--border);
-    border-radius: 8px; cursor: pointer; text-align: center; font-size: 0.85rem; font-weight: 600;
-    transition: all 0.18s; background: var(--paper); color: var(--mid);
-    font-family: 'DM Sans', sans-serif;
-  }
-  .likert-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
-  .likert-btn.selected { background: var(--teal); border-color: var(--teal); color: white; }
-  .likert-btn[data-val="1"].selected { background: #c0392b; border-color: #c0392b; }
-  .likert-btn[data-val="2"].selected { background: #e67e22; border-color: #e67e22; }
-  .likert-btn[data-val="3"].selected { background: #f1c40f; border-color: #f1c40f; color: #333; }
-  .likert-btn[data-val="4"].selected { background: #27ae60; border-color: #27ae60; }
-  .likert-btn[data-val="5"].selected { background: #1a6b6b; border-color: #1a6b6b; }
-  .likert-legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: var(--cream); border-radius: 8px; }
-  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--mid); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+/* CARDS */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; margin-bottom: 1.25rem; }
+.card-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 1.5rem; padding-bottom: 0.85rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; color: var(--text); }
+.card-title .badge-cat { font-size: 0.7rem; background: rgba(212,168,67,0.15); color: var(--gold); padding: 0.2rem 0.6rem; border-radius: 20px; font-family: 'Instrument Sans', sans-serif; font-weight: 600; }
 
-  /* BUTTONS */
-  .btn {
-    padding: 0.75rem 2rem; border: none; border-radius: 8px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600;
-    transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem;
-  }
-  .btn-primary { background: var(--teal); color: white; }
-  .btn-primary:hover { background: #14585a; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,107,107,0.3); }
-  .btn-gold { background: var(--gold); color: var(--ink); }
-  .btn-gold:hover { background: #b8953e; transform: translateY(-1px); }
-  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--mid); }
-  .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
-  .btn-danger { background: var(--rust); color: white; }
-  .btn-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+/* GRID */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.col-full { grid-column: 1/-1; }
 
-  /* PROGRESS */
-  .progress-bar { height: 6px; background: var(--border); border-radius: 3px; margin: 1rem 0; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--gold)); border-radius: 3px; transition: width 0.4s ease; }
+/* STATS ROW */
+.stats-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; flex: 1; min-width: 130px; }
+.stat-num { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--gold); }
+.stat-lbl { font-size: 0.75rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0.2rem; }
 
-  /* REPORTS */
-  .report-header {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
-  }
-  .leaders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
-  .leader-card {
-    background: white; border: 1px solid var(--border); border-radius: 12px;
-    padding: 1.5rem; cursor: pointer; transition: all 0.2s;
-    box-shadow: 0 2px 8px var(--shadow);
-  }
-  .leader-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--shadow); border-color: var(--gold); }
-  .leader-card.selected { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(26,107,107,0.15); }
-  .leader-name { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; }
-  .leader-role { font-size: 0.82rem; color: var(--mid); margin-bottom: 1rem; }
-  .leader-score { display: flex; align-items: baseline; gap: 0.3rem; }
-  .score-num { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; color: var(--teal); }
-  .score-max { font-size: 0.85rem; color: var(--mid); }
-  .score-label { font-size: 0.78rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 20px; margin-left: auto; }
-  .eval-count { font-size: 0.78rem; color: var(--mid); margin-top: 0.5rem; }
+/* TABLE */
+.table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+thead tr { background: var(--surface2); }
+th { padding: 0.75rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text2); white-space: nowrap; }
+td { padding: 0.7rem 1rem; border-top: 1px solid var(--border); color: var(--text); }
+tr:hover td { background: rgba(255,255,255,0.02); }
 
-  /* GAUGE */
-  .gauge-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-  .gauge-item { padding: 1rem 1.25rem; background: var(--cream); border-radius: 10px; }
-  .gauge-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--mid); font-weight: 600; margin-bottom: 0.5rem; }
-  .gauge-val { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; }
-  .gauge-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 0.5rem; }
-  .gauge-fill { height: 100%; border-radius: 2px; background: var(--teal); }
+/* BADGE */
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.73rem; font-weight: 700; }
+.badge-gold { background: rgba(212,168,67,0.15); color: var(--gold); }
+.badge-teal { background: rgba(45,212,191,0.12); color: var(--teal); }
+.badge-red { background: rgba(239,68,68,0.12); color: var(--red); }
+.badge-green { background: rgba(34,197,94,0.12); color: var(--green); }
+.badge-yellow { background: rgba(234,179,8,0.12); color: var(--yellow); }
+.badge-gray { background: var(--surface2); color: var(--text2); }
 
-  /* CATEGORY SCORES */
-  .cat-score-list { display: flex; flex-direction: column; gap: 0.85rem; }
-  .cat-score-item { display: flex; align-items: center; gap: 1rem; }
-  .cat-score-name { font-size: 0.88rem; font-weight: 600; min-width: 160px; }
-  .cat-score-bar { flex: 1; height: 12px; background: var(--border); border-radius: 6px; overflow: hidden; }
-  .cat-score-fill { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
-  .cat-score-num { font-weight: 700; font-size: 0.9rem; min-width: 40px; text-align: right; }
+/* LIKERT */
+.categories-eval { display: flex; flex-direction: column; gap: 1.25rem; }
+.cat-block { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.cat-header { padding: 0.9rem 1.25rem; font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+.cat-body { background: var(--surface); padding: 1.25rem; }
+.question { margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+.question:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.q-text { font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--text); font-weight: 500; }
+.likert-row { display: flex; gap: 0.35rem; }
+.lbtn { flex: 1; padding: 0.55rem 0.25rem; border: 1.5px solid var(--border2); border-radius: 7px; background: var(--bg); color: var(--text2); font-size: 0.85rem; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.15s; font-family: 'Instrument Sans', sans-serif; }
+.lbtn:hover { border-color: var(--gold); color: var(--gold); }
+.lbtn.sel-1 { background: rgba(239,68,68,0.2); border-color: var(--red); color: var(--red); }
+.lbtn.sel-2 { background: rgba(234,179,8,0.15); border-color: var(--yellow); color: var(--yellow); }
+.lbtn.sel-3 { background: rgba(212,168,67,0.15); border-color: var(--gold); color: var(--gold); }
+.lbtn.sel-4 { background: rgba(34,197,94,0.15); border-color: var(--green); color: var(--green); }
+.lbtn.sel-5 { background: rgba(45,212,191,0.15); border-color: var(--teal); color: var(--teal); }
+.likert-labels { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--text3); margin-top: 0.35rem; }
+.likert-legend { display: flex; gap: 1.25rem; flex-wrap: wrap; padding: 0.75rem 1rem; background: var(--surface2); border-radius: 8px; margin-bottom: 1.5rem; }
+.leg-item { display: flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; color: var(--text2); }
+.leg-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-  /* TABLE */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-  th { background: var(--ink); color: var(--paper); padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; letter-spacing: 0.5px; text-transform: uppercase; }
-  td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); }
-  tr:hover td { background: var(--cream); }
+/* PROGRESS */
+.prog-wrap { margin: 1rem 0; }
+.prog-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.prog-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--gold)); border-radius: 2px; transition: width 0.4s ease; }
+.prog-label { font-size: 0.75rem; color: var(--text2); margin-top: 0.4rem; }
 
-  /* BADGE */
-  .badge {
-    display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px;
-    font-size: 0.75rem; font-weight: 600;
-  }
-  .badge-excellent { background: #d4f4e8; color: #1a7a4a; }
-  .badge-good { background: #d9f0e8; color: #27ae60; }
-  .badge-average { background: #fef9c3; color: #a16207; }
-  .badge-below { background: #fee2e2; color: #dc2626; }
+/* REPORT BARS */
+.report-bar-item { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.85rem; }
+.report-bar-label { font-size: 0.82rem; font-weight: 600; min-width: 200px; color: var(--text); }
+.report-bar-track { flex: 1; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.report-bar-fill { height: 100%; border-radius: 5px; transition: width 0.7s ease; }
+.report-bar-val { font-weight: 700; font-size: 0.85rem; min-width: 36px; text-align: right; }
 
-  /* EMPTY STATE */
-  .empty { text-align: center; padding: 3rem; color: var(--mid); }
-  .empty .big { font-size: 3rem; margin-bottom: 1rem; }
-  .empty p { font-size: 1rem; }
+/* LEADER CARDS */
+.leader-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.leader-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; cursor: pointer; transition: all 0.2s; }
+.leader-card:hover, .leader-card.sel { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,168,67,0.1); }
+.lc-name { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; }
+.lc-role { font-size: 0.78rem; color: var(--text2); margin-bottom: 0.85rem; }
+.lc-score { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--teal); }
+.lc-evals { font-size: 0.75rem; color: var(--text3); margin-top: 0.25rem; }
 
-  /* TOAST */
-  .toast {
-    position: fixed; bottom: 2rem; right: 2rem; background: var(--ink); color: white;
-    padding: 1rem 1.5rem; border-radius: 10px; font-size: 0.9rem; font-weight: 500;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 999;
-    transform: translateY(100px); opacity: 0; transition: all 0.35s ease;
-    max-width: 320px; border-left: 4px solid var(--gold);
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
+/* TOAST */
+.toast { position: fixed; bottom: 2rem; right: 2rem; padding: 0.9rem 1.4rem; border-radius: 10px; font-size: 0.88rem; font-weight: 600; z-index: 9999; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; max-width: 320px; border-left: 3px solid var(--gold); background: var(--surface); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.err { border-left-color: var(--red); }
+.toast.ok { border-left-color: var(--green); }
 
-  /* RESPONDENT INFO */
-  .info-strip { background: var(--teal-light); border: 1px solid rgba(26,107,107,0.2); border-radius: 10px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--teal); font-weight: 500; }
+/* MODAL */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; padding: 2rem; max-width: 480px; width: 90%; box-shadow: 0 32px 80px rgba(0,0,0,0.6); animation: fadeUp 0.25s ease; }
+.modal h3 { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; }
+.modal-btns { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
 
-  /* MODAL */
-  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; }
-  .overlay.open { display: flex; }
-  .modal { background: white; border-radius: 16px; padding: 2rem; max-width: 480px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-  .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 1rem; }
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
 
-  @media(max-width: 600px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .gauge-row { grid-template-columns: 1fr; }
-    .hero h1 { font-size: 1.8rem; }
-  }
+/* INFO STRIP */
+.info-strip { background: rgba(45,212,191,0.08); border: 1px solid rgba(45,212,191,0.2); border-radius: 8px; padding: 0.85rem 1.1rem; font-size: 0.87rem; color: var(--teal); margin-bottom: 1.25rem; }
+
+/* CAT COLORS */
+.cc1 { background: linear-gradient(135deg, #0f3d38, #0a2e2b); } .cc1 .cat-header { color: #2dd4bf; }
+.cc2 { background: linear-gradient(135deg, #3d2008, #2a1505); } .cc2 .cat-header { color: #fb923c; }
+.cc3 { background: linear-gradient(135deg, #0f1f3d, #0a1628); } .cc3 .cat-header { color: #60a5fa; }
+.cc4 { background: linear-gradient(135deg, #2a0f3d, #1e0a2e); } .cc4 .cat-header { color: #c084fc; }
+.cc5 { background: linear-gradient(135deg, #3d0f15, #2e0a10); } .cc5 .cat-header { color: #f87171; }
+
+/* LOADER */
+.loader { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-screen { display: flex; align-items: center; justify-content: center; padding: 3rem; gap: 0.75rem; color: var(--text2); }
+
+/* EMPTY */
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--text2); }
+.empty-state .ico { font-size: 2.5rem; margin-bottom: 0.75rem; }
+
+/* FILTER BAR */
+.filter-bar { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-bottom: 1.5rem; }
+.filter-bar select { width: auto; min-width: 180px; }
+
+/* PASSWORD STRENGTH */
+.pw-strength { height: 3px; border-radius: 2px; margin-top: 0.4rem; transition: all 0.3s; }
+
+@media(max-width:700px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .col-full { grid-column: 1; }
+  nav { padding: 0 1rem; }
+  .container { padding: 1.25rem 1rem; }
+  .report-bar-label { min-width: 120px; }
+  .stats-row .stat-box { min-width: 100px; }
+}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="logo">Leader<span>Scope</span></div>
-  <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showSection('home')">Inicio</button>
-    <button class="nav-tab" onclick="showSection('lideres')">Líderes</button>
-    <button class="nav-tab" onclick="showSection('evaluar')">Evaluar</button>
-    <button class="nav-tab" onclick="showSection('reportes')">Reportes</button>
-  </div>
-</nav>
+<!-- ============ AUTH SCREEN ============ -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">Leader<span>Scope</span></div>
+    <div class="auth-sub">Plataforma de Evaluación de Liderazgo 360°</div>
 
-<!-- ===================== HOME ===================== -->
-<div id="home" class="section active">
-  <div class="container">
-    <div class="hero">
-      <h1>Evaluación de<br><em>Liderazgo 360°</em></h1>
-      <p>Plataforma para evaluar habilidades de gestión, liderazgo y competencias blandas de tus líderes, usando escala Likert validada.</p>
-      <div class="hero-stats">
-        <div class="hero-stat"><div class="num" id="stat-lideres">0</div><div class="lbl">Líderes</div></div>
-        <div class="hero-stat"><div class="num" id="stat-evals">0</div><div class="lbl">Evaluaciones</div></div>
-        <div class="hero-stat"><div class="num" id="stat-promedio">—</div><div class="lbl">Prom. General</div></div>
-      </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuth('login')">Iniciar Sesión</button>
+      <button class="auth-tab" onclick="switchAuth('register')">Registrarse</button>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;flex-wrap:wrap;">
-      <div class="card" style="cursor:pointer" onclick="showSection('lideres')">
-        <div style="font-size:2rem;margin-bottom:0.75rem;">👤</div>
-        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Gestionar Líderes</div>
-        <div style="font-size:0.85rem;color:var(--mid);line-height:1.5;">Registra y administra los líderes a evaluar.</div>
+    <!-- LOGIN -->
+    <div id="pane-login">
+      <div class="form-group">
+        <label>Correo Electrónico</label>
+        <input type="email" id="l-email" placeholder="correo@empresa.com">
       </div>
-      <div class="card" style="cursor:pointer" onclick="showSection('evaluar')">
-        <div style="font-size:2rem;margin-bottom:0.75rem;">📋</div>
-        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Realizar Evaluación</div>
-        <div style="font-size:0.85rem;color:var(--mid);line-height:1.5;">Subalternos evalúan a sus líderes en 5 categorías clave.</div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
-      <div class="card" style="cursor:pointer" onclick="showSection('reportes')">
-        <div style="font-size:2rem;margin-bottom:0.75rem;">📊</div>
-        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">Ver Reportes</div>
-        <div style="font-size:0.85rem;color:var(--mid);line-height:1.5;">Analiza resultados generales e individuales por categoría.</div>
-      </div>
+      <button class="btn btn-gold btn-full" onclick="doLogin()" id="btn-login">Ingresar</button>
     </div>
 
-    <div class="card" style="margin-top:1.5rem;">
-      <div class="card-title"><span class="icon">🎯</span> Categorías de Evaluación</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;">
-        <div style="padding:1rem;border-radius:8px;background:#e8f4f4;border-left:4px solid #1a6b6b;">
-          <div style="font-weight:700;font-size:0.9rem;color:#1a6b6b;">🧭 Liderazgo</div>
-          <div style="font-size:0.78rem;color:var(--mid);margin-top:0.3rem;">Visión, motivación, inspiración</div>
-        </div>
-        <div style="padding:1rem;border-radius:8px;background:#fdf3e7;border-left:4px solid #e67e22;">
-          <div style="font-weight:700;font-size:0.9rem;color:#c06000;">⚙️ Gestión</div>
-          <div style="font-size:0.78rem;color:var(--mid);margin-top:0.3rem;">Planificación, organización, resultados</div>
-        </div>
-        <div style="padding:1rem;border-radius:8px;background:#eaf0fb;border-left:4px solid #2c4a7c;">
-          <div style="font-weight:700;font-size:0.9rem;color:#2c4a7c;">💬 Comunicación</div>
-          <div style="font-size:0.78rem;color:var(--mid);margin-top:0.3rem;">Claridad, escucha, feedback</div>
-        </div>
-        <div style="padding:1rem;border-radius:8px;background:#f5eefb;border-left:4px solid #5a2d82;">
-          <div style="font-weight:700;font-size:0.9rem;color:#5a2d82;">🤝 Inteligencia Emocional</div>
-          <div style="font-size:0.78rem;color:var(--mid);margin-top:0.3rem;">Empatía, manejo de conflictos</div>
-        </div>
-        <div style="padding:1rem;border-radius:8px;background:#fbeaec;border-left:4px solid #8b2635;">
-          <div style="font-weight:700;font-size:0.9rem;color:#8b2635;">🌱 Desarrollo de Equipo</div>
-          <div style="font-size:0.78rem;color:var(--mid);margin-top:0.3rem;">Coaching, delegación, reconocimiento</div>
-        </div>
+    <!-- REGISTER -->
+    <div id="pane-register" style="display:none">
+      <div class="form-group">
+        <label>DNI</label>
+        <input type="text" id="r-dni" placeholder="Ej: 12345678" maxlength="8">
       </div>
+      <div class="form-group">
+        <label>Correo Electrónico</label>
+        <input type="email" id="r-email" placeholder="correo@empresa.com">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="r-pass" placeholder="Mínimo 8 caracteres" oninput="checkPwStrength(this.value)">
+        <div class="pw-strength" id="pw-bar" style="background:var(--border)"></div>
+      </div>
+      <div class="form-group">
+        <label>Confirmar Contraseña</label>
+        <input type="password" id="r-pass2" placeholder="Repite tu contraseña">
+      </div>
+      <div class="form-group">
+        <label>Grupo de Evaluación</label>
+        <select id="r-grupo">
+          <option value="">— Cargando grupos... —</option>
+        </select>
+      </div>
+      <button class="btn btn-gold btn-full" onclick="doRegister()" id="btn-register">Crear Cuenta</button>
+      <p style="font-size:0.78rem;color:var(--text2);margin-top:0.85rem;text-align:center;">Recibirás un correo de confirmación para activar tu cuenta.</p>
     </div>
   </div>
 </div>
 
-<!-- ===================== LÍDERES ===================== -->
-<div id="lideres" class="section">
+<!-- ============ APP SCREEN ============ -->
+<div id="app-screen">
+  <nav>
+    <div class="nav-logo">Leader<span>Scope</span></div>
+    <div class="nav-tabs" id="nav-tabs"></div>
+    <div class="nav-right">
+      <span class="nav-user" id="nav-user-info"></span>
+      <span class="nav-badge" id="nav-role-badge"></span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Salir</button>
+    </div>
+  </nav>
+
   <div class="container">
-    <div class="card">
-      <div class="card-title"><span class="icon">➕</span> Registrar Nuevo Líder</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Nombre Completo</label>
-          <input type="text" id="l-nombre" placeholder="Ej: Carlos Mendoza">
-        </div>
-        <div class="form-group">
-          <label>Cargo / Rol</label>
-          <input type="text" id="l-cargo" placeholder="Ej: Gerente Comercial">
-        </div>
-        <div class="form-group">
-          <label>Área / Departamento</label>
-          <input type="text" id="l-area" placeholder="Ej: Ventas">
-        </div>
-        <div class="form-group">
-          <label>Correo Electrónico</label>
-          <input type="email" id="l-email" placeholder="correo@empresa.com">
-        </div>
+
+    <!-- === ADMIN: DASHBOARD === -->
+    <div id="sec-dashboard" class="section">
+      <div class="page-header">
+        <h1>Panel Principal</h1>
+        <p>Resumen del sistema de evaluación</p>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="registrarLider()">✓ Registrar Líder</button>
-        <button class="btn btn-ghost" onclick="limpiarFormLider()">Limpiar</button>
+      <div class="stats-row" id="dash-stats"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">📊 Últimas Evaluaciones</div>
+          <div id="dash-recent"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">👥 Usuarios Registrados</div>
+          <div id="dash-users"></div>
+        </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title"><span class="icon">👥</span> Líderes Registrados</div>
-      <div id="lideres-lista"></div>
+    <!-- === ADMIN: GRUPOS === -->
+    <div id="sec-grupos" class="section">
+      <div class="page-header">
+        <h1>Grupos de Evaluación</h1>
+        <p>Crea y administra los grupos donde participan los evaluadores</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">➕ Nuevo Grupo</div>
+          <div class="form-group">
+            <label>Nombre del Grupo</label>
+            <input type="text" id="g-nombre" placeholder="Ej: Gerencia Comercial 2025">
+          </div>
+          <div class="form-group">
+            <label>Descripción (opcional)</label>
+            <textarea id="g-desc" rows="2" placeholder="Breve descripción del grupo..." style="resize:vertical"></textarea>
+          </div>
+          <button class="btn btn-gold" onclick="crearGrupo()">Crear Grupo</button>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 Grupos Existentes</div>
+          <div id="grupos-lista"></div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- ===================== EVALUAR ===================== -->
-<div id="evaluar" class="section">
-  <div class="container">
-    <div class="card" id="eval-step-1">
-      <div class="card-title"><span class="icon">📋</span> Información del Evaluador</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Tu Nombre</label>
-          <input type="text" id="ev-nombre" placeholder="Nombre del evaluador">
+    <!-- === ADMIN: LÍDERES === -->
+    <div id="sec-lideres" class="section">
+      <div class="page-header">
+        <h1>Gestión de Líderes</h1>
+        <p>Registra los líderes a evaluar por grupo</p>
+      </div>
+      <div class="card">
+        <div class="card-title">➕ Registrar Líder</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Nombre Completo</label>
+            <input type="text" id="ld-nombre" placeholder="Ej: Carlos Mendoza">
+          </div>
+          <div class="form-group">
+            <label>Cargo / Rol</label>
+            <input type="text" id="ld-cargo" placeholder="Ej: Gerente Comercial">
+          </div>
+          <div class="form-group">
+            <label>Área / Departamento</label>
+            <input type="text" id="ld-area" placeholder="Ej: Ventas">
+          </div>
+          <div class="form-group">
+            <label>Grupo de Evaluación</label>
+            <select id="ld-grupo"><option value="">— Selecciona grupo —</option></select>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Tu Cargo</label>
-          <input type="text" id="ev-cargo" placeholder="Tu cargo en la empresa">
-        </div>
-        <div class="form-group full">
-          <label>Líder a Evaluar</label>
-          <select id="ev-lider">
-            <option value="">— Selecciona un líder —</option>
+        <button class="btn btn-gold" onclick="crearLider()" style="margin-top:0.5rem">Registrar Líder</button>
+      </div>
+      <div class="card">
+        <div class="card-title">👤 Líderes Registrados</div>
+        <div class="filter-bar">
+          <select id="ldfilter-grupo" onchange="cargarLideresAdmin()">
+            <option value="">Todos los grupos</option>
           </select>
         </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="iniciarEvaluacion()">Comenzar Evaluación →</button>
+        <div id="lideres-admin-lista"></div>
       </div>
     </div>
 
-    <div id="eval-formulario" style="display:none;">
-      <div class="info-strip" id="eval-info-strip"></div>
-
-      <div class="likert-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div> 1 - Nunca</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div> 2 - Rara vez</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#f1c40f"></div> 3 - A veces</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#27ae60"></div> 4 - Frecuentemente</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#1a6b6b"></div> 5 - Siempre</div>
+    <!-- === ADMIN: REPORTES === -->
+    <div id="sec-reportes-admin" class="section">
+      <div class="page-header">
+        <h1>Reportes de Desempeño</h1>
+        <p>Análisis completo por grupo — escala Likert 1–5</p>
       </div>
-
-      <div class="progress-bar"><div class="progress-fill" id="eval-progress" style="width:0%"></div></div>
-      <div style="font-size:0.8rem;color:var(--mid);margin-bottom:1.5rem;" id="eval-progress-label"></div>
-
-      <div class="categories" id="eval-categories"></div>
-
-      <div class="btn-row" style="margin-top:2rem;">
-        <button class="btn btn-gold" onclick="enviarEvaluacion()">📤 Enviar Evaluación</button>
-        <button class="btn btn-ghost" onclick="cancelarEvaluacion()">Cancelar</button>
+      <div class="filter-bar">
+        <select id="rpt-grupo" onchange="cargarReporteAdmin()">
+          <option value="">— Selecciona un grupo —</option>
+        </select>
+        <div id="rpt-tipo-btns" style="display:flex;gap:0.5rem;">
+          <button class="btn btn-ghost btn-sm" id="rbtn-general" onclick="setRptTipo('general')">📊 General</button>
+          <button class="btn btn-ghost btn-sm" id="rbtn-individual" onclick="setRptTipo('individual')">👤 Individual</button>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===================== REPORTES ===================== -->
-<div id="reportes" class="section">
-  <div class="container">
-    <div class="report-header">
-      <div>
-        <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;">Reportes de Desempeño</h2>
-        <p style="color:var(--mid);margin-top:0.25rem;font-size:0.9rem;">Resultados en escala Likert 1–5</p>
-      </div>
-      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
-        <button class="btn btn-ghost" onclick="toggleReporte('general')" id="btn-general">📊 Reporte General</button>
-        <button class="btn btn-ghost" onclick="toggleReporte('individual')" id="btn-individual">👤 Individual</button>
-        <button class="btn btn-danger" onclick="confirmarLimpiar()" style="font-size:0.82rem;padding:0.5rem 1rem;">🗑 Limpiar BD</button>
-      </div>
+      <div id="rpt-content"></div>
     </div>
 
-    <!-- GENERAL -->
-    <div id="reporte-general" style="display:none;">
+    <!-- === ADMIN: USUARIOS === -->
+    <div id="sec-usuarios" class="section">
+      <div class="page-header">
+        <h1>Usuarios del Sistema</h1>
+        <p>Usuarios evaluadores registrados</p>
+      </div>
       <div class="card">
-        <div class="card-title"><span class="icon">🌐</span> Resumen General de Todos los Líderes</div>
-        <div id="reporte-general-content"></div>
+        <div id="usuarios-lista"></div>
       </div>
     </div>
 
-    <!-- INDIVIDUAL -->
-    <div id="reporte-individual" style="display:none;">
-      <div class="leaders-grid" id="leaders-selector"></div>
-      <div id="reporte-individual-content"></div>
+    <!-- === USER: EVALUAR === -->
+    <div id="sec-evaluar" class="section">
+      <div id="eval-step1">
+        <div class="page-header">
+          <h1>Nueva Evaluación</h1>
+          <p>Completa tu información y selecciona al líder a evaluar</p>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 Información del Evaluador</div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Tu Nombre Completo</label>
+              <input type="text" id="ev-nombre" placeholder="Tu nombre">
+            </div>
+            <div class="form-group">
+              <label>Tu Puesto / Cargo</label>
+              <input type="text" id="ev-puesto" placeholder="Tu cargo actual">
+            </div>
+            <div class="form-group">
+              <label>Tiempo en la Empresa</label>
+              <select id="ev-tiempo">
+                <option value="">— Selecciona —</option>
+                <option value="menos_6m">Menos de 6 meses</option>
+                <option value="6m_1a">De 6 meses a menos de 1 año</option>
+                <option value="1a_2a">De 1 año a 2 años</option>
+                <option value="mas_2a">Mayor de 2 años</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Líder a Evaluar</label>
+              <select id="ev-lider">
+                <option value="">— Selecciona líder —</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-gold" onclick="iniciarEval()" style="margin-top:0.5rem">Comenzar Evaluación →</button>
+        </div>
+      </div>
+
+      <div id="eval-form" style="display:none">
+        <div class="info-strip" id="eval-info"></div>
+        <div class="likert-legend">
+          <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>1 Nunca</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--yellow)"></div>2 Rara vez</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div>3 A veces</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>4 Frecuentemente</div>
+          <div class="leg-item"><div class="leg-dot" style="background:var(--teal)"></div>5 Siempre</div>
+        </div>
+        <div class="prog-wrap">
+          <div class="prog-bar"><div class="prog-fill" id="eval-prog-fill" style="width:0%"></div></div>
+          <div class="prog-label" id="eval-prog-label">0 de 25 preguntas</div>
+        </div>
+        <div class="categories-eval" id="eval-cats"></div>
+        <div style="display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;">
+          <button class="btn btn-gold" onclick="enviarEval()" id="btn-enviar-eval">📤 Enviar Evaluación</button>
+          <button class="btn btn-ghost" onclick="cancelarEval()">Cancelar</button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+
+    <!-- === USER: REPORTE GENERAL === -->
+    <div id="sec-reporte-user" class="section">
+      <div class="page-header">
+        <h1>Reporte General</h1>
+        <p>Resultados generales de tu grupo de evaluación</p>
+      </div>
+      <div id="rpt-user-content"></div>
+    </div>
+
+  </div><!-- /container -->
+</div><!-- /app-screen -->
 
 <!-- MODAL CONFIRMAR -->
-<div class="overlay" id="confirm-overlay">
+<div class="overlay" id="confirm-modal">
   <div class="modal">
-    <h3>⚠️ ¿Limpiar base de datos?</h3>
-    <p style="color:var(--mid);margin-bottom:1.5rem;line-height:1.6;">Esto eliminará todos los líderes y evaluaciones registradas. Esta acción no se puede deshacer.</p>
-    <div style="display:flex;gap:1rem;">
-      <button class="btn btn-danger" onclick="limpiarTodo()">Sí, eliminar todo</button>
-      <button class="btn btn-ghost" onclick="cerrarModal()">Cancelar</button>
+    <h3 id="confirm-title">¿Confirmar acción?</h3>
+    <p id="confirm-body" style="color:var(--text2);line-height:1.6;font-size:0.9rem;"></p>
+    <div class="modal-btns">
+      <button class="btn btn-danger" id="confirm-ok">Confirmar</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -442,485 +505,650 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ========== DATA ==========
+// ===================== SUPABASE INIT =====================
+const { createClient } = supabase;
+const sb = createClient(
+  'https://pywuptvirqzatahmnugo.supabase.co',
+  'sb_publishable_caNjEQxg4C4ppwWh83YncA_skxyjC44'
+);
+
+const ADMIN_EMAIL = 'luisalberto.angelessanchez@gmail.com';
+
 const PREGUNTAS = {
-  liderazgo: {
-    nombre: "🧭 Liderazgo e Inspiración",
-    color: "#1a6b6b",
-    cls: "cat-1",
-    preguntas: [
-      "Comunica una visión clara y motivadora para el equipo",
-      "Inspira a los colaboradores a dar lo mejor de sí mismos",
-      "Da el ejemplo con su actitud y comportamiento",
-      "Toma decisiones con seguridad incluso en situaciones difíciles",
-      "Genera confianza y credibilidad en el equipo"
-    ]
-  },
-  gestion: {
-    nombre: "⚙️ Gestión y Resultados",
-    color: "#7b3f00",
-    cls: "cat-2",
-    preguntas: [
-      "Planifica y organiza el trabajo de manera efectiva",
-      "Establece metas claras y alcanzables para el equipo",
-      "Monitorea el avance de tareas y proyectos",
-      "Toma acciones correctivas cuando los resultados no son los esperados",
-      "Optimiza los recursos disponibles para lograr los objetivos"
-    ]
-  },
-  comunicacion: {
-    nombre: "💬 Comunicación",
-    color: "#2c4a7c",
-    cls: "cat-3",
-    preguntas: [
-      "Se expresa de forma clara y comprensible",
-      "Escucha activamente las ideas y preocupaciones del equipo",
-      "Brinda retroalimentación constructiva y oportuna",
-      "Mantiene informado al equipo sobre decisiones relevantes",
-      "Fomenta un diálogo abierto y sin miedo a represalias"
-    ]
-  },
-  emocional: {
-    nombre: "🤝 Inteligencia Emocional",
-    color: "#5a2d82",
-    cls: "cat-4",
-    preguntas: [
-      "Demuestra empatía ante las situaciones personales del equipo",
-      "Maneja sus emociones con madurez ante la presión",
-      "Resuelve conflictos de manera justa y efectiva",
-      "Respeta la diversidad de opiniones y estilos de trabajo",
-      "Mantiene una actitud positiva y resiliente frente a los cambios"
-    ]
-  },
-  desarrollo: {
-    nombre: "🌱 Desarrollo del Equipo",
-    color: "#8b2635",
-    cls: "cat-5",
-    preguntas: [
-      "Brinda oportunidades de aprendizaje y crecimiento profesional",
-      "Delega responsabilidades de forma apropiada",
-      "Reconoce y valora los logros individuales y del equipo",
-      "Apoya el desarrollo de habilidades de cada colaborador",
-      "Promueve el trabajo en equipo y la colaboración"
-    ]
-  }
+  liderazgo: { nombre: '🧭 Liderazgo e Inspiración', cc: 'cc1', color: '#2dd4bf', preguntas: ['Comunica una visión clara y motivadora para el equipo','Inspira a los colaboradores a dar lo mejor de sí mismos','Da el ejemplo con su actitud y comportamiento','Toma decisiones con seguridad incluso en situaciones difíciles','Genera confianza y credibilidad en el equipo'] },
+  gestion:   { nombre: '⚙️ Gestión y Resultados',    cc: 'cc2', color: '#fb923c', preguntas: ['Planifica y organiza el trabajo de manera efectiva','Establece metas claras y alcanzables para el equipo','Monitorea el avance de tareas y proyectos','Toma acciones correctivas cuando los resultados no son los esperados','Optimiza los recursos disponibles para lograr los objetivos'] },
+  comunicacion: { nombre: '💬 Comunicación',          cc: 'cc3', color: '#60a5fa', preguntas: ['Se expresa de forma clara y comprensible','Escucha activamente las ideas y preocupaciones del equipo','Brinda retroalimentación constructiva y oportuna','Mantiene informado al equipo sobre decisiones relevantes','Fomenta un diálogo abierto y sin miedo a represalias'] },
+  emocional: { nombre: '🤝 Inteligencia Emocional',   cc: 'cc4', color: '#c084fc', preguntas: ['Demuestra empatía ante las situaciones personales del equipo','Maneja sus emociones con madurez ante la presión','Resuelve conflictos de manera justa y efectiva','Respeta la diversidad de opiniones y estilos de trabajo','Mantiene una actitud positiva y resiliente frente a los cambios'] },
+  desarrollo: { nombre: '🌱 Desarrollo del Equipo',   cc: 'cc5', color: '#f87171', preguntas: ['Brinda oportunidades de aprendizaje y crecimiento profesional','Delega responsabilidades de forma apropiada','Reconoce y valora los logros individuales y del equipo','Apoya el desarrollo de habilidades de cada colaborador','Promueve el trabajo en equipo y la colaboración'] }
 };
 
-let db = { lideres: [], evaluaciones: [] };
-let evalActual = null;
-let reporteActivo = null;
-let liderSeleccionado = null;
+// ===================== STATE =====================
+let currentUser = null;
+let isAdmin = false;
+let userGrupoId = null;
+let evalData = null;
+let rptTipo = 'general';
+let rptLiderId = null;
 
-function cargarDB() {
-  try {
-    const saved = localStorage.getItem('leaderscope_db');
-    if (saved) db = JSON.parse(saved);
-  } catch(e) {}
-}
-function guardarDB() {
-  try { localStorage.setItem('leaderscope_db', JSON.stringify(db)); } catch(e) {}
-}
-cargarDB();
+// ===================== INIT =====================
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) await loadUser(session.user);
+  else showAuth();
 
-// ========== NAV ==========
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  const tabs = ['home','lideres','evaluar','reportes'];
-  const idx = tabs.indexOf(id);
-  document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) await loadUser(session.user);
+    if (event === 'SIGNED_OUT') showAuth();
+  });
 
-  if (id === 'home') actualizarStats();
-  if (id === 'lideres') renderLideres();
-  if (id === 'evaluar') { document.getElementById('eval-step-1').style.display=''; document.getElementById('eval-formulario').style.display='none'; cargarSelectLideres(); }
-  if (id === 'reportes') { reporteActivo = null; document.getElementById('reporte-general').style.display='none'; document.getElementById('reporte-individual').style.display='none'; }
+  // Load grupos for register
+  loadGruposPublic();
 }
 
-// ========== STATS ==========
-function actualizarStats() {
-  document.getElementById('stat-lideres').textContent = db.lideres.length;
-  document.getElementById('stat-evals').textContent = db.evaluaciones.length;
-  if (db.evaluaciones.length > 0) {
-    const total = db.evaluaciones.reduce((a,e) => a + e.puntajeGlobal, 0);
-    document.getElementById('stat-promedio').textContent = (total/db.evaluaciones.length).toFixed(2);
+async function loadUser(user) {
+  currentUser = user;
+  isAdmin = user.email === ADMIN_EMAIL;
+
+  if (!isAdmin) {
+    // get profile
+    const { data: profile } = await sb.from('usuarios').select('*').eq('auth_id', user.id).single();
+    if (profile) userGrupoId = profile.grupo_id;
+  }
+
+  showApp();
+}
+
+// ===================== AUTH UI =====================
+function showAuth() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-screen').style.display = 'none';
+}
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  buildNav();
+  if (isAdmin) {
+    navigateTo('dashboard');
+    loadDashboard();
   } else {
-    document.getElementById('stat-promedio').textContent = '—';
+    navigateTo('evaluar');
+    loadEvalStep1();
   }
 }
 
-// ========== LÍDERES ==========
-function registrarLider() {
-  const nombre = document.getElementById('l-nombre').value.trim();
-  const cargo = document.getElementById('l-cargo').value.trim();
-  const area = document.getElementById('l-area').value.trim();
+function switchAuth(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('pane-login').style.display = tab==='login'?'':'none';
+  document.getElementById('pane-register').style.display = tab==='register'?'':'none';
+}
+
+async function loadGruposPublic() {
+  const { data } = await sb.from('grupos').select('id, nombre').order('nombre');
+  const sel = document.getElementById('r-grupo');
+  if (!data || data.length === 0) { sel.innerHTML = '<option value="">— No hay grupos disponibles —</option>'; return; }
+  sel.innerHTML = '<option value="">— Selecciona tu grupo —</option>' + data.map(g => `<option value="${g.id}">${g.nombre}</option>`).join('');
+}
+
+function checkPwStrength(v) {
+  const bar = document.getElementById('pw-bar');
+  if (!v) { bar.style.background='var(--border)'; bar.style.width='100%'; return; }
+  let s = 0;
+  if (v.length >= 8) s++;
+  if (/[A-Z]/.test(v)) s++;
+  if (/[0-9]/.test(v)) s++;
+  if (/[^A-Za-z0-9]/.test(v)) s++;
+  const colors = ['var(--red)','var(--yellow)','var(--gold)','var(--green)'];
+  bar.style.background = colors[s-1] || 'var(--border)';
+}
+
+// ===================== LOGIN / REGISTER =====================
+async function doLogin() {
   const email = document.getElementById('l-email').value.trim();
-  if (!nombre || !cargo) return toast('⚠️ Nombre y cargo son obligatorios');
-  db.lideres.push({ id: Date.now(), nombre, cargo, area, email, fechaRegistro: new Date().toLocaleDateString('es-PE') });
-  guardarDB();
-  limpiarFormLider();
-  renderLideres();
-  toast('✅ Líder registrado exitosamente');
+  const pass = document.getElementById('l-pass').value;
+  if (!email || !pass) return toast('Completa todos los campos', 'err');
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Ingresando...';
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Ingresar';
+  if (error) return toast('Credenciales incorrectas o cuenta no confirmada', 'err');
 }
-function limpiarFormLider() {
-  ['l-nombre','l-cargo','l-area','l-email'].forEach(id => document.getElementById(id).value = '');
+
+async function doRegister() {
+  const dni = document.getElementById('r-dni').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const pass = document.getElementById('r-pass').value;
+  const pass2 = document.getElementById('r-pass2').value;
+  const grupo = document.getElementById('r-grupo').value;
+  if (!dni || !email || !pass || !grupo) return toast('Completa todos los campos', 'err');
+  if (pass !== pass2) return toast('Las contraseñas no coinciden', 'err');
+  if (pass.length < 8) return toast('La contraseña debe tener al menos 8 caracteres', 'err');
+  if (email === ADMIN_EMAIL) return toast('Ese correo no está permitido para registro', 'err');
+
+  const btn = document.getElementById('btn-register');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Registrando...';
+
+  const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { dni, grupo_id: grupo } } });
+  btn.disabled = false; btn.textContent = 'Crear Cuenta';
+  if (error) return toast(error.message, 'err');
+
+  // Insert profile
+  if (data.user) {
+    await sb.from('usuarios').insert({ auth_id: data.user.id, dni, email, grupo_id: grupo });
+  }
+  toast('✅ Revisa tu correo para confirmar tu cuenta', 'ok');
+  switchAuth('login');
 }
-function eliminarLider(id) {
-  if (!confirm('¿Eliminar este líder y sus evaluaciones?')) return;
-  db.lideres = db.lideres.filter(l => l.id !== id);
-  db.evaluaciones = db.evaluaciones.filter(e => e.liderId !== id);
-  guardarDB(); renderLideres(); toast('Líder eliminado');
+
+async function doLogout() {
+  await sb.auth.signOut();
+  currentUser = null; isAdmin = false; userGrupoId = null;
 }
-function renderLideres() {
-  const cont = document.getElementById('lideres-lista');
-  if (db.lideres.length === 0) { cont.innerHTML = '<div class="empty"><div class="big">👤</div><p>No hay líderes registrados aún.</p></div>'; return; }
-  const rows = db.lideres.map(l => {
-    const evals = db.evaluaciones.filter(e => e.liderId === l.id);
-    const prom = evals.length ? (evals.reduce((a,e) => a+e.puntajeGlobal,0)/evals.length).toFixed(2) : '—';
-    return `<tr>
-      <td><strong>${l.nombre}</strong></td>
-      <td>${l.cargo}</td>
-      <td>${l.area||'—'}</td>
-      <td>${l.email||'—'}</td>
-      <td>${evals.length}</td>
-      <td><strong>${prom}</strong></td>
-      <td>${l.fechaRegistro}</td>
-      <td><button class="btn btn-danger" style="padding:0.3rem 0.75rem;font-size:0.8rem;" onclick="eliminarLider(${l.id})">Eliminar</button></td>
-    </tr>`;
-  }).join('');
+
+// ===================== NAV =====================
+function buildNav() {
+  const cont = document.getElementById('nav-tabs');
+  const user = document.getElementById('nav-user-info');
+  const badge = document.getElementById('nav-role-badge');
+  user.textContent = currentUser?.email?.split('@')[0] || '';
+  badge.textContent = isAdmin ? 'Admin' : 'Evaluador';
+
+  const tabs = isAdmin
+    ? [['dashboard','🏠 Inicio'],['grupos','🗂 Grupos'],['lideres','👤 Líderes'],['reportes-admin','📊 Reportes'],['usuarios','👥 Usuarios']]
+    : [['evaluar','📋 Evaluar'],['reporte-user','📊 Reporte General']];
+
+  cont.innerHTML = tabs.map(([id,lbl]) => `<button class="nav-tab" onclick="navigateTo('${id}')" id="ntab-${id}">${lbl}</button>`).join('');
+}
+
+function navigateTo(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const sec = document.getElementById('sec-'+id);
+  if (sec) sec.classList.add('active');
+  const tab = document.getElementById('ntab-'+id);
+  if (tab) tab.classList.add('active');
+
+  if (id === 'grupos') cargarGrupos();
+  if (id === 'lideres') { cargarGruposSelect(); cargarLideresAdmin(); }
+  if (id === 'reportes-admin') cargarGruposReporte();
+  if (id === 'usuarios') cargarUsuarios();
+  if (id === 'reporte-user') cargarReporteUser();
+}
+
+// ===================== DASHBOARD =====================
+async function loadDashboard() {
+  const [{ count: cg }, { count: cl }, { count: ce }, { count: cu }] = await Promise.all([
+    sb.from('grupos').select('*', {count:'exact',head:true}),
+    sb.from('lideres').select('*', {count:'exact',head:true}),
+    sb.from('evaluaciones').select('*', {count:'exact',head:true}),
+    sb.from('usuarios').select('*', {count:'exact',head:true})
+  ]);
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-box"><div class="stat-num">${cg||0}</div><div class="stat-lbl">Grupos</div></div>
+    <div class="stat-box"><div class="stat-num">${cl||0}</div><div class="stat-lbl">Líderes</div></div>
+    <div class="stat-box"><div class="stat-num">${ce||0}</div><div class="stat-lbl">Evaluaciones</div></div>
+    <div class="stat-box"><div class="stat-num">${cu||0}</div><div class="stat-lbl">Usuarios</div></div>
+  `;
+
+  const { data: recents } = await sb.from('evaluaciones').select('evaluador_nombre, lider_id, puntaje_global, fecha, lideres(nombre)').order('created_at',{ascending:false}).limit(8);
+  if (!recents || recents.length === 0) {
+    document.getElementById('dash-recent').innerHTML = '<div class="empty-state"><div class="ico">📋</div><p>Sin evaluaciones aún</p></div>';
+  } else {
+    document.getElementById('dash-recent').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Evaluador</th><th>Líder</th><th>Puntaje</th><th>Fecha</th></tr></thead>
+      <tbody>${recents.map(e=>`<tr><td>${e.evaluador_nombre}</td><td>${e.lideres?.nombre||'—'}</td><td><strong>${e.puntaje_global}</strong></td><td style="color:var(--text2);font-size:0.8rem">${e.fecha}</td></tr>`).join('')}</tbody>
+    </table></div>`;
+  }
+
+  const { data: users } = await sb.from('usuarios').select('dni, email, grupos(nombre), created_at').order('created_at',{ascending:false}).limit(8);
+  if (!users || users.length === 0) {
+    document.getElementById('dash-users').innerHTML = '<div class="empty-state"><div class="ico">👥</div><p>Sin usuarios aún</p></div>';
+  } else {
+    document.getElementById('dash-users').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>DNI</th><th>Email</th><th>Grupo</th></tr></thead>
+      <tbody>${users.map(u=>`<tr><td>${u.dni}</td><td style="font-size:0.8rem">${u.email}</td><td><span class="badge badge-teal">${u.grupos?.nombre||'—'}</span></td></tr>`).join('')}</tbody>
+    </table></div>`;
+  }
+}
+
+// ===================== GRUPOS =====================
+async function crearGrupo() {
+  const nombre = document.getElementById('g-nombre').value.trim();
+  const desc = document.getElementById('g-desc').value.trim();
+  if (!nombre) return toast('Ingresa un nombre para el grupo', 'err');
+  const { error } = await sb.from('grupos').insert({ nombre, descripcion: desc });
+  if (error) return toast('Error al crear grupo: ' + error.message, 'err');
+  document.getElementById('g-nombre').value = '';
+  document.getElementById('g-desc').value = '';
+  toast('✅ Grupo creado', 'ok');
+  cargarGrupos();
+}
+
+async function cargarGrupos() {
+  const { data } = await sb.from('grupos').select('*, lideres(count), usuarios(count)').order('created_at');
+  const cont = document.getElementById('grupos-lista');
+  if (!data || data.length === 0) { cont.innerHTML = '<div class="empty-state"><div class="ico">🗂</div><p>No hay grupos aún</p></div>'; return; }
+  cont.innerHTML = data.map(g => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid var(--border);gap:0.5rem;flex-wrap:wrap;">
+      <div>
+        <div style="font-weight:600;font-size:0.92rem">${g.nombre}</div>
+        <div style="font-size:0.75rem;color:var(--text2);margin-top:0.15rem">${g.descripcion||''} · <span style="color:var(--gold)">${g.lideres?.[0]?.count||0} líderes</span> · ${g.usuarios?.[0]?.count||0} evaluadores</div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="eliminarGrupo(${g.id},'${g.nombre}')">Eliminar</button>
+    </div>`).join('');
+}
+
+function eliminarGrupo(id, nombre) {
+  confirm2(`¿Eliminar grupo "${nombre}"?`, 'Se eliminarán también los líderes y evaluaciones asociados.', async () => {
+    await sb.from('grupos').delete().eq('id', id);
+    toast('Grupo eliminado'); cargarGrupos();
+  });
+}
+
+// ===================== LÍDERES (ADMIN) =====================
+async function cargarGruposSelect() {
+  const { data } = await sb.from('grupos').select('id, nombre').order('nombre');
+  const makeOpts = (el, all=false) => {
+    const cont = document.getElementById(el);
+    if (!cont) return;
+    cont.innerHTML = (all?'<option value="">Todos los grupos</option>':'<option value="">— Selecciona grupo —</option>') + (data||[]).map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
+  };
+  makeOpts('ld-grupo'); makeOpts('ldfilter-grupo', true); makeOpts('r-grupo');
+}
+
+async function crearLider() {
+  const nombre = document.getElementById('ld-nombre').value.trim();
+  const cargo = document.getElementById('ld-cargo').value.trim();
+  const area = document.getElementById('ld-area').value.trim();
+  const grupo_id = document.getElementById('ld-grupo').value;
+  if (!nombre || !cargo || !grupo_id) return toast('Nombre, cargo y grupo son obligatorios', 'err');
+  const { error } = await sb.from('lideres').insert({ nombre, cargo, area, grupo_id });
+  if (error) return toast('Error: ' + error.message, 'err');
+  ['ld-nombre','ld-cargo','ld-area'].forEach(id => document.getElementById(id).value = '');
+  toast('✅ Líder registrado', 'ok');
+  cargarLideresAdmin();
+}
+
+async function cargarLideresAdmin() {
+  const gfilt = document.getElementById('ldfilter-grupo')?.value;
+  let q = sb.from('lideres').select('*, grupos(nombre)').order('nombre');
+  if (gfilt) q = q.eq('grupo_id', gfilt);
+  const { data } = await q;
+  const cont = document.getElementById('lideres-admin-lista');
+  if (!data || data.length === 0) { cont.innerHTML = '<div class="empty-state"><div class="ico">👤</div><p>No hay líderes registrados</p></div>'; return; }
   cont.innerHTML = `<div class="table-wrap"><table>
-    <thead><tr><th>Nombre</th><th>Cargo</th><th>Área</th><th>Email</th><th>Evaluaciones</th><th>Promedio</th><th>Registrado</th><th></th></tr></thead>
-    <tbody>${rows}</tbody>
+    <thead><tr><th>Nombre</th><th>Cargo</th><th>Área</th><th>Grupo</th><th></th></tr></thead>
+    <tbody>${data.map(l=>`<tr>
+      <td><strong>${l.nombre}</strong></td><td>${l.cargo}</td><td>${l.area||'—'}</td>
+      <td><span class="badge badge-teal">${l.grupos?.nombre||'—'}</span></td>
+      <td><button class="btn btn-danger btn-sm" onclick="eliminarLider(${l.id},'${l.nombre}')">Eliminar</button></td>
+    </tr>`).join('')}</tbody>
   </table></div>`;
 }
 
-// ========== EVALUAR ==========
-function cargarSelectLideres() {
+function eliminarLider(id, nombre) {
+  confirm2(`¿Eliminar a "${nombre}"?`, 'Se eliminarán también sus evaluaciones.', async () => {
+    await sb.from('lideres').delete().eq('id', id);
+    toast('Líder eliminado'); cargarLideresAdmin();
+  });
+}
+
+// ===================== USUARIOS =====================
+async function cargarUsuarios() {
+  const { data } = await sb.from('usuarios').select('*, grupos(nombre)').order('created_at', {ascending:false});
+  const cont = document.getElementById('usuarios-lista');
+  if (!data || data.length === 0) { cont.innerHTML = '<div class="empty-state"><div class="ico">👥</div><p>No hay usuarios registrados</p></div>'; return; }
+  cont.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>DNI</th><th>Email</th><th>Grupo Asignado</th><th>Registrado</th></tr></thead>
+    <tbody>${data.map(u=>`<tr>
+      <td><strong>${u.dni}</strong></td>
+      <td>${u.email}</td>
+      <td><span class="badge badge-teal">${u.grupos?.nombre||'—'}</span></td>
+      <td style="font-size:0.8rem;color:var(--text2)">${new Date(u.created_at).toLocaleDateString('es-PE')}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// ===================== EVALUAR (USER) =====================
+async function loadEvalStep1() {
+  document.getElementById('eval-step1').style.display = '';
+  document.getElementById('eval-form').style.display = 'none';
+  if (!userGrupoId) return;
+  const { data } = await sb.from('lideres').select('id, nombre, cargo').eq('grupo_id', userGrupoId).order('nombre');
   const sel = document.getElementById('ev-lider');
-  sel.innerHTML = '<option value="">— Selecciona un líder —</option>';
-  db.lideres.forEach(l => sel.innerHTML += `<option value="${l.id}">${l.nombre} — ${l.cargo}</option>`);
+  sel.innerHTML = '<option value="">— Selecciona líder —</option>' + (data||[]).map(l=>`<option value="${l.id}">${l.nombre} — ${l.cargo}</option>`).join('');
 }
-function iniciarEvaluacion() {
+
+function iniciarEval() {
   const nombre = document.getElementById('ev-nombre').value.trim();
-  const cargo = document.getElementById('ev-cargo').value.trim();
-  const liderId = parseInt(document.getElementById('ev-lider').value);
-  if (!nombre || !cargo) return toast('⚠️ Completa tu información de evaluador');
-  if (!liderId) return toast('⚠️ Selecciona un líder a evaluar');
-  const lider = db.lideres.find(l => l.id === liderId);
-  evalActual = { nombre, cargo, liderId, lider, respuestas: {}, fecha: new Date().toLocaleDateString('es-PE') };
-  document.getElementById('eval-step-1').style.display = 'none';
-  document.getElementById('eval-formulario').style.display = '';
-  document.getElementById('eval-info-strip').textContent = `📋 Evaluando a: ${lider.nombre} (${lider.cargo}) · Evaluador: ${nombre}`;
-  renderEvalForm();
+  const puesto = document.getElementById('ev-puesto').value.trim();
+  const tiempo = document.getElementById('ev-tiempo').value;
+  const liderId = document.getElementById('ev-lider').value;
+  if (!nombre || !puesto || !tiempo || !liderId) return toast('Completa todos los campos', 'err');
+  const liderText = document.getElementById('ev-lider').options[document.getElementById('ev-lider').selectedIndex].text;
+  evalData = { nombre, puesto, tiempo, liderId: parseInt(liderId), liderText, respuestas: {} };
+  document.getElementById('eval-step1').style.display = 'none';
+  document.getElementById('eval-form').style.display = '';
+  document.getElementById('eval-info').textContent = `📋 Evaluando a: ${liderText} · Evaluador: ${nombre} (${puesto})`;
+  renderEvalCats();
 }
-function renderEvalForm() {
-  const cont = document.getElementById('eval-categories');
-  cont.innerHTML = '';
-  Object.entries(PREGUNTAS).forEach(([key, cat]) => {
-    const pregs = cat.preguntas.map((p, i) => {
-      const qid = `${key}_${i}`;
-      const btns = [1,2,3,4,5].map(v =>
-        `<button class="likert-btn" data-val="${v}" data-qid="${qid}" onclick="selLikert('${qid}',${v},this)">${v}</button>`
-      ).join('');
-      return `<div class="question" id="q-${qid}">
-        <div class="q-text">${i+1}. ${p}</div>
-        <div class="likert-scale">${btns}</div>
-      </div>`;
-    }).join('');
-    cont.innerHTML += `<div class="category ${cat.cls}">
-      <div class="category-header"><span style="font-size:1.2rem">${cat.nombre.split(' ')[0]}</span><span>${cat.nombre.split(' ').slice(1).join(' ')}</span></div>
-      <div class="category-body">${pregs}</div>
-    </div>`;
-  });
-  actualizarProgreso();
+
+function renderEvalCats() {
+  const cont = document.getElementById('eval-cats');
+  cont.innerHTML = Object.entries(PREGUNTAS).map(([key, cat]) => `
+    <div class="cat-block ${cat.cc}">
+      <div class="cat-header">${cat.nombre}</div>
+      <div class="cat-body">
+        ${cat.preguntas.map((p,i) => {
+          const qid = `${key}_${i}`;
+          return `<div class="question" id="qq-${qid}">
+            <div class="q-text">${i+1}. ${p}</div>
+            <div class="likert-row">
+              ${[1,2,3,4,5].map(v=>`<button class="lbtn" data-qid="${qid}" data-val="${v}" onclick="selQ('${qid}',${v},this)">${v}</button>`).join('')}
+            </div>
+            <div class="likert-labels"><span>Nunca</span><span>Siempre</span></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+  updateProg();
 }
-function selLikert(qid, val, btn) {
-  evalActual.respuestas[qid] = val;
-  const btns = btn.parentElement.querySelectorAll('.likert-btn');
-  btns.forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  actualizarProgreso();
+
+function selQ(qid, val, btn) {
+  evalData.respuestas[qid] = val;
+  btn.closest('.likert-row').querySelectorAll('.lbtn').forEach(b => { b.className = 'lbtn'; });
+  btn.className = `lbtn sel-${val}`;
+  updateProg();
 }
-function actualizarProgreso() {
-  const total = Object.values(PREGUNTAS).reduce((a,c) => a + c.preguntas.length, 0);
-  const resp = Object.keys(evalActual.respuestas).length;
-  const pct = Math.round(resp/total*100);
-  document.getElementById('eval-progress').style.width = pct+'%';
-  document.getElementById('eval-progress-label').textContent = `${resp} de ${total} preguntas respondidas (${pct}%)`;
+
+function updateProg() {
+  const total = Object.values(PREGUNTAS).reduce((a,c) => a+c.preguntas.length, 0);
+  const done = Object.keys(evalData.respuestas).length;
+  const pct = Math.round(done/total*100);
+  document.getElementById('eval-prog-fill').style.width = pct+'%';
+  document.getElementById('eval-prog-label').textContent = `${done} de ${total} preguntas respondidas (${pct}%)`;
 }
-function cancelarEvaluacion() {
-  evalActual = null;
-  document.getElementById('eval-step-1').style.display = '';
-  document.getElementById('eval-formulario').style.display = 'none';
-}
-function enviarEvaluacion() {
-  const total = Object.values(PREGUNTAS).reduce((a,c) => a + c.preguntas.length, 0);
-  if (Object.keys(evalActual.respuestas).length < total) return toast('⚠️ Responde todas las preguntas antes de enviar');
-  // Calcular puntajes por categoría
+
+function cancelarEval() { evalData = null; loadEvalStep1(); }
+
+async function enviarEval() {
+  const total = Object.values(PREGUNTAS).reduce((a,c) => a+c.preguntas.length, 0);
+  if (Object.keys(evalData.respuestas).length < total) return toast('Responde todas las preguntas antes de enviar', 'err');
+
+  const btn = document.getElementById('btn-enviar-eval');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Enviando...';
+
   const porCategoria = {};
-  let sumGlobal = 0, countGlobal = 0;
+  let sumG = 0, cntG = 0;
   Object.entries(PREGUNTAS).forEach(([key, cat]) => {
-    let sum = 0;
-    cat.preguntas.forEach((_, i) => { sum += evalActual.respuestas[`${key}_${i}`]; });
-    porCategoria[key] = +(sum / cat.preguntas.length).toFixed(2);
-    sumGlobal += sum; countGlobal += cat.preguntas.length;
+    const vals = cat.preguntas.map((_,i) => evalData.respuestas[`${key}_${i}`]);
+    porCategoria[key] = parseFloat((vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2));
+    sumG += vals.reduce((a,b)=>a+b,0); cntG += vals.length;
   });
-  const eval_data = {
-    id: Date.now(),
-    liderId: evalActual.liderId,
-    evaluadorNombre: evalActual.nombre,
-    evaluadorCargo: evalActual.cargo,
-    fecha: evalActual.fecha,
-    respuestas: { ...evalActual.respuestas },
-    porCategoria,
-    puntajeGlobal: +(sumGlobal/countGlobal).toFixed(2)
-  };
-  db.evaluaciones.push(eval_data);
-  guardarDB();
-  cancelarEvaluacion();
-  toast('🎉 Evaluación registrada exitosamente');
-  showSection('reportes');
-  setTimeout(() => toggleReporte('individual'), 400);
+
+  const { error } = await sb.from('evaluaciones').insert({
+    lider_id: evalData.liderId,
+    evaluador_auth_id: currentUser.id,
+    evaluador_nombre: evalData.nombre,
+    evaluador_puesto: evalData.puesto,
+    evaluador_tiempo: evalData.tiempo,
+    respuestas: evalData.respuestas,
+    por_categoria: porCategoria,
+    puntaje_global: parseFloat((sumG/cntG).toFixed(2)),
+    grupo_id: userGrupoId,
+    fecha: new Date().toLocaleDateString('es-PE')
+  });
+
+  btn.disabled = false; btn.textContent = '📤 Enviar Evaluación';
+  if (error) return toast('Error al enviar: ' + error.message, 'err');
+
+  toast('🎉 Evaluación enviada exitosamente', 'ok');
+  evalData = null;
+  loadEvalStep1();
+  setTimeout(() => navigateTo('reporte-user'), 1000);
 }
 
-// ========== REPORTES ==========
-function toggleReporte(tipo) {
-  document.getElementById('reporte-general').style.display = 'none';
-  document.getElementById('reporte-individual').style.display = 'none';
-  document.getElementById('btn-general').classList.remove('btn-primary');
-  document.getElementById('btn-individual').classList.remove('btn-primary');
-  document.getElementById('btn-general').classList.add('btn-ghost');
-  document.getElementById('btn-individual').classList.add('btn-ghost');
-
-  if (tipo === 'general') {
-    document.getElementById('reporte-general').style.display = '';
-    document.getElementById('btn-general').classList.add('btn-primary');
-    document.getElementById('btn-general').classList.remove('btn-ghost');
-    renderReporteGeneral();
-  } else {
-    document.getElementById('reporte-individual').style.display = '';
-    document.getElementById('btn-individual').classList.add('btn-primary');
-    document.getElementById('btn-individual').classList.remove('btn-ghost');
-    renderSelectorLideres();
-  }
+// ===================== REPORTES ADMIN =====================
+async function cargarGruposReporte() {
+  const { data } = await sb.from('grupos').select('id, nombre').order('nombre');
+  const sel = document.getElementById('rpt-grupo');
+  sel.innerHTML = '<option value="">— Selecciona un grupo —</option>' + (data||[]).map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
+  document.getElementById('rpt-content').innerHTML = '';
 }
 
-function getLabel(score) {
-  if (score >= 4.5) return ['Excelente', 'badge-excellent'];
-  if (score >= 3.5) return ['Bueno', 'badge-good'];
-  if (score >= 2.5) return ['Regular', 'badge-average'];
-  return ['Por mejorar', 'badge-below'];
+function setRptTipo(tipo) {
+  rptTipo = tipo; rptLiderId = null;
+  document.getElementById('rbtn-general').className = tipo==='general' ? 'btn btn-gold btn-sm' : 'btn btn-ghost btn-sm';
+  document.getElementById('rbtn-individual').className = tipo==='individual' ? 'btn btn-gold btn-sm' : 'btn btn-ghost btn-sm';
+  cargarReporteAdmin();
 }
 
-function renderReporteGeneral() {
-  const cont = document.getElementById('reporte-general-content');
-  if (db.evaluaciones.length === 0) { cont.innerHTML = '<div class="empty"><div class="big">📊</div><p>No hay evaluaciones registradas aún.</p></div>'; return; }
+async function cargarReporteAdmin() {
+  const grupoId = document.getElementById('rpt-grupo').value;
+  if (!grupoId) { document.getElementById('rpt-content').innerHTML = '<div class="empty-state"><div class="ico">📊</div><p>Selecciona un grupo para ver el reporte</p></div>'; return; }
+  if (rptTipo === 'general') await renderReporteGeneral(grupoId, 'rpt-content', true);
+  else await renderSelectorLideres(grupoId);
+}
+
+async function renderSelectorLideres(grupoId) {
+  const { data: lideres } = await sb.from('lideres').select('*').eq('grupo_id', grupoId).order('nombre');
+  const { data: evals } = await sb.from('evaluaciones').select('lider_id, puntaje_global').eq('grupo_id', grupoId);
+  const cont = document.getElementById('rpt-content');
+
+  const cards = (lideres||[]).map(l => {
+    const le = (evals||[]).filter(e => e.lider_id === l.id);
+    const prom = le.length ? (le.reduce((a,e)=>a+e.puntaje_global,0)/le.length).toFixed(2) : null;
+    const [lbl, cls] = getLabel(prom);
+    return `<div class="leader-card ${rptLiderId===l.id?'sel':''}" onclick="verLiderAdmin(${l.id},${grupoId})">
+      <div class="lc-name">${l.nombre}</div>
+      <div class="lc-role">${l.cargo}${l.area?' · '+l.area:''}</div>
+      <div class="lc-score">${prom||'—'}<span style="font-size:1rem;color:var(--text2)">/5</span></div>
+      <div style="margin-top:0.3rem"><span class="badge ${cls}">${lbl}</span></div>
+      <div class="lc-evals">${le.length} evaluación${le.length!==1?'es':''}</div>
+    </div>`;
+  }).join('');
+
+  cont.innerHTML = `<div class="leader-cards">${cards}</div><div id="rpt-lider-detail"></div>`;
+}
+
+async function verLiderAdmin(liderId, grupoId) {
+  rptLiderId = liderId;
+  await renderSelectorLideres(grupoId);
+  await renderReporteIndividual(liderId, 'rpt-lider-detail');
+}
+
+// ===================== REPORTE USER =====================
+async function cargarReporteUser() {
+  if (!userGrupoId) { document.getElementById('rpt-user-content').innerHTML = '<div class="empty-state"><div class="ico">🔒</div><p>No tienes un grupo asignado</p></div>'; return; }
+  await renderReporteGeneral(userGrupoId, 'rpt-user-content', false);
+}
+
+// ===================== RENDER REPORTE GENERAL =====================
+async function renderReporteGeneral(grupoId, contId, showIndividual) {
+  const cont = document.getElementById(contId);
+  cont.innerHTML = '<div class="loading-screen"><span class="loader"></span> Cargando datos...</div>';
+
+  const { data: evals } = await sb.from('evaluaciones').select('*, lideres(nombre, cargo)').eq('grupo_id', grupoId);
+  const { data: grupo } = await sb.from('grupos').select('nombre').eq('id', grupoId).single();
+
+  if (!evals || evals.length === 0) { cont.innerHTML = '<div class="empty-state"><div class="ico">📊</div><p>No hay evaluaciones en este grupo aún</p></div>'; return; }
 
   const catKeys = Object.keys(PREGUNTAS);
   const catProms = {};
-  catKeys.forEach(k => {
-    const vals = db.evaluaciones.map(e => e.porCategoria[k]);
-    catProms[k] = +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2);
-  });
-  const globalProm = +(db.evaluaciones.reduce((a,e)=>a+e.puntajeGlobal,0)/db.evaluaciones.length).toFixed(2);
+  catKeys.forEach(k => { catProms[k] = parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2)); });
+  const globalProm = parseFloat((evals.reduce((a,e)=>a+e.puntaje_global,0)/evals.length).toFixed(2));
   const [lbl, cls] = getLabel(globalProm);
 
-  const catColors = { liderazgo:'#1a6b6b', gestion:'#7b3f00', comunicacion:'#2c4a7c', emocional:'#5a2d82', desarrollo:'#8b2635' };
+  // Por líder
+  const liderMap = {};
+  evals.forEach(e => {
+    if (!liderMap[e.lider_id]) liderMap[e.lider_id] = { nombre: e.lideres?.nombre||'—', cargo: e.lideres?.cargo||'', evals: [] };
+    liderMap[e.lider_id].evals.push(e);
+  });
+
+  const liderRows = Object.entries(liderMap).map(([id, l]) => {
+    const p = (l.evals.reduce((a,e)=>a+e.puntaje_global,0)/l.evals.length).toFixed(2);
+    const [ll, lc] = getLabel(p);
+    return `<tr><td><strong>${l.nombre}</strong></td><td>${l.cargo}</td><td>${l.evals.length}</td><td><strong>${p}/5</strong></td><td><span class="badge ${lc}">${ll}</span></td></tr>`;
+  }).join('');
 
   const catBars = catKeys.map(k => {
     const pct = (catProms[k]/5*100).toFixed(1);
-    return `<div class="cat-score-item">
-      <div class="cat-score-name">${PREGUNTAS[k].nombre}</div>
-      <div class="cat-score-bar"><div class="cat-score-fill" style="width:${pct}%;background:${catColors[k]}"></div></div>
-      <div class="cat-score-num" style="color:${catColors[k]}">${catProms[k]}</div>
+    return `<div class="report-bar-item">
+      <div class="report-bar-label">${PREGUNTAS[k].nombre}</div>
+      <div class="report-bar-track"><div class="report-bar-fill" style="width:${pct}%;background:${PREGUNTAS[k].color}"></div></div>
+      <div class="report-bar-val" style="color:${PREGUNTAS[k].color}">${catProms[k]}</div>
     </div>`;
   }).join('');
 
-  // Por líder
-  const liderRows = db.lideres.map(l => {
-    const evals = db.evaluaciones.filter(e => e.liderId === l.id);
-    if (evals.length === 0) return '';
-    const prom = (evals.reduce((a,e)=>a+e.puntajeGlobal,0)/evals.length).toFixed(2);
-    const [ll, lc] = getLabel(prom);
-    return `<tr><td><strong>${l.nombre}</strong></td><td>${l.cargo}</td><td>${evals.length}</td><td><strong>${prom}/5</strong></td><td><span class="badge ${lc}">${ll}</span></td></tr>`;
-  }).join('');
+  // Distribución Likert
+  const tiempoMap = { menos_6m:'<6 meses', '6m_1a':'6m–1 año', '1a_2a':'1–2 años', mas_2a:'>2 años' };
+  const tiempoCont = {};
+  evals.forEach(e => { tiempoCont[e.evaluador_tiempo] = (tiempoCont[e.evaluador_tiempo]||0)+1; });
+  const tiempoBars = Object.entries(tiempoCont).map(([k,v]) => `
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">
+      <div style="min-width:100px;font-size:0.8rem;color:var(--text2)">${tiempoMap[k]||k}</div>
+      <div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${(v/evals.length*100).toFixed(0)}%;background:var(--teal);border-radius:4px;"></div></div>
+      <div style="font-size:0.8rem;font-weight:700;color:var(--teal)">${v}</div>
+    </div>`).join('');
 
   cont.innerHTML = `
-    <div class="gauge-row">
-      <div class="gauge-item">
-        <div class="gauge-label">Promedio Global</div>
-        <div class="gauge-val" style="color:var(--teal)">${globalProm} <span style="font-size:1rem;color:var(--mid)">/5</span></div>
-        <div class="gauge-bar"><div class="gauge-fill" style="width:${globalProm/5*100}%"></div></div>
+    <div class="card">
+      <div class="card-title">🌐 Resultados Generales — ${grupo?.nombre||'Grupo'}</div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num" style="color:var(--teal)">${globalProm}</div><div class="stat-lbl">Promedio Global /5</div></div>
+        <div class="stat-box"><div class="stat-num">${evals.length}</div><div class="stat-lbl">Evaluaciones</div></div>
+        <div class="stat-box"><div class="stat-num">${Object.keys(liderMap).length}</div><div class="stat-lbl">Líderes Evaluados</div></div>
+        <div class="stat-box"><div class="stat-num"><span class="badge ${cls}">${lbl}</span></div><div class="stat-lbl">Clasificación</div></div>
       </div>
-      <div class="gauge-item">
-        <div class="gauge-label">Clasificación</div>
-        <div class="gauge-val"><span class="badge ${cls}" style="font-size:1rem;padding:0.3rem 0.8rem;">${lbl}</span></div>
-      </div>
-      <div class="gauge-item">
-        <div class="gauge-label">Total Evaluaciones</div>
-        <div class="gauge-val">${db.evaluaciones.length}</div>
-      </div>
-      <div class="gauge-item">
-        <div class="gauge-label">Líderes Evaluados</div>
-        <div class="gauge-val">${db.lideres.filter(l=>db.evaluaciones.some(e=>e.liderId===l.id)).length}</div>
+      <div style="margin-top:1rem">
+        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text2);margin-bottom:1rem">Puntaje por Categoría</div>
+        ${catBars}
       </div>
     </div>
-    <div style="margin:1.5rem 0;">
-      <div style="font-weight:700;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--mid);margin-bottom:1rem;">Puntaje Promedio por Categoría</div>
-      <div class="cat-score-list">${catBars}</div>
-    </div>
-    <div class="table-wrap" style="margin-top:1.5rem;">
-      <table>
-        <thead><tr><th>Líder</th><th>Cargo</th><th>Evaluaciones</th><th>Promedio</th><th>Clasificación</th></tr></thead>
-        <tbody>${liderRows || '<tr><td colspan="5" style="text-align:center;color:var(--mid)">Sin datos</td></tr>'}</tbody>
-      </table>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📋 Ranking de Líderes</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Líder</th><th>Cargo</th><th>Evals</th><th>Prom.</th><th>Nivel</th></tr></thead>
+          <tbody>${liderRows}</tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <div class="card-title">⏱ Evaluadores por Antigüedad</div>
+        ${tiempoBars || '<p style="color:var(--text2)">Sin datos</p>'}
+      </div>
     </div>`;
 }
 
-function renderSelectorLideres() {
-  const cont = document.getElementById('leaders-selector');
-  if (db.lideres.length === 0) { cont.innerHTML = '<div class="empty"><div class="big">👤</div><p>No hay líderes registrados.</p></div>'; return; }
-  cont.innerHTML = db.lideres.map(l => {
-    const evals = db.evaluaciones.filter(e => e.liderId === l.id);
-    const prom = evals.length ? (evals.reduce((a,e)=>a+e.puntajeGlobal,0)/evals.length).toFixed(2) : null;
-    const [lbl, cls] = prom ? getLabel(parseFloat(prom)) : ['Sin evaluar', 'badge-average'];
-    return `<div class="leader-card ${liderSeleccionado===l.id?'selected':''}" onclick="verLider(${l.id})">
-      <div class="leader-name">${l.nombre}</div>
-      <div class="leader-role">${l.cargo}${l.area?' · '+l.area:''}</div>
-      <div class="leader-score">
-        <span class="score-num">${prom||'—'}</span>
-        <span class="score-max">/5</span>
-        <span class="score-label badge ${cls}">${lbl}</span>
-      </div>
-      <div class="eval-count">${evals.length} evaluación${evals.length!==1?'es':''}</div>
-    </div>`;
-  }).join('');
-}
+// ===================== REPORTE INDIVIDUAL =====================
+async function renderReporteIndividual(liderId, contId) {
+  const cont = document.getElementById(contId);
+  cont.innerHTML = '<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
 
-function verLider(id) {
-  liderSeleccionado = id;
-  renderSelectorLideres();
-  const lider = db.lideres.find(l => l.id === id);
-  const evals = db.evaluaciones.filter(e => e.liderId === id);
-  const cont = document.getElementById('reporte-individual-content');
+  const { data: lider } = await sb.from('lideres').select('*, grupos(nombre)').eq('id', liderId).single();
+  const { data: evals } = await sb.from('evaluaciones').select('*').eq('lider_id', liderId);
 
-  if (evals.length === 0) {
-    cont.innerHTML = `<div class="card"><div class="empty"><div class="big">📋</div><p>No hay evaluaciones para ${lider.nombre} aún.</p></div></div>`;
-    return;
-  }
+  if (!evals || evals.length === 0) { cont.innerHTML = `<div class="card"><div class="empty-state"><div class="ico">📋</div><p>No hay evaluaciones para ${lider?.nombre||'este líder'}</p></div></div>`; return; }
 
   const catKeys = Object.keys(PREGUNTAS);
-  const catColors = { liderazgo:'#1a6b6b', gestion:'#7b3f00', comunicacion:'#2c4a7c', emocional:'#5a2d82', desarrollo:'#8b2635' };
   const catProms = {};
-  catKeys.forEach(k => { catProms[k] = +(evals.reduce((a,e)=>a+e.porCategoria[k],0)/evals.length).toFixed(2); });
-  const globalProm = +(evals.reduce((a,e)=>a+e.puntajeGlobal,0)/evals.length).toFixed(2);
+  catKeys.forEach(k => { catProms[k] = parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2)); });
+  const globalProm = parseFloat((evals.reduce((a,e)=>a+e.puntaje_global,0)/evals.length).toFixed(2));
   const [lbl, cls] = getLabel(globalProm);
 
-  // Preguntas individuales
+  // Promedio por pregunta
   const qProms = {};
   catKeys.forEach(k => {
-    PREGUNTAS[k].preguntas.forEach((_, i) => {
+    PREGUNTAS[k].preguntas.forEach((_,i) => {
       const qid = `${k}_${i}`;
-      qProms[qid] = +(evals.reduce((a,e) => a+(e.respuestas[qid]||0), 0)/evals.length).toFixed(2);
+      qProms[qid] = parseFloat((evals.reduce((a,e)=>a+(e.respuestas?.[qid]||0),0)/evals.length).toFixed(2));
     });
   });
 
   const catDetail = catKeys.map(k => {
     const cat = PREGUNTAS[k];
-    const pct = (catProms[k]/5*100).toFixed(1);
     const pregs = cat.preguntas.map((p,i) => {
       const qid = `${k}_${i}`;
       const v = qProms[qid];
-      const barPct = (v/5*100).toFixed(1);
-      return `<div style="margin-bottom:0.85rem;">
-        <div style="font-size:0.82rem;color:var(--ink);margin-bottom:0.3rem;">${p}</div>
-        <div style="display:flex;align-items:center;gap:0.75rem;">
-          <div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
-            <div style="height:100%;width:${barPct}%;background:${catColors[k]};border-radius:4px;"></div>
-          </div>
-          <span style="font-weight:700;font-size:0.85rem;color:${catColors[k]};min-width:30px;">${v}</span>
+      return `<div style="margin-bottom:0.75rem">
+        <div style="font-size:0.82rem;margin-bottom:0.3rem;color:var(--text2)">${p}</div>
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <div style="flex:1;height:7px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:${v/5*100}%;background:${cat.color};border-radius:3px"></div></div>
+          <span style="font-weight:700;font-size:0.85rem;color:${cat.color};min-width:30px">${v}</span>
         </div>
       </div>`;
     }).join('');
     return `<div class="card">
-      <div class="card-title" style="color:${catColors[k]}">${cat.nombre}</div>
-      <div style="margin-bottom:1rem;">
-        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
-          <div style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;color:${catColors[k]}">${catProms[k]}</div>
-          <div>
-            <div style="font-size:0.75rem;color:var(--mid);">Promedio categoría</div>
-            <div style="height:6px;width:120px;background:var(--border);border-radius:3px;margin-top:4px;overflow:hidden;">
-              <div style="height:100%;width:${pct}%;background:${catColors[k]};border-radius:3px;"></div>
-            </div>
-          </div>
-        </div>
-        ${pregs}
-      </div>
+      <div class="card-title" style="color:${cat.color}">${cat.nombre} <span class="badge-cat badge">${catProms[k]}/5</span></div>
+      ${pregs}
     </div>`;
   }).join('');
 
-  // Tabla de evaluaciones individuales
   const evRows = evals.map(e => `<tr>
-    <td>${e.evaluadorNombre}</td><td>${e.evaluadorCargo}</td>
-    ${catKeys.map(k=>`<td style="text-align:center;font-weight:600;">${e.porCategoria[k]}</td>`).join('')}
-    <td style="text-align:center;"><strong>${e.puntajeGlobal}</strong></td>
-    <td>${e.fecha}</td>
+    <td>${e.evaluador_nombre}</td><td>${e.evaluador_puesto}</td>
+    <td><span class="badge badge-gray">${{menos_6m:'<6m','6m_1a':'6m-1a','1a_2a':'1-2a',mas_2a:'>2a'}[e.evaluador_tiempo]||'—'}</span></td>
+    ${catKeys.map(k=>`<td style="text-align:center;font-weight:600;color:${PREGUNTAS[k].color}">${e.por_categoria?.[k]||'—'}</td>`).join('')}
+    <td><strong>${e.puntaje_global}</strong></td><td style="color:var(--text2);font-size:0.8rem">${e.fecha}</td>
   </tr>`).join('');
 
   cont.innerHTML = `
     <div class="card">
-      <div class="card-title"><span class="icon">👤</span> ${lider.nombre} — ${lider.cargo}${lider.area?' · '+lider.area:''}</div>
-      <div class="gauge-row">
-        <div class="gauge-item">
-          <div class="gauge-label">Puntaje Global</div>
-          <div class="gauge-val" style="color:var(--teal)">${globalProm}<span style="font-size:1rem;color:var(--mid)">/5</span></div>
-          <div class="gauge-bar"><div class="gauge-fill" style="width:${globalProm/5*100}%"></div></div>
-        </div>
-        <div class="gauge-item"><div class="gauge-label">Clasificación</div><div class="gauge-val"><span class="badge ${cls}" style="font-size:1rem;">${lbl}</span></div></div>
-        <div class="gauge-item"><div class="gauge-label">Total Evaluaciones</div><div class="gauge-val">${evals.length}</div></div>
-        <div class="gauge-item"><div class="gauge-label">Última Evaluación</div><div class="gauge-val" style="font-size:1.1rem;">${evals[evals.length-1].fecha}</div></div>
+      <div class="card-title">👤 ${lider?.nombre} — ${lider?.cargo}${lider?.area?' · '+lider.area:''}</div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num" style="color:var(--teal)">${globalProm}</div><div class="stat-lbl">Global /5</div></div>
+        <div class="stat-box"><div class="stat-num">${evals.length}</div><div class="stat-lbl">Evaluaciones</div></div>
+        <div class="stat-box"><div class="stat-num"><span class="badge ${cls}">${lbl}</span></div><div class="stat-lbl">Nivel</div></div>
+        <div class="stat-box"><div class="stat-num" style="font-size:1rem;color:var(--gold)">${lider?.grupos?.nombre||'—'}</div><div class="stat-lbl">Grupo</div></div>
       </div>
-      <div style="margin-top:1rem;">
-        <div style="font-weight:700;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--mid);margin-bottom:1rem;">Puntaje por Categoría</div>
-        <div class="cat-score-list">
-          ${catKeys.map(k=>`<div class="cat-score-item">
-            <div class="cat-score-name">${PREGUNTAS[k].nombre}</div>
-            <div class="cat-score-bar"><div class="cat-score-fill" style="width:${catProms[k]/5*100}%;background:${catColors[k]}"></div></div>
-            <div class="cat-score-num" style="color:${catColors[k]}">${catProms[k]}</div>
-          </div>`).join('')}
-        </div>
+      <div style="margin-top:1rem">
+        ${catKeys.map(k=>`<div class="report-bar-item">
+          <div class="report-bar-label">${PREGUNTAS[k].nombre}</div>
+          <div class="report-bar-track"><div class="report-bar-fill" style="width:${catProms[k]/5*100}%;background:${PREGUNTAS[k].color}"></div></div>
+          <div class="report-bar-val" style="color:${PREGUNTAS[k].color}">${catProms[k]}</div>
+        </div>`).join('')}
       </div>
     </div>
-
     ${catDetail}
-
     <div class="card">
-      <div class="card-title"><span class="icon">📋</span> Detalle de Evaluaciones Recibidas</div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Evaluador</th><th>Cargo</th>${catKeys.map(k=>`<th>${PREGUNTAS[k].nombre.split(' ').slice(1,2).join('')}</th>`).join('')}<th>Global</th><th>Fecha</th></tr></thead>
-          <tbody>${evRows}</tbody>
-        </table>
-      </div>
+      <div class="card-title">📋 Detalle de Evaluaciones</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Evaluador</th><th>Puesto</th><th>Antigüedad</th>${catKeys.map(k=>`<th style="color:${PREGUNTAS[k].color}">${PREGUNTAS[k].nombre.split(' ').slice(1,2).join('')||k}</th>`).join('')}<th>Global</th><th>Fecha</th></tr></thead>
+        <tbody>${evRows}</tbody>
+      </table></div>
     </div>`;
 }
 
-// ========== UTILS ==========
-function confirmarLimpiar() { document.getElementById('confirm-overlay').classList.add('open'); }
-function cerrarModal() { document.getElementById('confirm-overlay').classList.remove('open'); }
-function limpiarTodo() {
-  db = { lideres: [], evaluaciones: [] }; guardarDB(); cerrarModal();
-  toast('🗑 Base de datos limpiada');
-  showSection('home');
+// ===================== UTILS =====================
+function getLabel(score) {
+  const s = parseFloat(score);
+  if (!score || isNaN(s)) return ['Sin datos', 'badge-gray'];
+  if (s >= 4.5) return ['Excelente', 'badge-teal'];
+  if (s >= 3.5) return ['Bueno', 'badge-green'];
+  if (s >= 2.5) return ['Regular', 'badge-yellow'];
+  return ['Por mejorar', 'badge-red'];
 }
-function toast(msg) {
+
+function toast(msg, type='') {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3000);
+  el.textContent = msg; el.className = `toast ${type} show`;
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(() => el.classList.remove('show'), 3500);
 }
-document.getElementById('confirm-overlay').addEventListener('click', function(e) { if(e.target===this) cerrarModal(); });
-actualizarStats();
+
+let _confirmCb = null;
+function confirm2(title, body, cb) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-body').textContent = body;
+  _confirmCb = cb;
+  document.getElementById('confirm-modal').classList.add('open');
+  document.getElementById('confirm-ok').onclick = () => { closeModal(); _confirmCb && _confirmCb(); };
+}
+function closeModal() { document.getElementById('confirm-modal').classList.remove('open'); }
+document.getElementById('confirm-modal').addEventListener('click', e => { if(e.target.id==='confirm-modal') closeModal(); });
+
+// ===================== START =====================
+init();
 </script>
 </body>
 </html>
