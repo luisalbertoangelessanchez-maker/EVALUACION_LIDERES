@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LeaderScope — Evaluación de Liderazgo</title>
+<title>AngelesGroup — Evaluación de Liderazgo</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -213,7 +213,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-box">
-    <div class="auth-logo">Leader<span>Scope</span></div>
+    <div class="auth-logo">Angeles<span>Group</span></div>
     <div class="auth-sub">Plataforma de Evaluación de Liderazgo 360°</div>
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchAuth('login')">Iniciar Sesión</button>
@@ -243,7 +243,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <!-- APP -->
 <div id="app-screen">
   <nav>
-    <div class="nav-logo">Leader<span>Scope</span></div>
+    <div class="nav-logo">Angeles<span>Group</span></div>
     <div class="nav-tabs" id="nav-tabs"></div>
     <div class="nav-right">
       <span class="nav-user" id="nav-user-info"></span>
@@ -562,9 +562,14 @@ function switchAuth(tab){
   document.getElementById('pane-register').style.display=tab==='register'?'':'none';
 }
 async function loadGruposPublic(){
-  const{data}=await sb.from('grupos').select('id,nombre').order('nombre');
+  const{data,error}=await sb.from('grupos').select('id,nombre').order('nombre');
+  if(error) console.warn('Error cargando grupos públicos:',error.message);
   const sel=document.getElementById('r-grupo');
-  sel.innerHTML='<option value="">— Selecciona tu grupo —</option>'+(data||[]).map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
+  if(!data||data.length===0){
+    sel.innerHTML='<option value="">— No hay grupos disponibles —</option>';
+  } else {
+    sel.innerHTML='<option value="">— Selecciona tu grupo —</option>'+data.map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
+  }
 }
 function checkPwStrength(v){
   const bar=document.getElementById('pw-bar');let s=0;
@@ -871,21 +876,47 @@ function switchPTab(tab){
   if(tab==='historial')cargarHistorial();
 }
 async function cargarPerfil(){
-  const{data:grupos}=await sb.from('grupos').select('id,nombre').order('nombre');
-  const sel=document.getElementById('p-grupo');
-  sel.innerHTML='<option value="">— Selecciona —</option>'+(grupos||[]).map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
-  if(userProfile){
-    document.getElementById('p-nombre').value=userProfile.nombre_completo||'';
-    document.getElementById('p-puesto').value=userProfile.puesto||'';
-    document.getElementById('p-dni').value=userProfile.dni||'';
-    document.getElementById('p-email').value=currentUser.email||'';
-    document.getElementById('p-grupo').value=userProfile.grupo_id||'';
+  // Recargar perfil fresco desde Supabase
+  if(currentUser && !isAdmin){
+    const{data:p}=await sb.from('usuarios').select('*,grupos(nombre)').eq('auth_id',currentUser.id).single();
+    if(p){userProfile=p; userGrupoId=p.grupo_id?parseInt(p.grupo_id):null;}
   }
-  if(userGrupoId){
-    const{data:lideres}=await sb.from('lideres').select('cargo').eq('grupo_id',userGrupoId);
+
+  // Cargar lista de grupos disponibles
+  const{data:grupos, error:ge}=await sb.from('grupos').select('id,nombre').order('nombre');
+  if(ge) console.warn('Error grupos perfil:',ge.message);
+
+  const sel=document.getElementById('p-grupo');
+  if(!grupos||grupos.length===0){
+    sel.innerHTML='<option value="">— No hay grupos disponibles —</option>';
+  } else {
+    sel.innerHTML='<option value="">— Selecciona tu grupo —</option>'+grupos.map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
+  }
+
+  // Llenar campos del perfil
+  document.getElementById('p-nombre').value=userProfile?.nombre_completo||'';
+  document.getElementById('p-puesto').value=userProfile?.puesto||'';
+  document.getElementById('p-dni').value=userProfile?.dni||'';
+  document.getElementById('p-email').value=currentUser?.email||'';
+
+  // Seleccionar grupo actual del usuario
+  if(userProfile?.grupo_id){
+    sel.value=String(userProfile.grupo_id);
+    // Si no se seleccionó (mismatch de tipo), iterar opciones
+    if(!sel.value){
+      for(let i=0;i<sel.options.length;i++){
+        if(sel.options[i].value==userProfile.grupo_id){sel.selectedIndex=i;break;}
+      }
+    }
+  }
+
+  // Cargar puestos para filtro historial
+  const grupoParaFiltro=userGrupoId||userProfile?.grupo_id;
+  if(grupoParaFiltro){
+    const{data:lideres}=await sb.from('lideres').select('cargo').eq('grupo_id',grupoParaFiltro);
     const puestos=[...new Set((lideres||[]).map(l=>l.cargo))].sort();
     const sp=document.getElementById('hist-puesto');
-    sp.innerHTML='<option value="">Todos los puestos</option>'+puestos.map(p=>`<option value="${escH(p)}">${escH(p)}</option>`).join('');
+    if(sp) sp.innerHTML='<option value="">Todos los puestos</option>'+puestos.map(p=>`<option value="${escH(p)}">${escH(p)}</option>`).join('');
   }
 }
 async function guardarPerfil(){
@@ -894,12 +925,14 @@ async function guardarPerfil(){
   const dni=document.getElementById('p-dni').value.trim();
   const grupo_id=document.getElementById('p-grupo').value;
   if(!dni)return toast('El DNI es obligatorio','err');
-  if(!grupo_id)return toast('Selecciona un grupo','err');
+  if(!grupo_id)return toast('Selecciona un grupo de evaluación','err');
   const{error}=await sb.from('usuarios').update({nombre_completo:nombre,puesto,dni,grupo_id}).eq('auth_id',currentUser.id);
-  if(error)return toast('Error: '+error.message,'err');
+  if(error)return toast('Error al guardar: '+error.message,'err');
   userProfile={...userProfile,nombre_completo:nombre,puesto,dni,grupo_id};
   userGrupoId=parseInt(grupo_id);
-  toast('✅ Perfil actualizado','ok');
+  toast('✅ Perfil actualizado correctamente','ok');
+  // Recargar líderes del nuevo grupo automáticamente
+  await loadEvalStep1();
 }
 async function cambiarPass(){
   const pass=document.getElementById('p-pass').value,pass2=document.getElementById('p-pass2').value;
