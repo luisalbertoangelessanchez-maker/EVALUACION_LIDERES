@@ -540,8 +540,12 @@ async function init(){
 async function loadUser(user){
   currentUser=user; isAdmin=user.email===ADMIN_EMAIL;
   if(!isAdmin){
-    const{data:p}=await sb.from('usuarios').select('*,grupos(nombre)').eq('auth_id',user.id).single();
-    if(p){userProfile=p;userGrupoId=p.grupo_id;}
+    const{data:p,error:pe}=await sb.from('usuarios').select('*,grupos(nombre)').eq('auth_id',user.id).single();
+    if(pe) console.warn('Error cargando perfil:',pe.message);
+    if(p){
+      userProfile=p;
+      userGrupoId=p.grupo_id ? parseInt(p.grupo_id) : null;
+    }
   }
   showApp();
 }
@@ -794,10 +798,34 @@ async function loadEvalStep1(){
     if(userProfile.nombre_completo) document.getElementById('ev-nombre').value=userProfile.nombre_completo;
     if(userProfile.puesto) document.getElementById('ev-puesto').value=userProfile.puesto;
   }
-  if(!userGrupoId)return;
-  const{data}=await sb.from('lideres').select('id,nombre,cargo').eq('grupo_id',userGrupoId).order('nombre');
   const sel=document.getElementById('ev-lider');
-  sel.innerHTML='<option value="">— Selecciona líder —</option>'+(data||[]).map(l=>`<option value="${l.id}">${escH(l.nombre)} — ${escH(l.cargo)}</option>`).join('');
+  sel.innerHTML='<option value="">— Cargando líderes... —</option>';
+
+  // Si no tenemos grupoId aún, intentar obtenerlo de nuevo
+  if(!userGrupoId && currentUser){
+    const{data:p}=await sb.from('usuarios').select('grupo_id').eq('auth_id',currentUser.id).single();
+    if(p && p.grupo_id){
+      userGrupoId=parseInt(p.grupo_id);
+      if(userProfile) userProfile.grupo_id=p.grupo_id;
+    }
+  }
+
+  if(!userGrupoId){
+    sel.innerHTML='<option value="">— Sin grupo asignado —</option>';
+    const strip=document.createElement('div');
+    strip.className='warn-strip';strip.style.marginTop='.75rem';
+    strip.textContent='⚠️ No tienes un grupo de evaluación asignado. Ve a Mi Perfil para configurarlo.';
+    sel.parentElement.appendChild(strip);
+    return;
+  }
+
+  const{data,error}=await sb.from('lideres').select('id,nombre,cargo').eq('grupo_id',userGrupoId).order('nombre');
+  if(error){ console.error('Error cargando líderes:',error.message); sel.innerHTML='<option value="">— Error al cargar —</option>'; return; }
+  if(!data || data.length===0){
+    sel.innerHTML='<option value="">— No hay líderes en tu grupo —</option>';
+    return;
+  }
+  sel.innerHTML='<option value="">— Selecciona líder —</option>'+data.map(l=>`<option value="${l.id}">${escH(l.nombre)} — ${escH(l.cargo)}</option>`).join('');
 }
 function iniciarEval(){
   const nombre=document.getElementById('ev-nombre').value.trim(),puesto=document.getElementById('ev-puesto').value.trim();
