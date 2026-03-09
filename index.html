@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AngelesGroup — Evaluación de Liderazgo</title>
+<title>AngelesGroup — Evaluación de Liderazgo 360°</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
   --bg:#07090f;--surface:#0e1117;--surface2:#151922;--border:#1e2433;--border2:#2a3349;
@@ -19,7 +20,6 @@ html{scroll-behavior:smooth}
 body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
-/* AUTH */
 #auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(ellipse at 20% 50%,rgba(212,168,67,.08) 0%,transparent 60%),
   radial-gradient(ellipse at 80% 20%,rgba(45,212,191,.06) 0%,transparent 50%),var(--bg)}
@@ -31,7 +31,6 @@ body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--t
 .auth-tab{flex:1;padding:.5rem;text-align:center;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--text2);transition:all .2s;border:none;background:transparent}
 .auth-tab.active{background:var(--surface2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3)}
 
-/* FORMS */
 .form-group{margin-bottom:1rem}
 label{display:block;font-size:.78rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:.4rem}
 input,select,textarea{width:100%;padding:.75rem 1rem;background:var(--bg);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:.95rem;transition:border-color .2s,box-shadow .2s}
@@ -40,7 +39,6 @@ input::placeholder{color:var(--text3)}
 input:disabled,select:disabled{opacity:.5;cursor:not-allowed}
 select option{background:var(--surface2)}
 
-/* BUTTONS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem 1.5rem;border:none;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
 .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0700}
 .btn-gold:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,168,67,.35)}
@@ -52,12 +50,13 @@ select option{background:var(--surface2)}
 .btn-blue:hover{background:rgba(96,165,250,.25)}
 .btn-danger{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red)}
 .btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-green{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green)}
+.btn-green:hover{background:rgba(34,197,94,.25)}
 .btn-active{background:rgba(212,168,67,.15);border:1.5px solid var(--gold);color:var(--gold)}
 .btn-sm{padding:.4rem .85rem;font-size:.8rem}
 .btn-full{width:100%}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
 
-/* NAV */
 #app-screen{display:none}
 nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;gap:1rem;height:60px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.3)}
 .nav-logo{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;margin-right:1rem;white-space:nowrap}
@@ -70,7 +69,6 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.
 .nav-user{font-size:.8rem;color:var(--text2);white-space:nowrap}
 .nav-badge{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0700;font-size:.65rem;font-weight:700;padding:.15rem .5rem;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
 
-/* LAYOUT */
 .container{max-width:1200px;margin:0 auto;padding:2rem 1.5rem}
 .section{display:none;animation:fadeUp .35s ease}
 .section.active{display:block}
@@ -79,7 +77,6 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.
 .page-header h1{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800}
 .page-header p{color:var(--text2);margin-top:.3rem;font-size:.9rem}
 
-/* CARDS */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem;margin-bottom:1.25rem}
 .card-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:1.5rem;padding-bottom:.85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .card-title .sub{font-family:'Instrument Sans',sans-serif;font-size:.72rem;background:rgba(212,168,67,.15);color:var(--gold);padding:.2rem .6rem;border-radius:20px;font-weight:600}
@@ -87,13 +84,11 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
 .col-full{grid-column:1/-1}
 
-/* STATS */
 .stats-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
 .stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;flex:1;min-width:120px}
 .stat-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--gold)}
 .stat-lbl{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:.2rem}
 
-/* TABLE */
 .table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse;font-size:.875rem}
 thead tr{background:var(--surface2)}
@@ -101,7 +96,6 @@ th{padding:.75rem 1rem;text-align:left;font-size:.72rem;font-weight:700;text-tra
 td{padding:.7rem 1rem;border-top:1px solid var(--border);color:var(--text);vertical-align:middle}
 tr:hover td{background:rgba(255,255,255,.02)}
 
-/* BADGE */
 .badge{display:inline-block;padding:.2rem .6rem;border-radius:20px;font-size:.73rem;font-weight:700}
 .badge-gold{background:rgba(212,168,67,.15);color:var(--gold)}
 .badge-teal{background:rgba(45,212,191,.12);color:var(--teal)}
@@ -110,8 +104,15 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .badge-yellow{background:rgba(234,179,8,.12);color:var(--yellow)}
 .badge-gray{background:var(--surface2);color:var(--text2)}
 .badge-blue{background:rgba(96,165,250,.12);color:var(--blue)}
+.badge-purple{background:rgba(192,132,252,.12);color:var(--purple)}
+.badge-orange{background:rgba(251,146,60,.12);color:var(--orange)}
 
-/* LIKERT EVAL */
+/* JERARQUÍA BADGES */
+.jer-subordinado{background:rgba(45,212,191,.15);color:var(--teal)}
+.jer-jefe{background:rgba(212,168,67,.15);color:var(--gold)}
+.jer-par_interno{background:rgba(96,165,250,.15);color:var(--blue)}
+.jer-par_externo{background:rgba(192,132,252,.15);color:var(--purple)}
+
 .categories-eval{display:flex;flex-direction:column;gap:1.25rem}
 .cat-block{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .cat-header{padding:.9rem 1.25rem;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
@@ -132,25 +133,56 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .leg-item{display:flex;align-items:center;gap:.35rem;font-size:.75rem;color:var(--text2)}
 .leg-dot{width:8px;height:8px;border-radius:50%}
 
-/* PROGRESS */
+/* JERARQUÍA SELECTOR */
+.jer-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:.5rem}
+.jer-btn{padding:.7rem 1rem;border:1.5px solid var(--border2);border-radius:8px;background:var(--bg);color:var(--text2);font-size:.85rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;font-family:'Instrument Sans',sans-serif}
+.jer-btn:hover{border-color:var(--gold)}
+.jer-btn.sel-jer{border-color:var(--teal);background:rgba(45,212,191,.12);color:var(--teal)}
+
 .prog-wrap{margin:1rem 0}
 .prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:2px;transition:width .4s ease}
 .prog-label{font-size:.75rem;color:var(--text2);margin-top:.4rem}
 
-/* FILTER BAR */
 .filter-bar{display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.5rem;padding:1.25rem;background:var(--surface2);border-radius:10px;border:1px solid var(--border)}
 .filter-group{display:flex;flex-direction:column;gap:.25rem;min-width:155px}
 .filter-group select,.filter-group input{width:auto}
 
-/* REPORT BARS */
+/* BUSCADOR LÍDERES MULTI-SELECT */
+.lideres-search-wrap{position:relative}
+.lideres-search-wrap input{padding-right:2.5rem}
+.lideres-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;max-height:220px;overflow-y:auto;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.ldrop-item{padding:.55rem 1rem;cursor:pointer;display:flex;align-items:center;gap:.6rem;font-size:.87rem;transition:background .15s}
+.ldrop-item:hover{background:var(--border)}
+.ldrop-item.selected{background:rgba(212,168,67,.1)}
+.ldrop-check{width:15px;height:15px;border:1.5px solid var(--border2);border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem}
+.ldrop-check.chk{background:var(--gold);border-color:var(--gold);color:#0a0700}
+.selected-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem;min-height:24px}
+.sel-tag{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .6rem;background:rgba(212,168,67,.15);border:1px solid rgba(212,168,67,.3);border-radius:20px;font-size:.77rem;color:var(--gold)}
+.sel-tag button{background:none;border:none;color:var(--gold);cursor:pointer;font-size:.9rem;line-height:1;padding:0}
+
 .report-bar-item{display:flex;align-items:center;gap:1rem;margin-bottom:.85rem}
 .report-bar-label{font-size:.82rem;font-weight:600;min-width:180px;color:var(--text)}
 .report-bar-track{flex:1;height:10px;background:var(--border);border-radius:5px;overflow:hidden}
 .report-bar-fill{height:100%;border-radius:5px;transition:width .7s ease}
 .report-bar-val{font-weight:700;font-size:.85rem;min-width:36px;text-align:right}
 
-/* LEADER CARDS */
+/* TOP RANKING */
+.top-list{display:flex;flex-direction:column;gap:.6rem}
+.top-item{display:flex;align-items:center;gap:1rem;padding:.85rem 1rem;background:var(--surface2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s}
+.top-item:hover{border-color:var(--gold);background:rgba(212,168,67,.05)}
+.top-rank{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;min-width:36px;text-align:center}
+.top-rank.r1{color:var(--gold)}
+.top-rank.r2{color:#c0c0c0}
+.top-rank.r3{color:#cd7f32}
+.top-rank.rn{color:var(--text3)}
+.top-info{flex:1}
+.top-name{font-weight:700;font-size:.95rem}
+.top-role{font-size:.77rem;color:var(--text2);margin-top:.1rem}
+.top-score{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--teal)}
+.top-bar-wrap{width:90px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:.25rem}
+.top-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--teal),var(--gold))}
+
 .leader-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-bottom:1.5rem}
 .leader-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;cursor:pointer;transition:all .2s}
 .leader-card:hover,.leader-card.sel{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,67,.1)}
@@ -158,40 +190,45 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .lc-role{font-size:.78rem;color:var(--text2);margin-bottom:.85rem}
 .lc-score{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--teal)}
 
-/* CHART */
 .chart-wrap{position:relative;background:var(--surface2);border-radius:10px;padding:1.25rem;margin-bottom:1.25rem}
 .chart-wrap canvas{max-height:320px}
 
-/* INLINE EDIT ROW */
-.edit-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
-.edit-row input,.edit-row select{flex:1;min-width:100px;padding:.45rem .75rem;font-size:.85rem}
-.edit-row .btn{flex-shrink:0}
-
-/* INFO STRIP */
 .info-strip{background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.2);border-radius:8px;padding:.85rem 1.1rem;font-size:.87rem;color:var(--teal);margin-bottom:1.25rem}
 .warn-strip{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.2);border-radius:8px;padding:.85rem 1.1rem;font-size:.87rem;color:var(--yellow);margin-bottom:1.25rem}
 
-/* PROFILE TABS */
-.ptabs{display:flex;gap:.25rem;background:var(--bg);border-radius:8px;padding:3px;margin-bottom:1.5rem;width:fit-content}
+.ptabs{display:flex;gap:.25rem;background:var(--bg);border-radius:8px;padding:3px;margin-bottom:1.5rem;width:fit-content;flex-wrap:wrap}
 .ptab{padding:.45rem 1.1rem;border-radius:6px;cursor:pointer;font-size:.83rem;font-weight:600;color:var(--text2);border:none;background:transparent;transition:all .2s}
 .ptab.active{background:var(--surface2);color:var(--text)}
 
-/* CAT COLORS */
 .cc1{background:linear-gradient(135deg,#0f3d38,#0a2e2b)}.cc1 .cat-header{color:#2dd4bf}
 .cc2{background:linear-gradient(135deg,#3d2008,#2a1505)}.cc2 .cat-header{color:#fb923c}
 .cc3{background:linear-gradient(135deg,#0f1f3d,#0a1628)}.cc3 .cat-header{color:#60a5fa}
 .cc4{background:linear-gradient(135deg,#2a0f3d,#1e0a2e)}.cc4 .cat-header{color:#c084fc}
 .cc5{background:linear-gradient(135deg,#3d0f15,#2e0a10)}.cc5 .cat-header{color:#f87171}
 
-/* MODAL / TOAST / LOADER */
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border2);border-radius:10px;padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--gold);background:rgba(212,168,67,.05)}
+.upload-zone input[type=file]{display:none}
+.upload-icon{font-size:2.5rem;margin-bottom:.75rem}
+
+/* USUARIO TOGGLE */
+.user-row{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-top:1px solid var(--border)}
+.toggle-switch{position:relative;width:42px;height:22px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--border2);border-radius:11px;transition:.3s}
+.toggle-slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background:var(--text2);border-radius:50%;transition:.3s}
+.toggle-switch input:checked+.toggle-slider{background:var(--green)}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(20px);background:#fff}
+
 .toast{position:fixed;bottom:2rem;right:2rem;padding:.9rem 1.4rem;border-radius:10px;font-size:.88rem;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s ease;max-width:320px;border-left:3px solid var(--gold);background:var(--surface);box-shadow:0 8px 32px rgba(0,0,0,.5)}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.err{border-left-color:var(--red)}
 .toast.ok{border-left-color:var(--green)}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:2rem;max-width:520px;width:90%;box-shadow:0 32px 80px rgba(0,0,0,.6);animation:fadeUp .25s ease;max-height:90vh;overflow-y:auto}
-.modal h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:1.25rem}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:2rem;max-width:560px;width:90%;box-shadow:0 32px 80px rgba(0,0,0,.6);animation:fadeUp .25s ease;max-height:90vh;overflow-y:auto}
+.modal h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:1.25rem}
 .modal-btns{display:flex;gap:.75rem;margin-top:1.5rem;flex-wrap:wrap}
 .loader{display:inline-block;width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -204,7 +241,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
   .grid-2,.grid-3{grid-template-columns:1fr}.col-full{grid-column:1}
   nav{padding:0 1rem}.container{padding:1.25rem 1rem}
   .report-bar-label{min-width:120px}.filter-bar{flex-direction:column}
-  .filter-group{min-width:unset;width:100%}
+  .filter-group{min-width:unset;width:100%}.jer-grid{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
@@ -225,6 +262,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="btn btn-gold btn-full" onclick="doLogin()" id="btn-login">Ingresar</button>
     </div>
     <div id="pane-register" style="display:none">
+      <div class="form-group"><label>Nombre Completo</label><input type="text" id="r-nombre" placeholder="Tu nombre completo"></div>
       <div class="form-group"><label>DNI</label><input type="text" id="r-dni" placeholder="Ej: 12345678" maxlength="8"></div>
       <div class="form-group"><label>Correo Electrónico</label><input type="email" id="r-email" placeholder="correo@empresa.com"></div>
       <div class="form-group">
@@ -265,15 +303,48 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
     <!-- GRUPOS (ADMIN) -->
     <div id="sec-grupos" class="section">
-      <div class="page-header"><h1>Grupos de Evaluación</h1><p>Crear, editar y eliminar grupos</p></div>
+      <div class="page-header"><h1>Grupos de Evaluación</h1><p>Crear, editar, configurar periodicidad y cargar líderes en masa</p></div>
       <div class="grid-2">
         <div class="card">
           <div class="card-title">➕ Nuevo Grupo</div>
           <div class="form-group"><label>Nombre</label><input type="text" id="g-nombre" placeholder="Ej: Gerencia Comercial 2025"></div>
           <div class="form-group"><label>Descripción (opcional)</label><textarea id="g-desc" rows="2" style="resize:vertical" placeholder="Breve descripción..."></textarea></div>
+          <div class="form-group">
+            <label>⏱ Periodicidad de Evaluación</label>
+            <select id="g-periodo">
+              <option value="">— Sin periodo definido —</option>
+              <option value="quincenal">Quincenal (cada 15 días)</option>
+              <option value="mensual">Mensual</option>
+              <option value="bimestral">Bimestral (cada 2 meses)</option>
+              <option value="trimestral">Trimestral (cada 3 meses)</option>
+              <option value="semestral">Semestral (cada 6 meses)</option>
+              <option value="anual">Anual</option>
+            </select>
+          </div>
           <button class="btn btn-gold" onclick="crearGrupo()">Crear Grupo</button>
         </div>
         <div class="card"><div class="card-title">📋 Grupos Existentes</div><div id="grupos-lista"></div></div>
+      </div>
+      <!-- CARGA MASIVA -->
+      <div class="card">
+        <div class="card-title">📥 Carga Masiva de Líderes desde Excel</div>
+        <div class="warn-strip">El archivo Excel debe tener estas columnas en orden: <strong>Empresa / Sede / Departamento / Área / Sección / Puesto de trabajo / Grupo de evaluación / Nombre completo</strong></div>
+        <div class="grid-2">
+          <div>
+            <div class="upload-zone" id="upload-zone" onclick="document.getElementById('excel-file').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+              <input type="file" id="excel-file" accept=".xlsx,.xls" onchange="procesarExcel(this.files[0])">
+              <div class="upload-icon">📊</div>
+              <div style="font-weight:600;margin-bottom:.3rem">Arrastra tu Excel aquí</div>
+              <div style="font-size:.8rem;color:var(--text2)">o haz click para seleccionar</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="descargarPlantilla()" style="margin-top:.75rem;width:100%">⬇️ Descargar Plantilla Excel</button>
+          </div>
+          <div id="excel-preview"><div class="empty-state" style="padding:1.5rem"><div class="ico" style="font-size:1.5rem">📋</div><p style="font-size:.85rem">La vista previa aparecerá aquí</p></div></div>
+        </div>
+        <div id="excel-actions" style="display:none;margin-top:1rem">
+          <button class="btn btn-gold" onclick="importarLideres()" id="btn-importar">📤 Importar Líderes</button>
+          <button class="btn btn-ghost" onclick="cancelarImport()" style="margin-left:.5rem">Cancelar</button>
+        </div>
       </div>
     </div>
 
@@ -286,6 +357,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <div class="form-group"><label>Nombre Completo</label><input type="text" id="ld-nombre" placeholder="Ej: Carlos Mendoza"></div>
           <div class="form-group"><label>Cargo / Rol</label><input type="text" id="ld-cargo" placeholder="Ej: Gerente Comercial"></div>
           <div class="form-group"><label>Área / Departamento</label><input type="text" id="ld-area" placeholder="Ej: Ventas"></div>
+          <div class="form-group"><label>Empresa / Sede</label><input type="text" id="ld-empresa" placeholder="Ej: Sede Lima Norte"></div>
+          <div class="form-group"><label>Sección</label><input type="text" id="ld-seccion" placeholder="Ej: Atención al Cliente"></div>
           <div class="form-group"><label>Grupo de Evaluación</label><select id="ld-grupo"><option value="">— Selecciona grupo —</option></select></div>
         </div>
         <button class="btn btn-gold" onclick="crearLider()" style="margin-top:.5rem">Registrar Líder</button>
@@ -299,7 +372,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
     <!-- REPORTES ADMIN -->
     <div id="sec-reportes-admin" class="section">
-      <div class="page-header"><h1>Reportes de Desempeño</h1><p>Análisis completo con filtros y gráficas — Escala Likert 1–5</p></div>
+      <div class="page-header"><h1>Reportes de Desempeño</h1><p>Análisis completo — Escala Likert 1–5</p></div>
       <div class="filter-bar">
         <div class="filter-group"><label>Grupo</label><select id="rpt-grupo" onchange="onFiltroChange()"><option value="">Todos</option></select></div>
         <div class="filter-group"><label>Mes</label>
@@ -318,6 +391,15 @@ tr:hover td{background:rgba(255,255,255,.02)}
             <option value="mas_2a">Mayor de 2 años</option>
           </select>
         </div>
+        <div class="filter-group"><label>Jerarquía Evaluador</label>
+          <select id="rpt-jerarquia" onchange="onFiltroChange()">
+            <option value="">Todas</option>
+            <option value="subordinado">Subordinado</option>
+            <option value="jefe">Jefe</option>
+            <option value="par_interno">Par interno</option>
+            <option value="par_externo">Par externo</option>
+          </select>
+        </div>
         <div class="filter-group"><label>Categoría</label>
           <select id="rpt-categoria" onchange="onFiltroChange()">
             <option value="">Todas</option><option value="liderazgo">🧭 Liderazgo</option>
@@ -325,10 +407,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
             <option value="emocional">🤝 Int. Emocional</option><option value="desarrollo">🌱 Desarrollo</option>
           </select>
         </div>
-        <div class="filter-group"><label>Tipo</label>
+        <div class="filter-group" style="min-width:240px">
+          <label>Buscar Evaluado(s)</label>
+          <div class="lideres-search-wrap">
+            <input type="text" id="rpt-buscar-lider" placeholder="Escribe nombre o apellido..." oninput="onBuscarLider(this.value)" autocomplete="off">
+            <div class="lideres-dropdown" id="lider-dropdown" style="display:none"></div>
+          </div>
+          <div class="selected-tags" id="selected-tags"></div>
+        </div>
+        <div class="filter-group"><label>Vista</label>
           <div style="display:flex;gap:.5rem">
             <button class="btn btn-active btn-sm" id="rbtn-general" onclick="setRptTipo('general')">📊 General</button>
-            <button class="btn btn-ghost btn-sm" id="rbtn-individual" onclick="setRptTipo('individual')">👤 Individual</button>
+            <button class="btn btn-ghost btn-sm" id="rbtn-individual" onclick="setRptTipo('individual')">🏆 Top</button>
           </div>
         </div>
       </div>
@@ -337,7 +427,16 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
     <!-- USUARIOS (ADMIN) -->
     <div id="sec-usuarios" class="section">
-      <div class="page-header"><h1>Usuarios del Sistema</h1><p>Evaluadores registrados</p></div>
+      <div class="page-header"><h1>Usuarios del Sistema</h1><p>Evaluadores registrados — activa o desactiva su acceso</p></div>
+      <div class="filter-bar">
+        <div class="filter-group"><label>Filtrar por Grupo</label><select id="ufilter-grupo" onchange="cargarUsuarios()"><option value="">Todos los grupos</option></select></div>
+        <div class="filter-group"><label>Estado</label>
+          <select id="ufilter-estado" onchange="cargarUsuarios()">
+            <option value="">Todos</option><option value="activo">Activos</option><option value="inactivo">Inactivos</option>
+          </select>
+        </div>
+        <div class="filter-group"><label>Buscar</label><input type="text" id="ufilter-buscar" placeholder="Nombre, DNI o correo..." oninput="cargarUsuarios()"></div>
+      </div>
       <div class="card"><div id="usuarios-lista"></div></div>
     </div>
 
@@ -362,6 +461,16 @@ tr:hover td{background:rgba(255,255,255,.02)}
             </div>
             <div class="form-group"><label>Líder a Evaluar</label><select id="ev-lider"><option value="">— Selecciona líder —</option></select></div>
           </div>
+          <div class="form-group" style="margin-top:.5rem">
+            <label>🏅 Tu Jerarquía respecto al Líder Evaluado</label>
+            <div class="jer-grid">
+              <button class="jer-btn" onclick="selJer('subordinado',this)">⬇️ Subordinado<br><span style="font-size:.72rem;font-weight:400;color:var(--text2)">Reporto a él/ella</span></button>
+              <button class="jer-btn" onclick="selJer('jefe',this)">⬆️ Jefe<br><span style="font-size:.72rem;font-weight:400;color:var(--text2)">Él/ella me reporta a mí</span></button>
+              <button class="jer-btn" onclick="selJer('par_interno',this)">↔️ Par Interno<br><span style="font-size:.72rem;font-weight:400;color:var(--text2)">Mismo área</span></button>
+              <button class="jer-btn" onclick="selJer('par_externo',this)">🔀 Par Externo<br><span style="font-size:.72rem;font-weight:400;color:var(--text2)">Área diferente</span></button>
+            </div>
+            <input type="hidden" id="ev-jerarquia">
+          </div>
           <button class="btn btn-gold" onclick="iniciarEval()" style="margin-top:.5rem">Comenzar Evaluación →</button>
         </div>
       </div>
@@ -385,18 +494,17 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
     <!-- REPORTE GENERAL (USER) -->
     <div id="sec-reporte-user" class="section">
-      <div class="page-header"><h1>Reporte General</h1><p>Resultados generales de tu grupo</p></div>
+      <div class="page-header"><h1>Reporte General del Grupo</h1><p>Resultados de tu grupo de evaluación</p></div>
       <div id="rpt-user-content"></div>
     </div>
 
     <!-- MI PERFIL (USER) -->
     <div id="sec-perfil" class="section">
-      <div class="page-header"><h1>Mi Perfil</h1><p>Datos personales e historial de evaluaciones</p></div>
+      <div class="page-header"><h1>Mi Perfil</h1><p>Datos personales e historial de evaluaciones realizadas</p></div>
       <div class="ptabs">
         <button class="ptab active" onclick="switchPTab('datos')" id="ptab-datos">👤 Mis Datos</button>
         <button class="ptab" onclick="switchPTab('historial')" id="ptab-historial">📋 Mis Evaluaciones</button>
       </div>
-      <!-- DATOS -->
       <div id="ppane-datos">
         <div class="card">
           <div class="card-title">✏️ Editar Mis Datos</div>
@@ -407,7 +515,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
             <div class="form-group"><label>Correo</label><input type="email" id="p-email" disabled></div>
             <div class="form-group col-full"><label>Grupo de Evaluación</label><select id="p-grupo"><option value="">— Selecciona —</option></select></div>
           </div>
-          <div class="info-strip" style="font-size:.82rem">💡 Tu nombre y puesto se usarán automáticamente al evaluar para no tener que escribirlos cada vez.</div>
+          <div class="info-strip" style="font-size:.82rem">💡 Tu nombre y puesto se usarán automáticamente al evaluar para no escribirlos cada vez.</div>
           <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem">
             <button class="btn btn-gold" onclick="guardarPerfil()">💾 Guardar Cambios</button>
             <button class="btn btn-ghost" onclick="cargarPerfil()">↺ Cancelar</button>
@@ -422,21 +530,19 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <button class="btn btn-ghost" onclick="cambiarPass()">Actualizar Contraseña</button>
         </div>
       </div>
-      <!-- HISTORIAL -->
       <div id="ppane-historial" style="display:none">
         <div class="filter-bar">
-          <div class="filter-group"><label>Filtrar por Mes</label>
+          <div class="filter-group"><label>Grupo de Evaluación</label><select id="hist-grupo" onchange="cargarHistorial()"><option value="">Todos</option></select></div>
+          <div class="filter-group"><label>Mes</label>
             <select id="hist-mes" onchange="cargarHistorial()">
-              <option value="">Todos los meses</option><option value="01">Enero</option><option value="02">Febrero</option>
+              <option value="">Todos</option><option value="01">Enero</option><option value="02">Febrero</option>
               <option value="03">Marzo</option><option value="04">Abril</option><option value="05">Mayo</option>
               <option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option>
               <option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option>
               <option value="12">Diciembre</option>
             </select>
           </div>
-          <div class="filter-group"><label>Filtrar por Puesto del Líder</label>
-            <select id="hist-puesto" onchange="cargarHistorial()"><option value="">Todos los puestos</option></select>
-          </div>
+          <div class="filter-group"><label>Puesto del Líder</label><select id="hist-puesto" onchange="cargarHistorial()"><option value="">Todos</option></select></div>
         </div>
         <div id="historial-content"></div>
         <div class="card" style="margin-top:1.25rem">
@@ -446,15 +552,24 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
     </div>
 
-  </div><!-- /container -->
-</div><!-- /app-screen -->
+  </div>
+</div>
 
 <!-- MODAL EDITAR GRUPO -->
 <div class="overlay" id="modal-grupo">
   <div class="modal">
     <h3>✏️ Editar Grupo</h3>
-    <div class="form-group"><label>Nombre</label><input type="text" id="eg-nombre" placeholder="Nombre del grupo"></div>
+    <div class="form-group"><label>Nombre</label><input type="text" id="eg-nombre"></div>
     <div class="form-group"><label>Descripción</label><textarea id="eg-desc" rows="2" style="resize:vertical"></textarea></div>
+    <div class="form-group">
+      <label>⏱ Periodicidad de Evaluación</label>
+      <select id="eg-periodo">
+        <option value="">— Sin periodo definido —</option>
+        <option value="quincenal">Quincenal</option><option value="mensual">Mensual</option>
+        <option value="bimestral">Bimestral</option><option value="trimestral">Trimestral</option>
+        <option value="semestral">Semestral</option><option value="anual">Anual</option>
+      </select>
+    </div>
     <input type="hidden" id="eg-id">
     <div class="modal-btns">
       <button class="btn btn-gold" onclick="guardarGrupo()">💾 Guardar</button>
@@ -467,10 +582,14 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div class="overlay" id="modal-lider">
   <div class="modal">
     <h3>✏️ Editar Líder</h3>
-    <div class="form-group"><label>Nombre Completo</label><input type="text" id="el-nombre" placeholder="Nombre"></div>
-    <div class="form-group"><label>Cargo / Rol</label><input type="text" id="el-cargo" placeholder="Cargo"></div>
-    <div class="form-group"><label>Área / Departamento</label><input type="text" id="el-area" placeholder="Área"></div>
-    <div class="form-group"><label>Grupo de Evaluación</label><select id="el-grupo"><option value="">— Selecciona —</option></select></div>
+    <div class="grid-2" style="gap:.75rem">
+      <div class="form-group"><label>Nombre Completo</label><input type="text" id="el-nombre"></div>
+      <div class="form-group"><label>Cargo / Rol</label><input type="text" id="el-cargo"></div>
+      <div class="form-group"><label>Área</label><input type="text" id="el-area"></div>
+      <div class="form-group"><label>Empresa / Sede</label><input type="text" id="el-empresa"></div>
+      <div class="form-group"><label>Sección</label><input type="text" id="el-seccion"></div>
+      <div class="form-group"><label>Grupo</label><select id="el-grupo"><option value="">— Selecciona —</option></select></div>
+    </div>
     <input type="hidden" id="el-id">
     <div class="modal-btns">
       <button class="btn btn-gold" onclick="guardarLider()">💾 Guardar</button>
@@ -494,9 +613,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-// CONFIG
-// ============================================================
 const{createClient}=supabase;
 const sb=createClient('https://pywuptvirqzatahmnugo.supabase.co','sb_publishable_caNjEQxg4C4ppwWh83YncA_skxyjC44');
 const ADMIN_EMAIL='luisalberto.angelessanchez@gmail.com';
@@ -505,10 +621,12 @@ Chart.defaults.font.family="'Instrument Sans',sans-serif";
 
 const CAT_COLORS={liderazgo:'#2dd4bf',gestion:'#fb923c',comunicacion:'#60a5fa',emocional:'#c084fc',desarrollo:'#f87171'};
 const CAT_CC={liderazgo:'cc1',gestion:'cc2',comunicacion:'cc3',emocional:'cc4',desarrollo:'cc5'};
-const TIEMPO_LBL={menos_6m:'< 6 meses','6m_1a':'6m – 1 año','1a_2a':'1 – 2 años',mas_2a:'> 2 años'};
+const TIEMPO_LBL={menos_6m:'< 6 meses','6m_1a':'6m–1 año','1a_2a':'1–2 años',mas_2a:'> 2 años'};
+const JER_LBL={subordinado:'⬇️ Subordinado',jefe:'⬆️ Jefe',par_interno:'↔️ Par Interno',par_externo:'🔀 Par Externo'};
+const JER_CLS={subordinado:'jer-subordinado',jefe:'jer-jefe',par_interno:'jer-par_interno',par_externo:'jer-par_externo'};
+const PERIODO_LBL={quincenal:'Quincenal',mensual:'Mensual',bimestral:'Bimestral',trimestral:'Trimestral',semestral:'Semestral',anual:'Anual'};
 const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-const MES_NAMES={  '01':'Enero','02':'Febrero','03':'Marzo','04':'Abril','05':'Mayo','06':'Junio',
-  '07':'Julio','08':'Agosto','09':'Septiembre','10':'Octubre','11':'Noviembre','12':'Diciembre'};
+const MES_NAMES={'01':'Enero','02':'Febrero','03':'Marzo','04':'Abril','05':'Mayo','06':'Junio','07':'Julio','08':'Agosto','09':'Septiembre','10':'Octubre','11':'Noviembre','12':'Diciembre'};
 
 const PREGUNTAS={
   liderazgo:{nombre:'🧭 Liderazgo e Inspiración',preguntas:['Comunica una visión clara y motivadora para el equipo','Inspira a los colaboradores a dar lo mejor de sí mismos','Da el ejemplo con su actitud y comportamiento','Toma decisiones con seguridad incluso en situaciones difíciles','Genera confianza y credibilidad en el equipo']},
@@ -518,16 +636,14 @@ const PREGUNTAS={
   desarrollo:{nombre:'🌱 Desarrollo del Equipo',preguntas:['Brinda oportunidades de aprendizaje y crecimiento profesional','Delega responsabilidades de forma apropiada','Reconoce y valora los logros individuales y del equipo','Apoya el desarrollo de habilidades de cada colaborador','Promueve el trabajo en equipo y la colaboración']}
 };
 
-// ============================================================
-// STATE
-// ============================================================
 let currentUser=null,isAdmin=false,userProfile=null,userGrupoId=null,evalData=null;
-let rptTipo='general',rptLiderId=null;
+let rptTipo='general',selectedLideres=[],allLideresCache=[];
+let excelData=null;
 const charts={};
 
-// ============================================================
+// =============================================================
 // INIT
-// ============================================================
+// =============================================================
 async function init(){
   const{data:{session}}=await sb.auth.getSession();
   if(session) await loadUser(session.user); else showAuth();
@@ -536,16 +652,15 @@ async function init(){
     if(ev==='SIGNED_OUT') showAuth();
   });
   loadGruposPublic();
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.lideres-search-wrap')) document.getElementById('lider-dropdown').style.display='none';
+  });
 }
 async function loadUser(user){
   currentUser=user; isAdmin=user.email===ADMIN_EMAIL;
   if(!isAdmin){
-    const{data:p,error:pe}=await sb.from('usuarios').select('*,grupos(nombre)').eq('auth_id',user.id).single();
-    if(pe) console.warn('Error cargando perfil:',pe.message);
-    if(p){
-      userProfile=p;
-      userGrupoId=p.grupo_id ? parseInt(p.grupo_id) : null;
-    }
+    const{data:p}=await sb.from('usuarios').select('*,grupos(nombre)').eq('auth_id',user.id).single();
+    if(p){userProfile=p;userGrupoId=p.grupo_id?parseInt(p.grupo_id):null;}
   }
   showApp();
 }
@@ -562,14 +677,9 @@ function switchAuth(tab){
   document.getElementById('pane-register').style.display=tab==='register'?'':'none';
 }
 async function loadGruposPublic(){
-  const{data,error}=await sb.from('grupos').select('id,nombre').order('nombre');
-  if(error) console.warn('Error cargando grupos públicos:',error.message);
+  const{data}=await sb.from('grupos').select('id,nombre').order('nombre');
   const sel=document.getElementById('r-grupo');
-  if(!data||data.length===0){
-    sel.innerHTML='<option value="">— No hay grupos disponibles —</option>';
-  } else {
-    sel.innerHTML='<option value="">— Selecciona tu grupo —</option>'+data.map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
-  }
+  sel.innerHTML='<option value="">— Selecciona tu grupo —</option>'+(data||[]).map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
 }
 function checkPwStrength(v){
   const bar=document.getElementById('pw-bar');let s=0;
@@ -577,9 +687,9 @@ function checkPwStrength(v){
   bar.style.background=['var(--border)','var(--red)','var(--yellow)','var(--gold)','var(--green)'][s];
 }
 
-// ============================================================
+// =============================================================
 // AUTH
-// ============================================================
+// =============================================================
 async function doLogin(){
   const email=document.getElementById('l-email').value.trim(),pass=document.getElementById('l-pass').value;
   if(!email||!pass)return toast('Completa todos los campos','err');
@@ -589,40 +699,33 @@ async function doLogin(){
   if(error)return toast('Credenciales incorrectas o cuenta no confirmada','err');
 }
 async function doRegister(){
+  const nombre=document.getElementById('r-nombre').value.trim();
   const dni=document.getElementById('r-dni').value.trim(),email=document.getElementById('r-email').value.trim();
   const pass=document.getElementById('r-pass').value,pass2=document.getElementById('r-pass2').value;
   const grupo=document.getElementById('r-grupo').value;
-  if(!dni||!email||!pass||!grupo)return toast('Completa todos los campos','err');
+  if(!nombre||!dni||!email||!pass||!grupo)return toast('Completa todos los campos','err');
   if(pass!==pass2)return toast('Las contraseñas no coinciden','err');
   if(pass.length<8)return toast('Mínimo 8 caracteres','err');
   if(email===ADMIN_EMAIL)return toast('Correo no permitido','err');
   const btn=document.getElementById('btn-register');btn.disabled=true;btn.innerHTML='<span class="loader"></span>';
-  const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{dni,grupo_id:grupo}}});
+  const{data,error}=await sb.auth.signUp({email,password:pass});
   btn.disabled=false;btn.textContent='Crear Cuenta';
   if(error)return toast(error.message,'err');
-  if(data.user)await sb.from('usuarios').insert({auth_id:data.user.id,dni,email,grupo_id:grupo});
-  toast('✅ Revisa tu correo para confirmar','ok');switchAuth('login');
+  if(data.user)await sb.from('usuarios').insert({auth_id:data.user.id,dni,email,grupo_id:grupo,nombre_completo:nombre,activo:true});
+  toast('✅ Revisa tu correo para confirmar tu cuenta','ok');switchAuth('login');
 }
 async function doLogout(){await sb.auth.signOut();currentUser=null;isAdmin=false;userProfile=null;userGrupoId=null;}
 
-// ============================================================
+// =============================================================
 // NAV
-// ============================================================
+// =============================================================
 function buildNav(){
-  const userLabel=currentUser?.email?.split('@')[0]||'';
-  document.getElementById('nav-user-info').textContent=userLabel;
+  document.getElementById('nav-user-info').textContent=currentUser?.email?.split('@')[0]||'';
   document.getElementById('nav-role-badge').textContent=isAdmin?'Admin':'Evaluador';
   const adminTabs=[['dashboard','🏠 Inicio'],['grupos','🗂 Grupos'],['lideres','👤 Líderes'],['reportes-admin','📊 Reportes'],['usuarios','👥 Usuarios']];
   const userTabs=[['evaluar','📋 Evaluar'],['reporte-user','📊 Reporte General'],['perfil','👤 Mi Perfil']];
   const tabs=isAdmin?adminTabs:userTabs;
   document.getElementById('nav-tabs').innerHTML=tabs.map(([id,lbl])=>`<button class="nav-tab" onclick="navigateTo('${id}')" id="ntab-${id}">${lbl}</button>`).join('');
-  // Force render to DOM before navigating
-  requestAnimationFrame(()=>{
-    if(!isAdmin){
-      const perfilTab=document.getElementById('ntab-perfil');
-      if(perfilTab) perfilTab.style.display='inline-flex';
-    }
-  });
 }
 function navigateTo(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
@@ -631,15 +734,15 @@ function navigateTo(id){
   document.getElementById('ntab-'+id)?.classList.add('active');
   if(id==='grupos')cargarGrupos();
   if(id==='lideres'){cargarGruposSelect();cargarLideresAdmin();}
-  if(id==='reportes-admin')cargarGruposReporte();
-  if(id==='usuarios')cargarUsuarios();
+  if(id==='reportes-admin')initReportesAdmin();
+  if(id==='usuarios'){cargarGruposSelect();cargarUsuarios();}
   if(id==='reporte-user')cargarReporteUser();
   if(id==='perfil')cargarPerfil();
 }
 
-// ============================================================
+// =============================================================
 // DASHBOARD
-// ============================================================
+// =============================================================
 async function loadDashboard(){
   const[{count:cg},{count:cl},{count:ce},{count:cu}]=await Promise.all([
     sb.from('grupos').select('*',{count:'exact',head:true}),
@@ -652,21 +755,24 @@ async function loadDashboard(){
     <div class="stat-box"><div class="stat-num">${cl||0}</div><div class="stat-lbl">Líderes</div></div>
     <div class="stat-box"><div class="stat-num">${ce||0}</div><div class="stat-lbl">Evaluaciones</div></div>
     <div class="stat-box"><div class="stat-num">${cu||0}</div><div class="stat-lbl">Usuarios</div></div>`;
-  const{data:rec}=await sb.from('evaluaciones').select('evaluador_nombre,puntaje_global,fecha,lideres(nombre)').order('created_at',{ascending:false}).limit(8);
-  document.getElementById('dash-recent').innerHTML=rec?.length?`<div class="table-wrap"><table><thead><tr><th>Evaluador</th><th>Líder</th><th>Puntaje</th><th>Fecha</th></tr></thead><tbody>${rec.map(e=>`<tr><td>${e.evaluador_nombre}</td><td>${e.lideres?.nombre||'—'}</td><td><strong>${e.puntaje_global}</strong></td><td style="color:var(--text2);font-size:.8rem">${e.fecha}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state"><div class="ico">📋</div><p>Sin evaluaciones aún</p></div>';
-  const{data:users}=await sb.from('usuarios').select('dni,email,grupos(nombre),created_at').order('created_at',{ascending:false}).limit(8);
-  document.getElementById('dash-users').innerHTML=users?.length?`<div class="table-wrap"><table><thead><tr><th>DNI</th><th>Email</th><th>Grupo</th></tr></thead><tbody>${users.map(u=>`<tr><td>${u.dni}</td><td style="font-size:.8rem">${u.email}</td><td><span class="badge badge-teal">${u.grupos?.nombre||'—'}</span></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state"><div class="ico">👥</div><p>Sin usuarios aún</p></div>';
+  const{data:rec}=await sb.from('evaluaciones').select('evaluador_nombre,puntaje_global,fecha,jerarquia,lideres(nombre)').order('created_at',{ascending:false}).limit(8);
+  document.getElementById('dash-recent').innerHTML=rec?.length?`<div class="table-wrap"><table><thead><tr><th>Evaluador</th><th>Jerarquía</th><th>Líder</th><th>Puntaje</th><th>Fecha</th></tr></thead><tbody>${rec.map(e=>`<tr><td>${escH(e.evaluador_nombre)}</td><td><span class="badge ${JER_CLS[e.jerarquia]||'badge-gray'}">${JER_LBL[e.jerarquia]||'—'}</span></td><td>${e.lideres?.nombre||'—'}</td><td><strong>${e.puntaje_global}</strong></td><td style="color:var(--text2);font-size:.8rem">${e.fecha}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state"><div class="ico">📋</div><p>Sin evaluaciones aún</p></div>';
+  const{data:users}=await sb.from('usuarios').select('nombre_completo,dni,email,grupos(nombre),activo,created_at').order('created_at',{ascending:false}).limit(8);
+  document.getElementById('dash-users').innerHTML=users?.length?`<div class="table-wrap"><table><thead><tr><th>Nombre</th><th>DNI</th><th>Grupo</th><th>Estado</th></tr></thead><tbody>${users.map(u=>`<tr><td><strong>${escH(u.nombre_completo||u.email)}</strong></td><td>${u.dni||'—'}</td><td><span class="badge badge-teal">${u.grupos?.nombre||'—'}</span></td><td><span class="badge ${u.activo!==false?'badge-green':'badge-red'}">${u.activo!==false?'Activo':'Inactivo'}</span></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state"><div class="ico">👥</div><p>Sin usuarios aún</p></div>';
 }
 
-// ============================================================
-// GRUPOS — con edición
-// ============================================================
+// =============================================================
+// GRUPOS
+// =============================================================
 async function crearGrupo(){
-  const nombre=document.getElementById('g-nombre').value.trim(),desc=document.getElementById('g-desc').value.trim();
+  const nombre=document.getElementById('g-nombre').value.trim();
+  const desc=document.getElementById('g-desc').value.trim();
+  const periodo=document.getElementById('g-periodo').value;
   if(!nombre)return toast('Ingresa un nombre','err');
-  const{error}=await sb.from('grupos').insert({nombre,descripcion:desc});
+  const{error}=await sb.from('grupos').insert({nombre,descripcion:desc,periodo_evaluacion:periodo||null});
   if(error)return toast('Error: '+error.message,'err');
-  document.getElementById('g-nombre').value='';document.getElementById('g-desc').value='';
+  ['g-nombre','g-desc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('g-periodo').value='';
   toast('✅ Grupo creado','ok');cargarGrupos();
 }
 async function cargarGrupos(){
@@ -675,30 +781,35 @@ async function cargarGrupos(){
   if(!data?.length){cont.innerHTML='<div class="empty-state"><div class="ico">🗂</div><p>No hay grupos aún</p></div>';return;}
   cont.innerHTML=data.map(g=>`
     <div style="padding:.85rem 0;border-bottom:1px solid var(--border)">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;flex-wrap:wrap">
         <div>
-          <div style="font-weight:600;font-size:.92rem">${escH(g.nombre)}</div>
-          <div style="font-size:.75rem;color:var(--text2);margin-top:.1rem">${escH(g.descripcion||'')} · <span style="color:var(--gold)">${g.lideres?.[0]?.count||0} líderes</span> · ${g.usuarios?.[0]?.count||0} evaluadores</div>
+          <div style="font-weight:700;font-size:.92rem">${escH(g.nombre)}</div>
+          <div style="font-size:.75rem;color:var(--text2);margin-top:.2rem">${g.descripcion?escH(g.descripcion)+' · ':''}<span style="color:var(--gold)">${g.lideres?.[0]?.count||0} líderes</span> · ${g.usuarios?.[0]?.count||0} evaluadores</div>
+          ${g.periodo_evaluacion?`<span class="badge badge-blue" style="margin-top:.3rem">⏱ ${PERIODO_LBL[g.periodo_evaluacion]||g.periodo_evaluacion}</span>`:''}
         </div>
-        <div style="display:flex;gap:.4rem">
-          <button class="btn btn-blue btn-sm" onclick="abrirEditGrupo(${g.id},'${escQ(g.nombre)}','${escQ(g.descripcion||'')}')">✏️ Editar</button>
-          <button class="btn btn-danger btn-sm" onclick="eliminarGrupo(${g.id},'${escQ(g.nombre)}')">Eliminar</button>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+          <button class="btn btn-blue btn-sm" onclick="abrirEditGrupo(${g.id})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="eliminarGrupo(${g.id},'${escQ(g.nombre)}')">🗑</button>
         </div>
       </div>
     </div>`).join('');
 }
-function abrirEditGrupo(id,nombre,desc){
-  document.getElementById('eg-id').value=id;
-  document.getElementById('eg-nombre').value=nombre;
-  document.getElementById('eg-desc').value=desc;
+async function abrirEditGrupo(id){
+  const{data:g}=await sb.from('grupos').select('*').eq('id',id).single();
+  if(!g)return;
+  document.getElementById('eg-id').value=g.id;
+  document.getElementById('eg-nombre').value=g.nombre||'';
+  document.getElementById('eg-desc').value=g.descripcion||'';
+  document.getElementById('eg-periodo').value=g.periodo_evaluacion||'';
   openOverlay('modal-grupo');
 }
 async function guardarGrupo(){
   const id=document.getElementById('eg-id').value;
   const nombre=document.getElementById('eg-nombre').value.trim();
   const desc=document.getElementById('eg-desc').value.trim();
+  const periodo=document.getElementById('eg-periodo').value;
   if(!nombre)return toast('El nombre es obligatorio','err');
-  const{error}=await sb.from('grupos').update({nombre,descripcion:desc}).eq('id',id);
+  const{error}=await sb.from('grupos').update({nombre,descripcion:desc,periodo_evaluacion:periodo||null}).eq('id',id);
   if(error)return toast('Error: '+error.message,'err');
   toast('✅ Grupo actualizado','ok');closeOverlay('modal-grupo');cargarGrupos();
 }
@@ -708,25 +819,81 @@ function eliminarGrupo(id,nombre){
   });
 }
 
-// ============================================================
-// LÍDERES — con edición
-// ============================================================
+// =============================================================
+// CARGA MASIVA EXCEL
+// =============================================================
+function handleDrop(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)procesarExcel(f);}
+async function procesarExcel(file){
+  if(!file)return;
+  const buf=await file.arrayBuffer();
+  const wb=XLSX.read(buf,{type:'array'});
+  const ws=wb.Sheets[wb.SheetNames[0]];
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+  if(rows.length<2){toast('El archivo está vacío','err');return;}
+  // Skip header row
+  const data=rows.slice(1).filter(r=>r.some(c=>String(c).trim()));
+  excelData=data.map(r=>({
+    empresa:String(r[0]||'').trim(),
+    sede:String(r[1]||'').trim(),
+    departamento:String(r[2]||'').trim(),
+    area:String(r[3]||'').trim(),
+    seccion:String(r[4]||'').trim(),
+    puesto:String(r[5]||'').trim(),
+    grupo_nombre:String(r[6]||'').trim(),
+    nombre:String(r[7]||'').trim()
+  })).filter(r=>r.nombre);
+
+  const prev=document.getElementById('excel-preview');
+  if(!excelData.length){prev.innerHTML='<div class="warn-strip">No se encontraron filas válidas</div>';return;}
+  prev.innerHTML=`<div style="font-size:.82rem;color:var(--text2);margin-bottom:.5rem">${excelData.length} registros listos para importar</div>
+    <div class="table-wrap" style="max-height:200px;overflow-y:auto"><table><thead><tr><th>Nombre</th><th>Puesto</th><th>Grupo</th><th>Área</th></tr></thead>
+    <tbody>${excelData.slice(0,10).map(r=>`<tr><td>${escH(r.nombre)}</td><td>${escH(r.puesto)}</td><td>${escH(r.grupo_nombre)}</td><td>${escH(r.area)}</td></tr>`).join('')}
+    ${excelData.length>10?`<tr><td colspan="4" style="color:var(--text2);text-align:center">...y ${excelData.length-10} más</td></tr>`:''}</tbody></table></div>`;
+  document.getElementById('excel-actions').style.display='';
+}
+async function importarLideres(){
+  if(!excelData?.length)return;
+  const btn=document.getElementById('btn-importar');btn.disabled=true;btn.innerHTML='<span class="loader"></span> Importando...';
+  // Fetch all groups to match by name
+  const{data:grupos}=await sb.from('grupos').select('id,nombre');
+  const grupoMap={};(grupos||[]).forEach(g=>grupoMap[g.nombre.toLowerCase()]=g.id);
+  let ok=0,skip=0,errors=[];
+  for(const r of excelData){
+    const gid=grupoMap[r.grupo_nombre.toLowerCase()];
+    if(!gid){skip++;errors.push(`Sin grupo: "${r.grupo_nombre}"`);continue;}
+    const{error}=await sb.from('lideres').insert({nombre:r.nombre,cargo:r.puesto,area:r.area,empresa:r.empresa,seccion:r.seccion,grupo_id:gid});
+    if(error){skip++;errors.push(r.nombre);}else ok++;
+  }
+  btn.disabled=false;btn.textContent='📤 Importar Líderes';
+  toast(`✅ ${ok} importados${skip?' · '+skip+' omitidos':''}`,ok>0?'ok':'err');
+  if(errors.length)console.warn('Errores importación:',errors);
+  cancelarImport();cargarGrupos();
+}
+function cancelarImport(){excelData=null;document.getElementById('excel-actions').style.display='none';document.getElementById('excel-preview').innerHTML='<div class="empty-state" style="padding:1.5rem"><div class="ico" style="font-size:1.5rem">📋</div><p style="font-size:.85rem">La vista previa aparecerá aquí</p></div>';document.getElementById('excel-file').value='';}
+function descargarPlantilla(){
+  const ws=XLSX.utils.aoa_to_sheet([['Empresa','Sede','Departamento','Área','Sección','Puesto de trabajo','Grupo de evaluación','Nombre completo'],['Empresa SA','Lima Norte','Ventas','Comercial','Captación','Gerente Comercial','Grupo Piloto','Juan Pérez López']]);
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Líderes');
+  XLSX.writeFile(wb,'plantilla_lideres_angelesgroup.xlsx');
+}
+
+// =============================================================
+// LÍDERES
+// =============================================================
 async function cargarGruposSelect(){
   const{data}=await sb.from('grupos').select('id,nombre').order('nombre');
   const opts=(all)=>(all?'<option value="">Todos los grupos</option>':'<option value="">— Selecciona grupo —</option>')+(data||[]).map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
-  const el=id=>document.getElementById(id);
-  if(el('ld-grupo'))el('ld-grupo').innerHTML=opts(false);
-  if(el('ldfilter-grupo'))el('ldfilter-grupo').innerHTML=opts(true);
-  if(el('el-grupo'))el('el-grupo').innerHTML=opts(false);
-  if(el('r-grupo'))el('r-grupo').innerHTML=opts(false).replace('— Selecciona grupo —','— Selecciona tu grupo —');
+  ['ld-grupo','ldfilter-grupo','el-grupo','ufilter-grupo'].forEach(id=>{const el=document.getElementById(id);if(!el)return;
+    if(id==='ldfilter-grupo'||id==='ufilter-grupo')el.innerHTML=opts(true);else el.innerHTML=opts(false);
+  });
 }
 async function crearLider(){
   const nombre=document.getElementById('ld-nombre').value.trim(),cargo=document.getElementById('ld-cargo').value.trim();
   const area=document.getElementById('ld-area').value.trim(),grupo_id=document.getElementById('ld-grupo').value;
+  const empresa=document.getElementById('ld-empresa').value.trim(),seccion=document.getElementById('ld-seccion').value.trim();
   if(!nombre||!cargo||!grupo_id)return toast('Nombre, cargo y grupo son obligatorios','err');
-  const{error}=await sb.from('lideres').insert({nombre,cargo,area,grupo_id});
+  const{error}=await sb.from('lideres').insert({nombre,cargo,area,empresa,seccion,grupo_id});
   if(error)return toast('Error: '+error.message,'err');
-  ['ld-nombre','ld-cargo','ld-area'].forEach(id=>document.getElementById(id).value='');
+  ['ld-nombre','ld-cargo','ld-area','ld-empresa','ld-seccion'].forEach(id=>document.getElementById(id).value='');
   toast('✅ Líder registrado','ok');cargarLideresAdmin();
 }
 async function cargarLideresAdmin(){
@@ -737,38 +904,37 @@ async function cargarLideresAdmin(){
   const cont=document.getElementById('lideres-admin-lista');
   if(!data?.length){cont.innerHTML='<div class="empty-state"><div class="ico">👤</div><p>No hay líderes registrados</p></div>';return;}
   cont.innerHTML=`<div class="table-wrap"><table>
-    <thead><tr><th>Nombre</th><th>Cargo</th><th>Área</th><th>Grupo</th><th style="text-align:right">Acciones</th></tr></thead>
+    <thead><tr><th>Nombre</th><th>Cargo</th><th>Área</th><th>Empresa/Sede</th><th>Grupo</th><th style="text-align:right">Acciones</th></tr></thead>
     <tbody>${data.map(l=>`<tr>
-      <td><strong>${escH(l.nombre)}</strong></td>
-      <td>${escH(l.cargo)}</td>
-      <td>${escH(l.area||'—')}</td>
+      <td><strong>${escH(l.nombre)}</strong></td><td>${escH(l.cargo)}</td><td>${escH(l.area||'—')}</td>
+      <td style="font-size:.8rem;color:var(--text2)">${escH(l.empresa||'—')}</td>
       <td><span class="badge badge-teal">${escH(l.grupos?.nombre||'—')}</span></td>
-      <td style="text-align:right">
-        <div style="display:flex;gap:.4rem;justify-content:flex-end">
-          <button class="btn btn-blue btn-sm" onclick="abrirEditLider(${l.id},'${escQ(l.nombre)}','${escQ(l.cargo)}','${escQ(l.area||'')}',${l.grupo_id})">✏️ Editar</button>
-          <button class="btn btn-danger btn-sm" onclick="eliminarLider(${l.id},'${escQ(l.nombre)}')">Eliminar</button>
-        </div>
-      </td>
-    </tr>`).join('')}</tbody>
-  </table></div>`;
+      <td style="text-align:right"><div style="display:flex;gap:.4rem;justify-content:flex-end">
+        <button class="btn btn-blue btn-sm" onclick="abrirEditLider(${l.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarLider(${l.id},'${escQ(l.nombre)}')">🗑</button>
+      </div></td>
+    </tr>`).join('')}</tbody></table></div>`;
 }
-async function abrirEditLider(id,nombre,cargo,area,grupoId){
+async function abrirEditLider(id){
   await cargarGruposSelect();
-  document.getElementById('el-id').value=id;
-  document.getElementById('el-nombre').value=nombre;
-  document.getElementById('el-cargo').value=cargo;
-  document.getElementById('el-area').value=area;
-  document.getElementById('el-grupo').value=grupoId;
+  const{data:l}=await sb.from('lideres').select('*').eq('id',id).single();
+  if(!l)return;
+  document.getElementById('el-id').value=l.id;
+  document.getElementById('el-nombre').value=l.nombre||'';
+  document.getElementById('el-cargo').value=l.cargo||'';
+  document.getElementById('el-area').value=l.area||'';
+  document.getElementById('el-empresa').value=l.empresa||'';
+  document.getElementById('el-seccion').value=l.seccion||'';
+  document.getElementById('el-grupo').value=l.grupo_id||'';
   openOverlay('modal-lider');
 }
 async function guardarLider(){
   const id=document.getElementById('el-id').value;
-  const nombre=document.getElementById('el-nombre').value.trim();
-  const cargo=document.getElementById('el-cargo').value.trim();
-  const area=document.getElementById('el-area').value.trim();
-  const grupo_id=document.getElementById('el-grupo').value;
+  const nombre=document.getElementById('el-nombre').value.trim(),cargo=document.getElementById('el-cargo').value.trim();
+  const area=document.getElementById('el-area').value.trim(),grupo_id=document.getElementById('el-grupo').value;
+  const empresa=document.getElementById('el-empresa').value.trim(),seccion=document.getElementById('el-seccion').value.trim();
   if(!nombre||!cargo||!grupo_id)return toast('Nombre, cargo y grupo son obligatorios','err');
-  const{error}=await sb.from('lideres').update({nombre,cargo,area,grupo_id}).eq('id',id);
+  const{error}=await sb.from('lideres').update({nombre,cargo,area,empresa,seccion,grupo_id}).eq('id',id);
   if(error)return toast('Error: '+error.message,'err');
   toast('✅ Líder actualizado','ok');closeOverlay('modal-lider');cargarLideresAdmin();
 }
@@ -778,96 +944,114 @@ function eliminarLider(id,nombre){
   });
 }
 
-// ============================================================
-// USUARIOS (ADMIN)
-// ============================================================
+// =============================================================
+// USUARIOS ADMIN — con toggle activo/inactivo
+// =============================================================
 async function cargarUsuarios(){
-  const{data}=await sb.from('usuarios').select('*,grupos(nombre)').order('created_at',{ascending:false});
+  const gfilt=document.getElementById('ufilter-grupo')?.value||'';
+  const estado=document.getElementById('ufilter-estado')?.value||'';
+  const buscar=document.getElementById('ufilter-buscar')?.value?.toLowerCase()||'';
+  let q=sb.from('usuarios').select('*,grupos(nombre)').order('created_at',{ascending:false});
+  if(gfilt)q=q.eq('grupo_id',gfilt);
+  const{data}=await q;
+  let rows=(data||[]).filter(u=>{
+    if(estado==='activo'&&u.activo===false)return false;
+    if(estado==='inactivo'&&u.activo!==false)return false;
+    if(buscar&&!`${u.nombre_completo||''} ${u.dni||''} ${u.email||''}`.toLowerCase().includes(buscar))return false;
+    return true;
+  });
   const cont=document.getElementById('usuarios-lista');
-  if(!data?.length){cont.innerHTML='<div class="empty-state"><div class="ico">👥</div><p>No hay usuarios</p></div>';return;}
-  cont.innerHTML=`<div class="table-wrap"><table><thead><tr><th>DNI</th><th>Email</th><th>Grupo</th><th>Registrado</th></tr></thead>
-    <tbody>${data.map(u=>`<tr>
-      <td><strong>${u.dni}</strong></td><td>${u.email}</td>
+  if(!rows.length){cont.innerHTML='<div class="empty-state"><div class="ico">👥</div><p>No hay usuarios con esos filtros</p></div>';return;}
+  const activos=rows.filter(u=>u.activo!==false).length;
+  cont.innerHTML=`<div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
+    <span style="font-size:.85rem;color:var(--text2)">${rows.length} usuario${rows.length!==1?'s':''} · <span style="color:var(--green)">${activos} activos</span> · <span style="color:var(--red)">${rows.length-activos} inactivos</span></span>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Nombre</th><th>DNI</th><th>Correo</th><th>Grupo</th><th>Registrado</th><th>Estado</th><th style="text-align:center">Acceso</th></tr></thead>
+    <tbody>${rows.map(u=>`<tr>
+      <td><strong>${escH(u.nombre_completo||'Sin nombre')}</strong></td>
+      <td>${u.dni||'—'}</td>
+      <td style="font-size:.8rem">${u.email||'—'}</td>
       <td><span class="badge badge-teal">${u.grupos?.nombre||'—'}</span></td>
-      <td style="font-size:.8rem;color:var(--text2)">${new Date(u.created_at).toLocaleDateString('es-PE')}</td>
+      <td style="font-size:.78rem;color:var(--text2)">${new Date(u.created_at).toLocaleDateString('es-PE')}</td>
+      <td><span class="badge ${u.activo!==false?'badge-green':'badge-red'}">${u.activo!==false?'Activo':'Inactivo'}</span></td>
+      <td style="text-align:center">
+        <label class="toggle-switch">
+          <input type="checkbox" ${u.activo!==false?'checked':''} onchange="toggleUsuario('${u.id}',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
     </tr>`).join('')}</tbody></table></div>`;
 }
+async function toggleUsuario(id,activo){
+  const{error}=await sb.from('usuarios').update({activo}).eq('id',id);
+  if(error){toast('Error al cambiar estado','err');cargarUsuarios();return;}
+  toast(activo?'✅ Usuario activado':'🚫 Usuario desactivado',activo?'ok':'');
+}
 
-// ============================================================
+// =============================================================
 // EVALUAR (USER)
-// ============================================================
+// =============================================================
 async function loadEvalStep1(){
   document.getElementById('eval-step1').style.display='';document.getElementById('eval-form').style.display='none';
-  // Pre-fill from profile
+  document.getElementById('ev-jerarquia').value='';
+  document.querySelectorAll('.jer-btn').forEach(b=>b.classList.remove('sel-jer'));
   if(userProfile){
-    if(userProfile.nombre_completo) document.getElementById('ev-nombre').value=userProfile.nombre_completo;
-    if(userProfile.puesto) document.getElementById('ev-puesto').value=userProfile.puesto;
+    if(userProfile.nombre_completo)document.getElementById('ev-nombre').value=userProfile.nombre_completo;
+    if(userProfile.puesto)document.getElementById('ev-puesto').value=userProfile.puesto;
   }
   const sel=document.getElementById('ev-lider');
   sel.innerHTML='<option value="">— Cargando líderes... —</option>';
-
-  // Si no tenemos grupoId aún, intentar obtenerlo de nuevo
-  if(!userGrupoId && currentUser){
+  if(!userGrupoId&&currentUser){
     const{data:p}=await sb.from('usuarios').select('grupo_id').eq('auth_id',currentUser.id).single();
-    if(p && p.grupo_id){
-      userGrupoId=parseInt(p.grupo_id);
-      if(userProfile) userProfile.grupo_id=p.grupo_id;
-    }
+    if(p?.grupo_id)userGrupoId=parseInt(p.grupo_id);
   }
-
-  if(!userGrupoId){
-    sel.innerHTML='<option value="">— Sin grupo asignado —</option>';
-    const strip=document.createElement('div');
-    strip.className='warn-strip';strip.style.marginTop='.75rem';
-    strip.textContent='⚠️ No tienes un grupo de evaluación asignado. Ve a Mi Perfil para configurarlo.';
-    sel.parentElement.appendChild(strip);
-    return;
-  }
-
+  if(!userGrupoId){sel.innerHTML='<option value="">— Sin grupo asignado —</option>';return;}
   const{data,error}=await sb.from('lideres').select('id,nombre,cargo').eq('grupo_id',userGrupoId).order('nombre');
-  if(error){ console.error('Error cargando líderes:',error.message); sel.innerHTML='<option value="">— Error al cargar —</option>'; return; }
-  if(!data || data.length===0){
-    sel.innerHTML='<option value="">— No hay líderes en tu grupo —</option>';
-    return;
-  }
+  if(error||!data?.length){sel.innerHTML='<option value="">— No hay líderes en tu grupo —</option>';return;}
   sel.innerHTML='<option value="">— Selecciona líder —</option>'+data.map(l=>`<option value="${l.id}">${escH(l.nombre)} — ${escH(l.cargo)}</option>`).join('');
+}
+function selJer(val,btn){
+  document.getElementById('ev-jerarquia').value=val;
+  document.querySelectorAll('.jer-btn').forEach(b=>b.classList.remove('sel-jer'));
+  btn.classList.add('sel-jer');
 }
 function iniciarEval(){
   const nombre=document.getElementById('ev-nombre').value.trim(),puesto=document.getElementById('ev-puesto').value.trim();
   const tiempo=document.getElementById('ev-tiempo').value,liderId=document.getElementById('ev-lider').value;
+  const jerarquia=document.getElementById('ev-jerarquia').value;
   if(!nombre||!puesto||!tiempo||!liderId)return toast('Completa todos los campos','err');
+  if(!jerarquia)return toast('Selecciona tu jerarquía respecto al líder','err');
   const liderText=document.getElementById('ev-lider').options[document.getElementById('ev-lider').selectedIndex].text;
-  evalData={nombre,puesto,tiempo,liderId:parseInt(liderId),liderText,respuestas:{}};
+  evalData={nombre,puesto,tiempo,jerarquia,liderId:parseInt(liderId),liderText,respuestas:{}};
   document.getElementById('eval-step1').style.display='none';document.getElementById('eval-form').style.display='';
-  document.getElementById('eval-info').textContent=`📋 Evaluando a: ${liderText} · Evaluador: ${nombre} (${puesto})`;
+  document.getElementById('eval-info').innerHTML=`📋 Evaluando a: <strong>${liderText}</strong> · Evaluador: ${nombre} · <span class="badge ${JER_CLS[jerarquia]}">${JER_LBL[jerarquia]}</span>`;
   renderEvalCats();
 }
 function renderEvalCats(){
   document.getElementById('eval-cats').innerHTML=Object.entries(PREGUNTAS).map(([key,cat])=>`
-    <div class="cat-block ${CAT_CC[key]}">
-      <div class="cat-header">${cat.nombre}</div>
-      <div class="cat-body">${cat.preguntas.map((p,i)=>{const qid=`${key}_${i}`;return`<div class="question"><div class="q-text">${i+1}. ${p}</div><div class="likert-row">${[1,2,3,4,5].map(v=>`<button class="lbtn" onclick="selQ('${qid}',${v},this)">${v}</button>`).join('')}</div><div class="likert-labels"><span>Nunca</span><span>Siempre</span></div></div>`;}).join('')}</div>
-    </div>`).join('');
+    <div class="cat-block ${CAT_CC[key]}"><div class="cat-header">${cat.nombre}</div>
+    <div class="cat-body">${cat.preguntas.map((p,i)=>{const qid=`${key}_${i}`;return`<div class="question"><div class="q-text">${i+1}. ${p}</div><div class="likert-row">${[1,2,3,4,5].map(v=>`<button class="lbtn" onclick="selQ('${qid}',${v},this)">${v}</button>`).join('')}</div><div class="likert-labels"><span>Nunca</span><span>Siempre</span></div></div>`;}).join('')}</div></div>`).join('');
   updateProg();
 }
 function selQ(qid,val,btn){evalData.respuestas[qid]=val;btn.closest('.likert-row').querySelectorAll('.lbtn').forEach(b=>{b.className='lbtn';});btn.className=`lbtn sel-${val}`;updateProg();}
-function updateProg(){const total=25,done=Object.keys(evalData.respuestas).length,pct=Math.round(done/total*100);document.getElementById('eval-prog-fill').style.width=pct+'%';document.getElementById('eval-prog-label').textContent=`${done} de ${total} preguntas (${pct}%)`;}
+function updateProg(){const done=Object.keys(evalData.respuestas).length,pct=Math.round(done/25*100);document.getElementById('eval-prog-fill').style.width=pct+'%';document.getElementById('eval-prog-label').textContent=`${done} de 25 preguntas (${pct}%)`;}
 function cancelarEval(){evalData=null;loadEvalStep1();}
 async function enviarEval(){
   if(Object.keys(evalData.respuestas).length<25)return toast('Responde todas las preguntas','err');
   const btn=document.getElementById('btn-enviar-eval');btn.disabled=true;btn.innerHTML='<span class="loader"></span>';
-  const porCategoria={};let sumG=0,cntG=0;
-  Object.entries(PREGUNTAS).forEach(([key,cat])=>{const vals=cat.preguntas.map((_,i)=>evalData.respuestas[`${key}_${i}`]);porCategoria[key]=parseFloat((vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2));sumG+=vals.reduce((a,b)=>a+b,0);cntG+=vals.length;});
+  const porCategoria={};let sumG=0;
+  Object.entries(PREGUNTAS).forEach(([key,cat])=>{const vals=cat.preguntas.map((_,i)=>evalData.respuestas[`${key}_${i}`]);porCategoria[key]=parseFloat((vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2));sumG+=vals.reduce((a,b)=>a+b,0);});
   const now=new Date();
-  const{error}=await sb.from('evaluaciones').insert({lider_id:evalData.liderId,evaluador_auth_id:currentUser.id,evaluador_nombre:evalData.nombre,evaluador_puesto:evalData.puesto,evaluador_tiempo:evalData.tiempo,respuestas:evalData.respuestas,por_categoria:porCategoria,puntaje_global:parseFloat((sumG/cntG).toFixed(2)),grupo_id:userGrupoId,fecha:now.toLocaleDateString('es-PE'),mes:String(now.getMonth()+1).padStart(2,'0'),anio:now.getFullYear()});
+  const{error}=await sb.from('evaluaciones').insert({lider_id:evalData.liderId,evaluador_auth_id:currentUser.id,evaluador_nombre:evalData.nombre,evaluador_puesto:evalData.puesto,evaluador_tiempo:evalData.tiempo,jerarquia:evalData.jerarquia,respuestas:evalData.respuestas,por_categoria:porCategoria,puntaje_global:parseFloat((sumG/25).toFixed(2)),grupo_id:userGrupoId,fecha:now.toLocaleDateString('es-PE'),mes:String(now.getMonth()+1).padStart(2,'0'),anio:now.getFullYear()});
   btn.disabled=false;btn.textContent='📤 Enviar Evaluación';
   if(error)return toast('Error: '+error.message,'err');
   toast('🎉 Evaluación enviada','ok');evalData=null;loadEvalStep1();setTimeout(()=>navigateTo('reporte-user'),1000);
 }
 
-// ============================================================
-// MI PERFIL (USER)
-// ============================================================
+// =============================================================
+// PERFIL USER
+// =============================================================
 function switchPTab(tab){
   document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
   document.getElementById('ptab-'+tab).classList.add('active');
@@ -876,48 +1060,24 @@ function switchPTab(tab){
   if(tab==='historial')cargarHistorial();
 }
 async function cargarPerfil(){
-  // Recargar perfil fresco desde Supabase
-  if(currentUser && !isAdmin){
+  if(currentUser&&!isAdmin){
     const{data:p}=await sb.from('usuarios').select('*,grupos(nombre)').eq('auth_id',currentUser.id).single();
-    if(p){userProfile=p; userGrupoId=p.grupo_id?parseInt(p.grupo_id):null;}
+    if(p){userProfile=p;userGrupoId=p.grupo_id?parseInt(p.grupo_id):null;}
   }
-
-  // Cargar lista de grupos disponibles
-  const{data:grupos, error:ge}=await sb.from('grupos').select('id,nombre').order('nombre');
-  if(ge) console.warn('Error grupos perfil:',ge.message);
-
+  const{data:grupos}=await sb.from('grupos').select('id,nombre').order('nombre');
   const sel=document.getElementById('p-grupo');
-  if(!grupos||grupos.length===0){
-    sel.innerHTML='<option value="">— No hay grupos disponibles —</option>';
-  } else {
-    sel.innerHTML='<option value="">— Selecciona tu grupo —</option>'+grupos.map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
-  }
-
-  // Llenar campos del perfil
+  sel.innerHTML='<option value="">— Selecciona tu grupo —</option>'+(grupos||[]).map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
   document.getElementById('p-nombre').value=userProfile?.nombre_completo||'';
   document.getElementById('p-puesto').value=userProfile?.puesto||'';
   document.getElementById('p-dni').value=userProfile?.dni||'';
   document.getElementById('p-email').value=currentUser?.email||'';
-
-  // Seleccionar grupo actual del usuario
   if(userProfile?.grupo_id){
-    sel.value=String(userProfile.grupo_id);
-    // Si no se seleccionó (mismatch de tipo), iterar opciones
-    if(!sel.value){
-      for(let i=0;i<sel.options.length;i++){
-        if(sel.options[i].value==userProfile.grupo_id){sel.selectedIndex=i;break;}
-      }
-    }
+    for(let i=0;i<sel.options.length;i++){if(sel.options[i].value==userProfile.grupo_id){sel.selectedIndex=i;break;}}
   }
-
-  // Cargar puestos para filtro historial
-  const grupoParaFiltro=userGrupoId||userProfile?.grupo_id;
-  if(grupoParaFiltro){
-    const{data:lideres}=await sb.from('lideres').select('cargo').eq('grupo_id',grupoParaFiltro);
-    const puestos=[...new Set((lideres||[]).map(l=>l.cargo))].sort();
-    const sp=document.getElementById('hist-puesto');
-    if(sp) sp.innerHTML='<option value="">Todos los puestos</option>'+puestos.map(p=>`<option value="${escH(p)}">${escH(p)}</option>`).join('');
-  }
+  // Llenar filtros del historial
+  const{data:gruposHist}=await sb.from('grupos').select('id,nombre').order('nombre');
+  const hg=document.getElementById('hist-grupo');
+  if(hg)hg.innerHTML='<option value="">Todos</option>'+(gruposHist||[]).map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
 }
 async function guardarPerfil(){
   const nombre=document.getElementById('p-nombre').value.trim();
@@ -930,13 +1090,12 @@ async function guardarPerfil(){
   if(error)return toast('Error al guardar: '+error.message,'err');
   userProfile={...userProfile,nombre_completo:nombre,puesto,dni,grupo_id};
   userGrupoId=parseInt(grupo_id);
-  toast('✅ Perfil actualizado correctamente','ok');
-  // Recargar líderes del nuevo grupo automáticamente
+  toast('✅ Perfil actualizado','ok');
   await loadEvalStep1();
 }
 async function cambiarPass(){
   const pass=document.getElementById('p-pass').value,pass2=document.getElementById('p-pass2').value;
-  if(!pass||!pass2)return toast('Completa los campos de contraseña','err');
+  if(!pass||!pass2)return toast('Completa los campos','err');
   if(pass!==pass2)return toast('Las contraseñas no coinciden','err');
   if(pass.length<8)return toast('Mínimo 8 caracteres','err');
   const{error}=await sb.auth.updateUser({password:pass});
@@ -945,57 +1104,57 @@ async function cambiarPass(){
   toast('✅ Contraseña actualizada','ok');
 }
 
-// ============================================================
-// HISTORIAL DE EVALUACIONES (USER)
-// ============================================================
+// =============================================================
+// HISTORIAL EVALUADOR — por grupo, mes, puesto
+// =============================================================
 async function cargarHistorial(){
   const cont=document.getElementById('historial-content');
   cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
-  destroyCharts('hist');
-
+  if(charts['hist-act']){charts['hist-act'].destroy();delete charts['hist-act'];}
   const mes=document.getElementById('hist-mes').value;
   const puesto=document.getElementById('hist-puesto').value;
+  const grupo=document.getElementById('hist-grupo').value;
 
-  let q=sb.from('evaluaciones').select('*,lideres(nombre,cargo,area)').eq('evaluador_auth_id',currentUser.id).order('created_at',{ascending:false});
+  let q=sb.from('evaluaciones').select('*,lideres(nombre,cargo,area,grupos(nombre))').eq('evaluador_auth_id',currentUser.id).order('created_at',{ascending:false});
   if(mes)q=q.eq('mes',mes);
   const{data:evals}=await q;
-
   let filtered=(evals||[]);
   if(puesto)filtered=filtered.filter(e=>e.lideres?.cargo===puesto);
+  if(grupo)filtered=filtered.filter(e=>e.lideres?.grupos?.id==grupo||String(e.lideres?.grupos?.id)==grupo);
 
-  if(!filtered.length){cont.innerHTML='<div class="empty-state"><div class="ico">📋</div><p>No has realizado evaluaciones con estos filtros</p></div>';renderHistActividad([]);return;}
+  // Cargar puestos únicos de líderes evaluados para el filtro
+  const allPuestos=[...new Set((evals||[]).map(e=>e.lideres?.cargo).filter(Boolean))].sort();
+  const sp=document.getElementById('hist-puesto');
+  const prevPuesto=sp.value;
+  sp.innerHTML='<option value="">Todos</option>'+allPuestos.map(p=>`<option value="${escH(p)}">${escH(p)}</option>`).join('');
+  if(prevPuesto)sp.value=prevPuesto;
 
-  // Totales
+  if(!filtered.length){
+    cont.innerHTML='<div class="empty-state"><div class="ico">📋</div><p>No has realizado evaluaciones con estos filtros</p></div>';
+    renderHistActividad([]);return;
+  }
+
   const totalEvals=filtered.length;
   const lideresUnicos=[...new Set(filtered.map(e=>e.lider_id))].length;
   const promGlobal=(filtered.reduce((a,e)=>a+e.puntaje_global,0)/filtered.length).toFixed(2);
 
-  // Agrupar por mes para la tabla resumen
+  // Agrupar por mes
   const byMes={};
-  filtered.forEach(e=>{
-    const k=`${e.anio||'—'}-${e.mes||'—'}`;
-    if(!byMes[k])byMes[k]={mes:e.mes,anio:e.anio,evals:[]};
-    byMes[k].evals.push(e);
-  });
-
-  const mesRows=Object.entries(byMes).sort().reverse().map(([k,m])=>{
+  filtered.forEach(e=>{const k=`${e.anio||'—'}-${e.mes||'—'}`;if(!byMes[k])byMes[k]={mes:e.mes,anio:e.anio,evals:[]};byMes[k].evals.push(e);});
+  const mesRows=Object.entries(byMes).sort().reverse().map(([,m])=>{
     const prom=(m.evals.reduce((a,e)=>a+e.puntaje_global,0)/m.evals.length).toFixed(2);
     const[lbl,cls]=getLabel(prom);
-    return`<tr>
-      <td><strong>${MES_NAMES[m.mes]||m.mes} ${m.anio||''}</strong></td>
-      <td>${m.evals.length} evaluacion${m.evals.length!==1?'es':''}</td>
-      <td><strong>${prom}/5</strong></td>
-      <td><span class="badge ${cls}">${lbl}</span></td>
-    </tr>`;
+    return`<tr><td><strong>${MES_NAMES[m.mes]||m.mes||'—'} ${m.anio||''}</strong></td><td>${m.evals.length}</td><td><strong>${prom}/5</strong></td><td><span class="badge ${cls}">${lbl}</span></td></tr>`;
   }).join('');
 
-  // Tabla detalle
+  // Tabla detalle con grupo y fecha
   const detalleRows=filtered.map(e=>{
     const[lbl,cls]=getLabel(e.puntaje_global);
     return`<tr>
       <td><strong>${escH(e.lideres?.nombre||'—')}</strong></td>
       <td><span class="badge badge-gray">${escH(e.lideres?.cargo||'—')}</span></td>
-      <td><span class="badge badge-blue">${escH(e.lideres?.area||'—')}</span></td>
+      <td><span class="badge badge-blue">${escH(e.lideres?.grupos?.nombre||'—')}</span></td>
+      <td><span class="badge ${JER_CLS[e.jerarquia]||'badge-gray'}">${JER_LBL[e.jerarquia]||'—'}</span></td>
       <td><strong>${e.puntaje_global}/5</strong></td>
       <td><span class="badge ${cls}">${lbl}</span></td>
       <td style="color:var(--text2);font-size:.8rem">${e.fecha||'—'}</td>
@@ -1004,164 +1163,211 @@ async function cargarHistorial(){
 
   cont.innerHTML=`
     <div class="stats-row">
-      <div class="stat-box"><div class="stat-num">${totalEvals}</div><div class="stat-lbl">Evaluaciones realizadas</div></div>
-      <div class="stat-box"><div class="stat-num">${lideresUnicos}</div><div class="stat-lbl">Líderes evaluados</div></div>
-      <div class="stat-box"><div class="stat-num" style="color:var(--teal)">${promGlobal}</div><div class="stat-lbl">Puntaje promedio dado</div></div>
+      <div class="stat-box"><div class="stat-num">${totalEvals}</div><div class="stat-lbl">Evaluaciones</div></div>
+      <div class="stat-box"><div class="stat-num">${lideresUnicos}</div><div class="stat-lbl">Personas evaluadas</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--teal)">${promGlobal}</div><div class="stat-lbl">Puntaje prom. dado</div></div>
     </div>
-
     <div class="grid-2">
-      <div class="card">
-        <div class="card-title">📅 Resumen por Mes</div>
-        <div class="table-wrap"><table><thead><tr><th>Mes</th><th>Evaluaciones</th><th>Prom. Dado</th><th>Nivel</th></tr></thead>
-        <tbody>${mesRows}</tbody></table></div>
+      <div class="card"><div class="card-title">📅 Resumen por Mes</div>
+        <div class="table-wrap"><table><thead><tr><th>Mes</th><th>Cant.</th><th>Prom.</th><th>Nivel</th></tr></thead><tbody>${mesRows}</tbody></table></div>
       </div>
-      <div class="card">
-        <div class="card-title">📋 Detalle de Evaluaciones</div>
-        <div class="table-wrap"><table><thead><tr><th>Líder Evaluado</th><th>Puesto</th><th>Área</th><th>Puntaje</th><th>Nivel</th><th>Fecha</th></tr></thead>
+      <div class="card"><div class="card-title">📋 Detalle de Evaluaciones Realizadas</div>
+        <div class="table-wrap"><table><thead><tr><th>Persona Evaluada</th><th>Puesto</th><th>Grupo</th><th>Jerarquía</th><th>Puntaje</th><th>Nivel</th><th>Fecha</th></tr></thead>
         <tbody>${detalleRows}</tbody></table></div>
       </div>
     </div>`;
-
   renderHistActividad(filtered);
 }
-
 function renderHistActividad(evals){
   setTimeout(()=>{
-    const el=document.getElementById('chart-hist-actividad');
-    if(!el)return;
-    destroyCharts('hist-act');
-    if(!evals.length){el.parentElement.innerHTML='<p style="color:var(--text2);text-align:center;padding:1rem">No hay datos suficientes</p>';return;}
-    const byMes={};
-    evals.forEach(e=>{const k=`${e.anio||'2025'}-${e.mes||'01'}`;if(!byMes[k])byMes[k]=[];byMes[k].push(e.puntaje_global);});
+    const el=document.getElementById('chart-hist-actividad');if(!el)return;
+    if(charts['hist-act']){charts['hist-act'].destroy();delete charts['hist-act'];}
+    if(!evals.length){el.parentElement.innerHTML='<p style="color:var(--text2);text-align:center;padding:1rem">Sin datos suficientes</p>';return;}
+    const byMes={};evals.forEach(e=>{const k=`${e.anio||'2025'}-${e.mes||'01'}`;if(!byMes[k])byMes[k]=[];byMes[k].push(e.puntaje_global);});
     const sorted=Object.keys(byMes).sort();
     const labels=sorted.map(k=>{const[y,m]=k.split('-');return`${MESES[parseInt(m)-1]} ${y}`;});
-    const counts=sorted.map(k=>byMes[k].length);
-    const proms=sorted.map(k=>parseFloat((byMes[k].reduce((a,b)=>a+b,0)/byMes[k].length).toFixed(2)));
-    if(charts['hist-act'])charts['hist-act'].destroy();
     charts['hist-act']=new Chart(el,{type:'bar',data:{labels,datasets:[
-      {label:'Evaluaciones realizadas',data:counts,backgroundColor:'rgba(212,168,67,.3)',borderColor:'var(--gold)',borderWidth:2,borderRadius:5,yAxisID:'y1'},
-      {label:'Puntaje promedio dado',data:proms,type:'line',borderColor:'var(--teal)',backgroundColor:'rgba(45,212,191,.1)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'var(--teal)',tension:.35,fill:false,yAxisID:'y2'}
-    ]},options:{responsive:true,scales:{
-      y1:{type:'linear',position:'left',ticks:{stepSize:1},grid:{color:'#1e2433'},title:{display:true,text:'Cantidad'}},
-      y2:{type:'linear',position:'right',min:0,max:5,grid:{display:false},title:{display:true,text:'Puntaje'}}
-    },plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:11}}}}}});
-  },100);
+      {label:'Evaluaciones',data:sorted.map(k=>byMes[k].length),backgroundColor:'rgba(212,168,67,.3)',borderColor:'var(--gold)',borderWidth:2,borderRadius:5,yAxisID:'y1'},
+      {label:'Puntaje prom. dado',data:sorted.map(k=>parseFloat((byMes[k].reduce((a,b)=>a+b,0)/byMes[k].length).toFixed(2))),type:'line',borderColor:'var(--teal)',backgroundColor:'rgba(45,212,191,.1)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'var(--teal)',tension:.35,fill:false,yAxisID:'y2'}
+    ]},options:{responsive:true,scales:{y1:{type:'linear',position:'left',ticks:{stepSize:1},grid:{color:'#1e2433'},title:{display:true,text:'Cantidad'}},y2:{type:'linear',position:'right',min:0,max:5,grid:{display:false},title:{display:true,text:'Puntaje'}}},plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:11}}}}}});
+  },120);
 }
 
-// ============================================================
-// REPORTES ADMIN
-// ============================================================
-async function cargarGruposReporte(){
+// =============================================================
+// REPORTES ADMIN — buscador multi-select + top ranking
+// =============================================================
+async function initReportesAdmin(){
   const{data}=await sb.from('grupos').select('id,nombre').order('nombre');
   const sel=document.getElementById('rpt-grupo');
   sel.innerHTML='<option value="">Todos</option>'+(data||[]).map(g=>`<option value="${g.id}">${escH(g.nombre)}</option>`).join('');
-  document.getElementById('rpt-content').innerHTML='<div class="empty-state"><div class="ico">📊</div><p>Selecciona filtros para ver el reporte</p></div>';
+  const{data:lideres}=await sb.from('lideres').select('id,nombre,cargo,grupos(nombre)').order('nombre');
+  allLideresCache=(lideres||[]);
+  selectedLideres=[];
+  renderSelectedTags();
+  document.getElementById('rpt-content').innerHTML='<div class="empty-state"><div class="ico">📊</div><p>Aplica filtros para ver el reporte</p></div>';
+}
+// Buscador líderes
+function onBuscarLider(val){
+  const dd=document.getElementById('lider-dropdown');
+  if(!val.trim()){dd.style.display='none';return;}
+  const q=val.toLowerCase();
+  const matches=allLideresCache.filter(l=>l.nombre.toLowerCase().includes(q)||l.cargo.toLowerCase().includes(q));
+  if(!matches.length){dd.style.display='none';return;}
+  dd.style.display='';
+  dd.innerHTML=matches.slice(0,8).map(l=>{
+    const isSel=selectedLideres.some(s=>s.id===l.id);
+    return`<div class="ldrop-item ${isSel?'selected':''}" onclick="toggleLiderSel(${l.id},'${escQ(l.nombre)}','${escQ(l.cargo)}')">
+      <div class="ldrop-check ${isSel?'chk':''}">${isSel?'✓':''}</div>
+      <div><div style="font-weight:600;font-size:.87rem">${escH(l.nombre)}</div><div style="font-size:.75rem;color:var(--text2)">${escH(l.cargo)} · ${escH(l.grupos?.nombre||'')}</div></div>
+    </div>`;
+  }).join('');
+}
+function toggleLiderSel(id,nombre,cargo){
+  const idx=selectedLideres.findIndex(s=>s.id===id);
+  if(idx>=0)selectedLideres.splice(idx,1);else selectedLideres.push({id,nombre,cargo});
+  renderSelectedTags();
+  onBuscarLider(document.getElementById('rpt-buscar-lider').value);
+  onFiltroChange();
+}
+function renderSelectedTags(){
+  const cont=document.getElementById('selected-tags');
+  if(!selectedLideres.length){cont.innerHTML='<span style="font-size:.77rem;color:var(--text3)">Todos los líderes</span>';return;}
+  cont.innerHTML=selectedLideres.map(l=>`<span class="sel-tag">${escH(l.nombre)}<button onclick="toggleLiderSel(${l.id},'${escQ(l.nombre)}','${escQ(l.cargo)}')">×</button></span>`).join('');
 }
 function setRptTipo(tipo){
-  rptTipo=tipo;rptLiderId=null;
+  rptTipo=tipo;
   document.getElementById('rbtn-general').className=tipo==='general'?'btn btn-active btn-sm':'btn btn-ghost btn-sm';
   document.getElementById('rbtn-individual').className=tipo==='individual'?'btn btn-active btn-sm':'btn btn-ghost btn-sm';
   onFiltroChange();
 }
-function onFiltroChange(){if(rptTipo==='general')renderReporteGeneral();else renderSelectorLideres();}
-function getFiltros(){return{grupoId:document.getElementById('rpt-grupo').value,mes:document.getElementById('rpt-mes').value,tiempo:document.getElementById('rpt-tiempo').value,categoria:document.getElementById('rpt-categoria').value};}
-async function fetchEvals(grupoId,mes,tiempo){
-  let q=sb.from('evaluaciones').select('*,lideres(nombre,cargo,area)');
+function onFiltroChange(){if(rptTipo==='general')renderReporteGeneral();else renderTopRanking();}
+function getFiltros(){return{grupoId:document.getElementById('rpt-grupo').value,mes:document.getElementById('rpt-mes').value,tiempo:document.getElementById('rpt-tiempo').value,categoria:document.getElementById('rpt-categoria').value,jerarquia:document.getElementById('rpt-jerarquia').value};}
+async function fetchEvals(grupoId,mes,tiempo,jerarquia){
+  let q=sb.from('evaluaciones').select('*,lideres(nombre,cargo,area,grupos(nombre))');
   if(grupoId)q=q.eq('grupo_id',grupoId);
   if(mes)q=q.eq('mes',mes);
   if(tiempo)q=q.eq('evaluador_tiempo',tiempo);
+  if(jerarquia)q=q.eq('jerarquia',jerarquia);
   const{data}=await q.order('created_at');
-  return data||[];
+  let rows=data||[];
+  if(selectedLideres.length){const ids=selectedLideres.map(s=>s.id);rows=rows.filter(e=>ids.includes(e.lider_id));}
+  return rows;
 }
 
 async function renderReporteGeneral(){
   const cont=document.getElementById('rpt-content');
   cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
   destroyCharts('g');
-  const{grupoId,mes,tiempo,categoria}=getFiltros();
-  const evals=await fetchEvals(grupoId,mes,tiempo);
+  const{grupoId,mes,tiempo,categoria,jerarquia}=getFiltros();
+  const evals=await fetchEvals(grupoId,mes,tiempo,jerarquia);
   if(!evals.length){cont.innerHTML='<div class="empty-state"><div class="ico">📊</div><p>No hay evaluaciones con estos filtros</p></div>';return;}
   const catKeys=Object.keys(PREGUNTAS);
   const catProms={};catKeys.forEach(k=>{catProms[k]=parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2));});
   const globalProm=parseFloat((evals.reduce((a,e)=>a+e.puntaje_global,0)/evals.length).toFixed(2));
   const[lbl,cls]=getLabel(globalProm);
   const liderMap={};evals.forEach(e=>{if(!liderMap[e.lider_id])liderMap[e.lider_id]={nombre:e.lideres?.nombre||'—',cargo:e.lideres?.cargo||'',evals:[]};liderMap[e.lider_id].evals.push(e);});
-  const histData=await buildHistData(grupoId,tiempo,null);
+  const histData=aggByMonth(evals);
   const likertDist=buildLikertDist(evals,categoria||null);
   const tiempoCont={};evals.forEach(e=>{tiempoCont[e.evaluador_tiempo]=(tiempoCont[e.evaluador_tiempo]||0)+1;});
-
   const catBars=(categoria?[categoria]:catKeys).map(k=>`<div class="report-bar-item"><div class="report-bar-label">${PREGUNTAS[k].nombre}</div><div class="report-bar-track"><div class="report-bar-fill" style="width:${catProms[k]/5*100}%;background:${CAT_COLORS[k]}"></div></div><div class="report-bar-val" style="color:${CAT_COLORS[k]}">${catProms[k]}</div></div>`).join('');
-
   const liderRows=Object.entries(liderMap).sort((a,b)=>{const pa=a[1].evals.reduce((x,e)=>x+e.puntaje_global,0)/a[1].evals.length;const pb=b[1].evals.reduce((x,e)=>x+e.puntaje_global,0)/b[1].evals.length;return pb-pa;}).map(([,l])=>{const p=(l.evals.reduce((a,e)=>a+e.puntaje_global,0)/l.evals.length).toFixed(2);const[ll,lc]=getLabel(p);return`<tr><td><strong>${escH(l.nombre)}</strong></td><td>${escH(l.cargo)}</td><td>${l.evals.length}</td><td><strong>${p}/5</strong></td><td><span class="badge ${lc}">${ll}</span></td></tr>`;}).join('');
-
   cont.innerHTML=`
     <div class="stats-row">
       <div class="stat-box"><div class="stat-num" style="color:var(--teal)">${globalProm}</div><div class="stat-lbl">Promedio Global /5</div></div>
       <div class="stat-box"><div class="stat-num">${evals.length}</div><div class="stat-lbl">Evaluaciones</div></div>
-      <div class="stat-box"><div class="stat-num">${Object.keys(liderMap).length}</div><div class="stat-lbl">Líderes Evaluados</div></div>
+      <div class="stat-box"><div class="stat-num">${Object.keys(liderMap).length}</div><div class="stat-lbl">Líderes</div></div>
       <div class="stat-box"><div class="stat-num"><span class="badge ${cls}">${lbl}</span></div><div class="stat-lbl">Clasificación</div></div>
     </div>
     <div class="grid-2">
-      <div class="card"><div class="card-title">📊 Puntaje por Categoría <span class="sub">${categoria?PREGUNTAS[categoria]?.nombre:'Todas'}</span></div>${catBars}</div>
+      <div class="card"><div class="card-title">📊 Por Categoría <span class="sub">${categoria?PREGUNTAS[categoria]?.nombre:'Todas'}</span></div>${catBars}</div>
       <div class="card"><div class="card-title">🕸 Radar de Competencias</div><div class="chart-wrap"><canvas id="chart-radar-g"></canvas></div></div>
     </div>
-    <div class="card"><div class="card-title">📈 Evolución Histórica Mensual</div><div class="chart-wrap"><canvas id="chart-linea-g"></canvas></div></div>
+    <div class="card"><div class="card-title">📈 Evolución Mensual</div><div class="chart-wrap"><canvas id="chart-linea-g"></canvas></div></div>
     <div class="grid-2">
-      <div class="card"><div class="card-title">🏆 Comparativa entre Líderes</div><div class="chart-wrap"><canvas id="chart-barras-g"></canvas></div></div>
+      <div class="card"><div class="card-title">🏆 Comparativa de Líderes</div><div class="chart-wrap"><canvas id="chart-barras-g"></canvas></div></div>
       <div class="card"><div class="card-title">📊 Distribución Likert <span class="sub">${categoria?PREGUNTAS[categoria]?.nombre:'Global'}</span></div><div class="chart-wrap"><canvas id="chart-likert-g"></canvas></div></div>
     </div>
     <div class="grid-2">
       <div class="card"><div class="card-title">📋 Ranking de Líderes</div><div class="table-wrap"><table><thead><tr><th>Líder</th><th>Cargo</th><th>Evals</th><th>Prom</th><th>Nivel</th></tr></thead><tbody>${liderRows}</tbody></table></div></div>
       <div class="card"><div class="card-title">⏱ Evaluadores por Antigüedad</div><div class="chart-wrap"><canvas id="chart-antiguedad-g"></canvas></div></div>
     </div>`;
-
-  await sleep(80);
-  renderRadar('chart-radar-g',catProms,catKeys);
-  renderLinea('chart-linea-g',histData);
-  renderBarrasLideres('chart-barras-g',liderMap);
-  renderLikert('chart-likert-g',likertDist);
-  renderAntiguedad('chart-antiguedad-g',tiempoCont);
+  setTimeout(()=>{
+    renderRadar('chart-radar-g',catProms,catKeys);
+    renderLinea('chart-linea-g',histData);
+    renderBarrasLideres('chart-barras-g',liderMap);
+    renderLikert('chart-likert-g',likertDist);
+    renderAntiguedad('chart-antiguedad-g',tiempoCont);
+  },80);
 }
 
-async function renderSelectorLideres(){
+// TOP RANKING con click → reporte individual
+async function renderTopRanking(){
   const cont=document.getElementById('rpt-content');
   cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
-  destroyCharts('ind');
-  const{grupoId}=getFiltros();
-  let q=sb.from('lideres').select('*');if(grupoId)q=q.eq('grupo_id',grupoId);q=q.order('nombre');
-  const{data:lideres}=await q;
-  let q2=sb.from('evaluaciones').select('lider_id,puntaje_global');if(grupoId)q2=q2.eq('grupo_id',grupoId);
-  const{data:allEvals}=await q2;
-  const evAll=allEvals||[];
-  const cards=(lideres||[]).map(l=>{const le=evAll.filter(e=>e.lider_id===l.id);const prom=le.length?(le.reduce((a,e)=>a+e.puntaje_global,0)/le.length).toFixed(2):null;const[lbl2,cls2]=getLabel(prom);return`<div class="leader-card ${rptLiderId===l.id?'sel':''}" onclick="verLiderAdmin(${l.id})"><div class="lc-name">${escH(l.nombre)}</div><div class="lc-role">${escH(l.cargo)}${l.area?' · '+escH(l.area):''}</div><div class="lc-score">${prom||'—'}<span style="font-size:1rem;color:var(--text2)">/5</span></div><div style="margin-top:.3rem"><span class="badge ${cls2}">${lbl2}</span></div><div style="font-size:.75rem;color:var(--text3);margin-top:.25rem">${le.length} eval${le.length!==1?'s':''}</div></div>`;}).join('');
-  cont.innerHTML=`<div class="leader-cards">${cards||'<p style="color:var(--text2)">No hay líderes</p>'}</div><div id="rpt-lider-detail"></div>`;
-  if(rptLiderId)await renderReporteIndividual(rptLiderId);
+  destroyCharts('top');
+  const{grupoId,mes,tiempo,jerarquia}=getFiltros();
+  const evals=await fetchEvals(grupoId,mes,tiempo,jerarquia);
+  if(!evals.length){cont.innerHTML='<div class="empty-state"><div class="ico">🏆</div><p>No hay evaluaciones con estos filtros</p></div>';return;}
+  const liderMap={};
+  evals.forEach(e=>{
+    if(!liderMap[e.lider_id])liderMap[e.lider_id]={id:e.lider_id,nombre:e.lideres?.nombre||'—',cargo:e.lideres?.cargo||'',area:e.lideres?.area||'',grupo:e.lideres?.grupos?.nombre||'',evals:[]};
+    liderMap[e.lider_id].evals.push(e);
+  });
+  const ranked=Object.values(liderMap).map(l=>({...l,prom:parseFloat((l.evals.reduce((a,e)=>a+e.puntaje_global,0)/l.evals.length).toFixed(2))})).sort((a,b)=>b.prom-a.prom);
+  const rankClass=i=>i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+  const topHtml=ranked.map((l,i)=>{const[lbl,cls]=getLabel(l.prom);return`
+    <div class="top-item" onclick="verReporteDesdeTop(${l.id})">
+      <div class="top-rank ${rankClass(i)}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+      <div class="top-info">
+        <div class="top-name">${escH(l.nombre)}</div>
+        <div class="top-role">${escH(l.cargo)}${l.area?' · '+escH(l.area):''} · <span style="color:var(--gold)">${escH(l.grupo)}</span></div>
+        <div class="top-bar-wrap"><div class="top-bar-fill" style="width:${l.prom/5*100}%"></div></div>
+      </div>
+      <div style="text-align:right">
+        <div class="top-score">${l.prom}<span style="font-size:.9rem;color:var(--text2)">/5</span></div>
+        <div><span class="badge ${cls}" style="font-size:.7rem">${lbl}</span></div>
+        <div style="font-size:.75rem;color:var(--text3);margin-top:.2rem">${l.evals.length} eval${l.evals.length!==1?'s':''}</div>
+      </div>
+    </div>`}).join('');
+  cont.innerHTML=`
+    <div class="card">
+      <div class="card-title">🏆 Ranking de Líderes <span class="sub">${ranked.length} evaluados</span></div>
+      <div class="info-strip" style="font-size:.82rem;margin-bottom:1rem">💡 Haz click en cualquier nombre para ver su reporte individual completo</div>
+      <div class="top-list">${topHtml}</div>
+    </div>
+    <div id="top-detail"></div>`;
 }
-async function verLiderAdmin(liderId){rptLiderId=liderId;await renderSelectorLideres();await renderReporteIndividual(liderId);}
+async function verReporteDesdeTop(liderId){
+  document.querySelectorAll('.top-item').forEach(el=>el.style.borderColor='');
+  const cont=document.getElementById('top-detail');
+  cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando reporte...</div>';
+  cont.scrollIntoView({behavior:'smooth',block:'start'});
+  await renderReporteIndividual(liderId,'top-detail');
+}
 
-async function renderReporteIndividual(liderId){
-  const cont=document.getElementById('rpt-lider-detail');
-  cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
+async function renderReporteIndividual(liderId,targetId='rpt-lider-detail'){
+  const cont=document.getElementById(targetId);
+  if(!cont)return;
   destroyCharts('ind-c');
-  const{mes,tiempo,categoria}=getFiltros();
+  const{mes,tiempo,categoria,jerarquia}=getFiltros();
   const{data:lider}=await sb.from('lideres').select('*,grupos(nombre)').eq('id',liderId).single();
   let q=sb.from('evaluaciones').select('*').eq('lider_id',liderId);
-  if(mes)q=q.eq('mes',mes);if(tiempo)q=q.eq('evaluador_tiempo',tiempo);
+  if(mes)q=q.eq('mes',mes);if(tiempo)q=q.eq('evaluador_tiempo',tiempo);if(jerarquia)q=q.eq('jerarquia',jerarquia);
   const{data:evals}=await q.order('created_at');
-  if(!evals?.length){cont.innerHTML=`<div class="card"><div class="empty-state"><div class="ico">📋</div><p>No hay evaluaciones con estos filtros para ${escH(lider?.nombre||'')}</p></div></div>`;return;}
+  if(!evals?.length){cont.innerHTML=`<div class="card"><div class="empty-state"><div class="ico">📋</div><p>Sin evaluaciones para ${escH(lider?.nombre||'')} con estos filtros</p></div></div>`;return;}
   const catKeys=Object.keys(PREGUNTAS);
   const catProms={};catKeys.forEach(k=>{catProms[k]=parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2));});
   const globalProm=parseFloat((evals.reduce((a,e)=>a+e.puntaje_global,0)/evals.length).toFixed(2));
   const[lbl,cls]=getLabel(globalProm);
-  const qProms={};catKeys.forEach(k=>{PREGUNTAS[k].preguntas.forEach((_,i)=>{const qid=`${k}_${i}`;qProms[qid]=parseFloat((evals.reduce((a,e)=>a+(e.respuestas?.[qid]||0),0)/evals.length).toFixed(2));});});
-  const histData=await buildHistDataLider(liderId,tiempo);
+  const histData=aggByMonth(evals);
   const likertDist=buildLikertDist(evals,categoria||null);
-  const catDetail=catKeys.map(k=>{const cat=PREGUNTAS[k];return`<div class="card"><div class="card-title" style="color:${CAT_COLORS[k]}">${cat.nombre} <span class="sub">${catProms[k]}/5</span></div>${cat.preguntas.map((p,i)=>{const qid=`${k}_${i}`;const v=qProms[qid];return`<div style="margin-bottom:.75rem"><div style="font-size:.82rem;margin-bottom:.3rem;color:var(--text2)">${escH(p)}</div><div style="display:flex;align-items:center;gap:.75rem"><div style="flex:1;height:7px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:${v/5*100}%;background:${CAT_COLORS[k]};border-radius:3px"></div></div><span style="font-weight:700;font-size:.85rem;color:${CAT_COLORS[k]};min-width:30px">${v}</span></div></div>`;}).join('')}</div>`;}).join('');
-  const evRows=evals.map(e=>`<tr><td>${escH(e.evaluador_nombre)}</td><td>${escH(e.evaluador_puesto||'—')}</td><td><span class="badge badge-gray">${TIEMPO_LBL[e.evaluador_tiempo]||'—'}</span></td>${catKeys.map(k=>`<td style="text-align:center;font-weight:600;color:${CAT_COLORS[k]}">${e.por_categoria?.[k]||'—'}</td>`).join('')}<td><strong>${e.puntaje_global}</strong></td><td style="color:var(--text2);font-size:.8rem">${e.fecha||'—'}</td></tr>`).join('');
-
+  // Por jerarquía
+  const jerMap={};evals.forEach(e=>{if(!jerMap[e.jerarquia])jerMap[e.jerarquia]=[];jerMap[e.jerarquia].push(e.puntaje_global);});
+  const jerRows=Object.entries(jerMap).map(([j,vals])=>{const p=(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2);return`<tr><td><span class="badge ${JER_CLS[j]||'badge-gray'}">${JER_LBL[j]||j}</span></td><td>${vals.length}</td><td><strong>${p}/5</strong></td></tr>`;}).join('');
+  const evRows=evals.map(e=>`<tr><td>${escH(e.evaluador_nombre)}</td><td>${escH(e.evaluador_puesto||'—')}</td><td><span class="badge ${JER_CLS[e.jerarquia]||'badge-gray'}">${JER_LBL[e.jerarquia]||'—'}</span></td>${catKeys.map(k=>`<td style="text-align:center;font-weight:600;color:${CAT_COLORS[k]}">${e.por_categoria?.[k]||'—'}</td>`).join('')}<td><strong>${e.puntaje_global}</strong></td><td style="color:var(--text2);font-size:.8rem">${e.fecha||'—'}</td></tr>`).join('');
   cont.innerHTML=`
     <div class="card">
-      <div class="card-title">👤 ${escH(lider?.nombre)} — ${escH(lider?.cargo||'')}${lider?.area?' · '+escH(lider.area):''} <span class="sub">${escH(lider?.grupos?.nombre||'')}</span></div>
+      <div class="card-title">👤 ${escH(lider?.nombre)} <span class="sub">${escH(lider?.cargo||'')}</span><span class="sub">${escH(lider?.grupos?.nombre||'')}</span></div>
       <div class="stats-row">
         <div class="stat-box"><div class="stat-num" style="color:var(--teal)">${globalProm}</div><div class="stat-lbl">Global /5</div></div>
         <div class="stat-box"><div class="stat-num">${evals.length}</div><div class="stat-lbl">Evaluaciones</div></div>
@@ -1169,14 +1375,16 @@ async function renderReporteIndividual(liderId){
       </div>
     </div>
     <div class="grid-2">
-      <div class="card"><div class="card-title">🕸 Radar de Competencias</div><div class="chart-wrap"><canvas id="chart-radar-ind-c"></canvas></div></div>
-      <div class="card"><div class="card-title">📈 Evolución Histórica</div><div class="chart-wrap"><canvas id="chart-linea-ind-c"></canvas></div></div>
+      <div class="card"><div class="card-title">🕸 Radar</div><div class="chart-wrap"><canvas id="chart-radar-ind-c"></canvas></div></div>
+      <div class="card"><div class="card-title">📈 Evolución</div><div class="chart-wrap"><canvas id="chart-linea-ind-c"></canvas></div></div>
     </div>
-    <div class="card"><div class="card-title">📊 Distribución Likert <span class="sub">${categoria?PREGUNTAS[categoria]?.nombre:'Global'}</span></div><div class="chart-wrap" style="max-width:440px"><canvas id="chart-likert-ind-c"></canvas></div></div>
-    <div class="card"><div class="card-title">📊 Puntaje por Categoría</div>${catKeys.map(k=>`<div class="report-bar-item"><div class="report-bar-label">${PREGUNTAS[k].nombre}</div><div class="report-bar-track"><div class="report-bar-fill" style="width:${catProms[k]/5*100}%;background:${CAT_COLORS[k]}"></div></div><div class="report-bar-val" style="color:${CAT_COLORS[k]}">${catProms[k]}</div></div>`).join('')}</div>
-    ${catDetail}
-    <div class="card"><div class="card-title">📋 Detalle de Evaluaciones</div><div class="table-wrap"><table><thead><tr><th>Evaluador</th><th>Puesto</th><th>Antigüedad</th>${catKeys.map(k=>`<th style="color:${CAT_COLORS[k]};font-size:.65rem">${PREGUNTAS[k].nombre.split(' ').slice(0,2).join(' ')}</th>`).join('')}<th>Global</th><th>Fecha</th></tr></thead><tbody>${evRows}</tbody></table></div></div>`;
-
+    <div class="grid-2">
+      <div class="card"><div class="card-title">📊 Por Categoría</div>${catKeys.map(k=>`<div class="report-bar-item"><div class="report-bar-label">${PREGUNTAS[k].nombre}</div><div class="report-bar-track"><div class="report-bar-fill" style="width:${catProms[k]/5*100}%;background:${CAT_COLORS[k]}"></div></div><div class="report-bar-val" style="color:${CAT_COLORS[k]}">${catProms[k]}</div></div>`).join('')}</div>
+      <div class="card"><div class="card-title">🏅 Por Jerarquía del Evaluador</div><div class="table-wrap"><table><thead><tr><th>Jerarquía</th><th>Evals</th><th>Prom</th></tr></thead><tbody>${jerRows||'<tr><td colspan="3" style="color:var(--text2)">Sin datos</td></tr>'}</tbody></table></div>
+        <div style="margin-top:1rem"><div class="chart-wrap"><canvas id="chart-likert-ind-c"></canvas></div></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">📋 Detalle</div><div class="table-wrap"><table><thead><tr><th>Evaluador</th><th>Puesto</th><th>Jerarquía</th>${catKeys.map(k=>`<th style="color:${CAT_COLORS[k]};font-size:.65rem">${PREGUNTAS[k].nombre.split(' ').slice(0,2).join(' ')}</th>`).join('')}<th>Global</th><th>Fecha</th></tr></thead><tbody>${evRows}</tbody></table></div></div>`;
   setTimeout(()=>{
     renderRadar('chart-radar-ind-c',catProms,catKeys);
     renderLinea('chart-linea-ind-c',histData);
@@ -1184,22 +1392,24 @@ async function renderReporteIndividual(liderId){
   },80);
 }
 
-// ============================================================
-// REPORTE GENERAL USER
-// ============================================================
+// =============================================================
+// REPORTE USER
+// =============================================================
 async function cargarReporteUser(){
   const cont=document.getElementById('rpt-user-content');
-  if(!userGrupoId){cont.innerHTML='<div class="empty-state"><div class="ico">🔒</div><p>No tienes grupo asignado. Edita tu perfil.</p></div>';return;}
+  if(!userGrupoId){cont.innerHTML='<div class="empty-state"><div class="ico">🔒</div><p>No tienes grupo asignado. Ve a Mi Perfil.</p></div>';return;}
   cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
   destroyCharts('user');
-  const evals=await fetchEvals(userGrupoId,'','');
+  const evals=await fetchEvals(userGrupoId,'','','');
   if(!evals.length){cont.innerHTML='<div class="empty-state"><div class="ico">📊</div><p>No hay evaluaciones en tu grupo aún</p></div>';return;}
   const catKeys=Object.keys(PREGUNTAS);
   const catProms={};catKeys.forEach(k=>{catProms[k]=parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2));});
   const globalProm=parseFloat((evals.reduce((a,e)=>a+e.puntaje_global,0)/evals.length).toFixed(2));
   const[lbl,cls]=getLabel(globalProm);
   const liderMap={};evals.forEach(e=>{if(!liderMap[e.lider_id])liderMap[e.lider_id]={nombre:e.lideres?.nombre||'—',cargo:e.lideres?.cargo||'',evals:[]};liderMap[e.lider_id].evals.push(e);});
-  const histData=await buildHistData(userGrupoId,'','');
+  const histData=aggByMonth(evals);
+  const ranked=Object.values(liderMap).map(l=>({...l,prom:parseFloat((l.evals.reduce((a,e)=>a+e.puntaje_global,0)/l.evals.length).toFixed(2))})).sort((a,b)=>b.prom-a.prom);
+  const topRows=ranked.map((l,i)=>{const[ll,lc]=getLabel(l.prom);return`<tr><td><strong>${i+1}</strong></td><td><strong>${escH(l.nombre)}</strong></td><td>${escH(l.cargo)}</td><td><strong>${l.prom}/5</strong></td><td><span class="badge ${lc}">${ll}</span></td></tr>`;}).join('');
   cont.innerHTML=`
     <div class="stats-row">
       <div class="stat-box"><div class="stat-num" style="color:var(--teal)">${globalProm}</div><div class="stat-lbl">Promedio /5</div></div>
@@ -1208,27 +1418,17 @@ async function cargarReporteUser(){
     </div>
     <div class="grid-2">
       <div class="card"><div class="card-title">📊 Por Categoría</div>${catKeys.map(k=>`<div class="report-bar-item"><div class="report-bar-label">${PREGUNTAS[k].nombre}</div><div class="report-bar-track"><div class="report-bar-fill" style="width:${catProms[k]/5*100}%;background:${CAT_COLORS[k]}"></div></div><div class="report-bar-val" style="color:${CAT_COLORS[k]}">${catProms[k]}</div></div>`).join('')}</div>
-      <div class="card"><div class="card-title">🕸 Radar de Competencias</div><div class="chart-wrap"><canvas id="chart-radar-user"></canvas></div></div>
+      <div class="card"><div class="card-title">🕸 Radar</div><div class="chart-wrap"><canvas id="chart-radar-user"></canvas></div></div>
     </div>
-    <div class="card"><div class="card-title">📈 Evolución Histórica del Grupo</div><div class="chart-wrap"><canvas id="chart-linea-user"></canvas></div></div>`;
+    <div class="card"><div class="card-title">📈 Evolución del Grupo</div><div class="chart-wrap"><canvas id="chart-linea-user"></canvas></div></div>
+    <div class="card"><div class="card-title">🏆 Ranking de Líderes del Grupo</div><div class="table-wrap"><table><thead><tr><th>#</th><th>Líder</th><th>Cargo</th><th>Prom</th><th>Nivel</th></tr></thead><tbody>${topRows}</tbody></table></div></div>`;
   setTimeout(()=>{renderRadar('chart-radar-user',catProms,catKeys);renderLinea('chart-linea-user',histData);},100);
 }
 
-// ============================================================
-// CHART DATA HELPERS
-// ============================================================
-async function buildHistData(grupoId,tiempo,_mes){
-  let q=sb.from('evaluaciones').select('mes,anio,puntaje_global');
-  if(grupoId)q=q.eq('grupo_id',grupoId);if(tiempo)q=q.eq('evaluador_tiempo',tiempo);
-  const{data}=await q.order('anio').order('mes');
-  return aggByMonth(data||[]);
-}
-async function buildHistDataLider(liderId,tiempo){
-  let q=sb.from('evaluaciones').select('mes,anio,puntaje_global').eq('lider_id',liderId);
-  if(tiempo)q=q.eq('evaluador_tiempo',tiempo);
-  const{data}=await q.order('anio').order('mes');
-  return aggByMonth(data||[]);
-}
+// =============================================================
+// CHART HELPERS
+// =============================================================
+function destroyCharts(prefix){Object.keys(charts).forEach(k=>{if(!prefix||k.startsWith(prefix)){try{charts[k].destroy();}catch(e){}delete charts[k];}});}
 function aggByMonth(data){
   if(!data.length)return{labels:[],values:[]};
   const byM={};data.forEach(e=>{const k=`${e.anio||'2025'}-${e.mes||'01'}`;if(!byM[k])byM[k]=[];byM[k].push(e.puntaje_global);});
@@ -1237,32 +1437,27 @@ function aggByMonth(data){
 }
 function buildLikertDist(evals,catFilter){
   const dist={1:0,2:0,3:0,4:0,5:0};
-  evals.forEach(e=>{const catKeys=catFilter?[catFilter]:Object.keys(PREGUNTAS);catKeys.forEach(k=>{PREGUNTAS[k].preguntas.forEach((_,i)=>{const v=e.respuestas?.[`${k}_${i}`];if(v)dist[v]=(dist[v]||0)+1;});});});
+  evals.forEach(e=>{(catFilter?[catFilter]:Object.keys(PREGUNTAS)).forEach(k=>{PREGUNTAS[k].preguntas.forEach((_,i)=>{const v=e.respuestas?.[`${k}_${i}`];if(v)dist[v]=(dist[v]||0)+1;});});});
   return dist;
 }
-
-// ============================================================
-// CHART RENDERERS
-// ============================================================
-function destroyCharts(prefix){Object.keys(charts).forEach(k=>{if(!prefix||k.startsWith(prefix)){try{charts[k].destroy();}catch(e){}delete charts[k];}});}
 function renderRadar(id,catProms,catKeys){
   const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
   charts[id]=new Chart(el,{type:'radar',data:{labels:catKeys.map(k=>PREGUNTAS[k].nombre.replace(/^[^\s]+ /,'')),datasets:[{label:'Puntaje',data:catKeys.map(k=>catProms[k]),backgroundColor:'rgba(45,212,191,.15)',borderColor:'#2dd4bf',borderWidth:2,pointBackgroundColor:'#2dd4bf',pointRadius:4}]},options:{responsive:true,scales:{r:{min:0,max:5,ticks:{stepSize:1,backdropColor:'transparent'},grid:{color:'#1e2433'},angleLines:{color:'#1e2433'},pointLabels:{color:'#8892a4',font:{size:11}}}},plugins:{legend:{display:false}}}});
 }
 function renderLinea(id,histData){
   const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
-  if(!histData.labels.length){el.parentElement.innerHTML='<p style="color:var(--text2);text-align:center;padding:1rem">No hay datos históricos suficientes aún</p>';return;}
+  if(!histData.labels.length){el.parentElement.innerHTML='<p style="color:var(--text2);text-align:center;padding:1rem">Sin datos históricos aún</p>';return;}
   charts[id]=new Chart(el,{type:'line',data:{labels:histData.labels,datasets:[{label:'Puntaje Promedio',data:histData.values,borderColor:'#d4a843',backgroundColor:'rgba(212,168,67,.08)',borderWidth:2.5,pointBackgroundColor:'#d4a843',pointRadius:5,tension:.35,fill:true}]},options:{responsive:true,scales:{y:{min:0,max:5,ticks:{stepSize:1},grid:{color:'#1e2433'}},x:{grid:{color:'#1e2433'}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`Puntaje: ${ctx.parsed.y}/5`}}}}});
 }
 function renderBarrasLideres(id,liderMap){
   const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
-  const sorted=Object.values(liderMap).sort((a,b)=>{const pa=a.evals.reduce((x,e)=>x+e.puntaje_global,0)/a.evals.length;const pb=b.evals.reduce((x,e)=>x+e.puntaje_global,0)/b.evals.length;return pb-pa;});
-  charts[id]=new Chart(el,{type:'bar',data:{labels:sorted.map(l=>{const parts=l.nombre.split(' ');return parts[0]+(parts[1]?' '+parts[1][0]+'.':[]);}),datasets:[{label:'Puntaje',data:sorted.map(l=>parseFloat((l.evals.reduce((a,e)=>a+e.puntaje_global,0)/l.evals.length).toFixed(2))),backgroundColor:sorted.map((_,i)=>`hsl(${160+i*35},55%,50%)`),borderRadius:6}]},options:{responsive:true,indexAxis:'y',scales:{x:{min:0,max:5,ticks:{stepSize:1},grid:{color:'#1e2433'}},y:{grid:{color:'#1e2433'}}},plugins:{legend:{display:false}}}});
+  const sorted=Object.values(liderMap).map(l=>({nombre:l.nombre,prom:parseFloat((l.evals.reduce((a,e)=>a+e.puntaje_global,0)/l.evals.length).toFixed(2))})).sort((a,b)=>b.prom-a.prom);
+  charts[id]=new Chart(el,{type:'bar',data:{labels:sorted.map(l=>{const p=l.nombre.split(' ');return p[0]+(p[1]?' '+p[1][0]+'.':[]);}),datasets:[{label:'Puntaje',data:sorted.map(l=>l.prom),backgroundColor:sorted.map((_,i)=>`hsl(${160+i*35},55%,50%)`),borderRadius:6}]},options:{responsive:true,indexAxis:'y',scales:{x:{min:0,max:5,ticks:{stepSize:1},grid:{color:'#1e2433'}},y:{grid:{color:'#1e2433'}}},plugins:{legend:{display:false}}}});
 }
 function renderLikert(id,dist){
   const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
   const total=Object.values(dist).reduce((a,b)=>a+b,0)||1;
-  charts[id]=new Chart(el,{type:'doughnut',data:{labels:['1 - Nunca','2 - Rara vez','3 - A veces','4 - Frecuentemente','5 - Siempre'],datasets:[{data:[1,2,3,4,5].map(v=>dist[v]||0),backgroundColor:['#ef4444','#eab308','#d4a843','#22c55e','#2dd4bf'],borderWidth:0,hoverOffset:8}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:12,font:{size:11}}},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/total*100)}%)`}}}}});
+  charts[id]=new Chart(el,{type:'doughnut',data:{labels:['1 Nunca','2 Rara vez','3 A veces','4 Frecuentemente','5 Siempre'],datasets:[{data:[1,2,3,4,5].map(v=>dist[v]||0),backgroundColor:['#ef4444','#eab308','#d4a843','#22c55e','#2dd4bf'],borderWidth:0,hoverOffset:8}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:12,font:{size:11}}},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/total*100)}%)`}}}}});
 }
 function renderAntiguedad(id,tiempoCont){
   const el=document.getElementById(id);if(!el)return;if(charts[id])charts[id].destroy();
@@ -1270,19 +1465,18 @@ function renderAntiguedad(id,tiempoCont){
   charts[id]=new Chart(el,{type:'polarArea',data:{labels:keys.map(k=>TIEMPO_LBL[k]),datasets:[{data:keys.map(k=>tiempoCont[k]||0),backgroundColor:['rgba(96,165,250,.7)','rgba(45,212,191,.7)','rgba(212,168,67,.7)','rgba(192,132,252,.7)'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:10,font:{size:11}}}}}});
 }
 
-// ============================================================
+// =============================================================
 // UTILS
-// ============================================================
+// =============================================================
 function getLabel(score){const s=parseFloat(score);if(!score||isNaN(s))return['Sin datos','badge-gray'];if(s>=4.5)return['Excelente','badge-teal'];if(s>=3.5)return['Bueno','badge-green'];if(s>=2.5)return['Regular','badge-yellow'];return['Por mejorar','badge-red'];}
-function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function escQ(s){return String(s).replace(/'/g,"\\'").replace(/\n/g,' ');}
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escQ(s){return String(s||'').replace(/'/g,"\\'").replace(/\n/g,' ');}
 function toast(msg,type=''){const el=document.getElementById('toast');el.textContent=msg;el.className=`toast ${type} show`;clearTimeout(window._tt);window._tt=setTimeout(()=>el.classList.remove('show'),3500);}
 function openOverlay(id){document.getElementById(id).classList.add('open');}
 function closeOverlay(id){document.getElementById(id).classList.remove('open');}
 let _cb=null;
 function confirm2(title,body,cb){document.getElementById('confirm-title').textContent=title;document.getElementById('confirm-body').textContent=body;_cb=cb;openOverlay('confirm-modal');document.getElementById('confirm-ok').onclick=()=>{closeOverlay('confirm-modal');_cb&&_cb();};}
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeOverlay(o.id);}));
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 init();
 </script>
