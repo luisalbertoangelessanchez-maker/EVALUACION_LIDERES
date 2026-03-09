@@ -325,27 +325,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
         </div>
         <div class="card"><div class="card-title">📋 Grupos Existentes</div><div id="grupos-lista"></div></div>
       </div>
-      <!-- CARGA MASIVA -->
-      <div class="card">
-        <div class="card-title">📥 Carga Masiva de Líderes desde Excel</div>
-        <div class="warn-strip">El archivo Excel debe tener estas columnas en orden: <strong>Empresa / Sede / Departamento / Área / Sección / Puesto de trabajo / Grupo de evaluación / Nombre completo</strong></div>
-        <div class="grid-2">
-          <div>
-            <div class="upload-zone" id="upload-zone" onclick="document.getElementById('excel-file').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
-              <input type="file" id="excel-file" accept=".xlsx,.xls" onchange="procesarExcel(this.files[0])">
-              <div class="upload-icon">📊</div>
-              <div style="font-weight:600;margin-bottom:.3rem">Arrastra tu Excel aquí</div>
-              <div style="font-size:.8rem;color:var(--text2)">o haz click para seleccionar</div>
-            </div>
-            <button class="btn btn-ghost btn-sm" onclick="descargarPlantilla()" style="margin-top:.75rem;width:100%">⬇️ Descargar Plantilla Excel</button>
-          </div>
-          <div id="excel-preview"><div class="empty-state" style="padding:1.5rem"><div class="ico" style="font-size:1.5rem">📋</div><p style="font-size:.85rem">La vista previa aparecerá aquí</p></div></div>
-        </div>
-        <div id="excel-actions" style="display:none;margin-top:1rem">
-          <button class="btn btn-gold" onclick="importarLideres()" id="btn-importar">📤 Importar Líderes</button>
-          <button class="btn btn-ghost" onclick="cancelarImport()" style="margin-left:.5rem">Cancelar</button>
-        </div>
-      </div>
     </div>
 
     <!-- LÍDERES (ADMIN) -->
@@ -368,6 +347,27 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div style="margin-bottom:1rem"><select id="ldfilter-grupo" onchange="cargarLideresAdmin()" style="width:auto;min-width:200px"><option value="">Todos los grupos</option></select></div>
         <div id="lideres-admin-lista"></div>
       </div>
+      <!-- CARGA MASIVA EN LÍDERES -->
+      <div class="card">
+        <div class="card-title">📥 Carga Masiva desde Excel <span class="sub">por Grupo de Evaluación</span></div>
+        <div class="warn-strip">El archivo Excel debe tener estas columnas: <strong>Empresa / Sede / Departamento / Área / Sección / Puesto de trabajo / Grupo de evaluación / Nombre completo</strong></div>
+        <div class="grid-2">
+          <div>
+            <div class="upload-zone" id="upload-zone" onclick="document.getElementById('excel-file').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+              <input type="file" id="excel-file" accept=".xlsx,.xls" onchange="procesarExcel(this.files[0])">
+              <div class="upload-icon">📊</div>
+              <div style="font-weight:600;margin-bottom:.3rem">Arrastra tu Excel aquí</div>
+              <div style="font-size:.8rem;color:var(--text2)">o haz click para seleccionar</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="descargarPlantilla()" style="margin-top:.75rem;width:100%">⬇️ Descargar Plantilla Excel</button>
+          </div>
+          <div id="excel-preview"><div class="empty-state" style="padding:1.5rem"><div class="ico" style="font-size:1.5rem">📋</div><p style="font-size:.85rem">La vista previa aparecerá aquí</p></div></div>
+        </div>
+        <div id="excel-actions" style="display:none;margin-top:1rem">
+          <button class="btn btn-gold" onclick="importarLideres()" id="btn-importar">📤 Importar Líderes</button>
+          <button class="btn btn-ghost" onclick="cancelarImport()" style="margin-left:.5rem">Cancelar</button>
+        </div>
+      </div>
     </div>
 
     <!-- REPORTES ADMIN -->
@@ -375,6 +375,15 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="page-header"><h1>Reportes de Desempeño</h1><p>Análisis completo — Escala Likert 1–5</p></div>
       <div class="filter-bar">
         <div class="filter-group"><label>Grupo</label><select id="rpt-grupo" onchange="onFiltroChange()"><option value="">Todos</option></select></div>
+        <div class="filter-group"><label>Año</label>
+          <select id="rpt-anio" onchange="onFiltroChange()">
+            <option value="">Todos</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+        </div>
         <div class="filter-group"><label>Mes</label>
           <select id="rpt-mes" onchange="onFiltroChange()">
             <option value="">Todos</option><option value="01">Enero</option><option value="02">Febrero</option>
@@ -951,9 +960,13 @@ async function cargarUsuarios(){
   const gfilt=document.getElementById('ufilter-grupo')?.value||'';
   const estado=document.getElementById('ufilter-estado')?.value||'';
   const buscar=document.getElementById('ufilter-buscar')?.value?.toLowerCase()||'';
+  const cont=document.getElementById('usuarios-lista');
+  cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando usuarios...</div>';
   let q=sb.from('usuarios').select('*,grupos(nombre)').order('created_at',{ascending:false});
   if(gfilt)q=q.eq('grupo_id',gfilt);
-  const{data}=await q;
+  const{data,error:ue}=await q;
+  if(ue){console.error('Error usuarios:',ue.message);cont.innerHTML='<div class="warn-strip">⚠️ Error al cargar usuarios. Verifica las políticas RLS en Supabase (patch_v6.sql).<br><small>'+escH(ue.message)+'</small></div>';return;}
+  const allData=data||[];
   let rows=(data||[]).filter(u=>{
     if(estado==='activo'&&u.activo===false)return false;
     if(estado==='inactivo'&&u.activo!==false)return false;
@@ -1241,10 +1254,11 @@ function setRptTipo(tipo){
   onFiltroChange();
 }
 function onFiltroChange(){if(rptTipo==='general')renderReporteGeneral();else renderTopRanking();}
-function getFiltros(){return{grupoId:document.getElementById('rpt-grupo').value,mes:document.getElementById('rpt-mes').value,tiempo:document.getElementById('rpt-tiempo').value,categoria:document.getElementById('rpt-categoria').value,jerarquia:document.getElementById('rpt-jerarquia').value};}
-async function fetchEvals(grupoId,mes,tiempo,jerarquia){
+function getFiltros(){return{grupoId:document.getElementById('rpt-grupo').value,anio:document.getElementById('rpt-anio').value,mes:document.getElementById('rpt-mes').value,tiempo:document.getElementById('rpt-tiempo').value,categoria:document.getElementById('rpt-categoria').value,jerarquia:document.getElementById('rpt-jerarquia').value};}
+async function fetchEvals(grupoId,mes,tiempo,jerarquia,anio){
   let q=sb.from('evaluaciones').select('*,lideres(nombre,cargo,area,grupos(nombre))');
   if(grupoId)q=q.eq('grupo_id',grupoId);
+  if(anio)q=q.eq('anio',parseInt(anio));
   if(mes)q=q.eq('mes',mes);
   if(tiempo)q=q.eq('evaluador_tiempo',tiempo);
   if(jerarquia)q=q.eq('jerarquia',jerarquia);
@@ -1258,8 +1272,8 @@ async function renderReporteGeneral(){
   const cont=document.getElementById('rpt-content');
   cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
   destroyCharts('g');
-  const{grupoId,mes,tiempo,categoria,jerarquia}=getFiltros();
-  const evals=await fetchEvals(grupoId,mes,tiempo,jerarquia);
+  const{grupoId,anio,mes,tiempo,categoria,jerarquia}=getFiltros();
+  const evals=await fetchEvals(grupoId,mes,tiempo,jerarquia,anio);
   if(!evals.length){cont.innerHTML='<div class="empty-state"><div class="ico">📊</div><p>No hay evaluaciones con estos filtros</p></div>';return;}
   const catKeys=Object.keys(PREGUNTAS);
   const catProms={};catKeys.forEach(k=>{catProms[k]=parseFloat((evals.reduce((a,e)=>a+(e.por_categoria?.[k]||0),0)/evals.length).toFixed(2));});
@@ -1305,8 +1319,8 @@ async function renderTopRanking(){
   const cont=document.getElementById('rpt-content');
   cont.innerHTML='<div class="loading-screen"><span class="loader"></span> Cargando...</div>';
   destroyCharts('top');
-  const{grupoId,mes,tiempo,jerarquia}=getFiltros();
-  const evals=await fetchEvals(grupoId,mes,tiempo,jerarquia);
+  const{grupoId,anio,mes,tiempo,jerarquia}=getFiltros();
+  const evals=await fetchEvals(grupoId,mes,tiempo,jerarquia,anio);
   if(!evals.length){cont.innerHTML='<div class="empty-state"><div class="ico">🏆</div><p>No hay evaluaciones con estos filtros</p></div>';return;}
   const liderMap={};
   evals.forEach(e=>{
@@ -1351,7 +1365,9 @@ async function renderReporteIndividual(liderId,targetId='rpt-lider-detail'){
   destroyCharts('ind-c');
   const{mes,tiempo,categoria,jerarquia}=getFiltros();
   const{data:lider}=await sb.from('lideres').select('*,grupos(nombre)').eq('id',liderId).single();
+  const{anio:indAnio}=getFiltros();
   let q=sb.from('evaluaciones').select('*').eq('lider_id',liderId);
+  if(indAnio)q=q.eq('anio',parseInt(indAnio));
   if(mes)q=q.eq('mes',mes);if(tiempo)q=q.eq('evaluador_tiempo',tiempo);if(jerarquia)q=q.eq('jerarquia',jerarquia);
   const{data:evals}=await q.order('created_at');
   if(!evals?.length){cont.innerHTML=`<div class="card"><div class="empty-state"><div class="ico">📋</div><p>Sin evaluaciones para ${escH(lider?.nombre||'')} con estos filtros</p></div></div>`;return;}
