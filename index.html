@@ -967,14 +967,12 @@ async function cargarUsuarios(){
   if(gfilt)q=q.eq('grupo_id',gfilt);
   const{data,error:ue}=await q;
   if(ue){console.error('Error usuarios:',ue.message);cont.innerHTML='<div class="warn-strip">⚠️ Error al cargar usuarios. Verifica las políticas RLS en Supabase (patch_v6.sql).<br><small>'+escH(ue.message)+'</small></div>';return;}
-  const allData=data||[];
-  let rows=(data||[]).filter(u=>{
+  let rows=(allData).filter(u=>{
     if(estado==='activo'&&u.activo===false)return false;
     if(estado==='inactivo'&&u.activo!==false)return false;
     if(buscar&&!`${u.nombre_completo||''} ${u.dni||''} ${u.email||''}`.toLowerCase().includes(buscar))return false;
     return true;
   });
-  const cont=document.getElementById('usuarios-lista');
   if(!rows.length){cont.innerHTML='<div class="empty-state"><div class="ico">👥</div><p>No hay usuarios con esos filtros</p></div>';return;}
   const activos=rows.filter(u=>u.activo!==false).length;
   cont.innerHTML=`<div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
