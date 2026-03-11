@@ -666,7 +666,7 @@ async function init(){
   });
 }
 async function loadUser(user){
-  currentUser=user; isAdmin=user.email===ADMIN_EMAIL;
+  currentUser=user; isAdmin=(user.email||'').toLowerCase()===ADMIN_EMAIL.toLowerCase();
   if(!isAdmin){
     const{data:p}=await sb.from('usuarios').select('*,grupos(nombre)').eq('auth_id',user.id).single();
     if(p){userProfile=p;userGrupoId=p.grupo_id?parseInt(p.grupo_id):null;}
@@ -700,12 +700,13 @@ function checkPwStrength(v){
 // AUTH
 // =============================================================
 async function doLogin(){
-  const email=document.getElementById('l-email').value.trim(),pass=document.getElementById('l-pass').value;
+  const email=document.getElementById('l-email').value.trim().toLowerCase(),pass=document.getElementById('l-pass').value;
   if(!email||!pass)return toast('Completa todos los campos','err');
   const btn=document.getElementById('btn-login');btn.disabled=true;btn.innerHTML='<span class="loader"></span>';
-  const{error}=await sb.auth.signInWithPassword({email,password:pass});
+  const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
   btn.disabled=false;btn.textContent='Ingresar';
-  if(error)return toast('Credenciales incorrectas o cuenta no confirmada','err');
+  if(error){console.error('Login error:',error.message);return toast('Credenciales incorrectas o cuenta no confirmada','err');}
+  if(!data?.user)return toast('No se pudo iniciar sesión','err');
 }
 async function doRegister(){
   const nombre=document.getElementById('r-nombre').value.trim();
@@ -715,7 +716,7 @@ async function doRegister(){
   if(!nombre||!dni||!email||!pass||!grupo)return toast('Completa todos los campos','err');
   if(pass!==pass2)return toast('Las contraseñas no coinciden','err');
   if(pass.length<8)return toast('Mínimo 8 caracteres','err');
-  if(email===ADMIN_EMAIL)return toast('Correo no permitido','err');
+  if(email.toLowerCase()===ADMIN_EMAIL.toLowerCase())return toast('Correo no permitido','err');
   const btn=document.getElementById('btn-register');btn.disabled=true;btn.innerHTML='<span class="loader"></span>';
   const{data,error}=await sb.auth.signUp({email,password:pass});
   btn.disabled=false;btn.textContent='Crear Cuenta';
